@@ -29,10 +29,13 @@
 
   <aside class="side" id="side">
     <div class="brand"><span class="mark">σ</span><span>Stats Workbench</span></div>
-    <label class="search">
-      <input id="q" type="search" placeholder="Find a formula" aria-label="Find a formula" autocomplete="off">
-      <kbd id="kbdHint">Ctrl K</kbd>
-    </label>
+    <div class="side-tools">
+      <label class="search">
+        <input id="q" type="search" placeholder="Find a formula" aria-label="Find a formula" autocomplete="off">
+        <kbd id="kbdHint">Ctrl K</kbd>
+      </label>
+      <button class="icon-btn" id="foldBtn" type="button"></button>
+    </div>
     <nav id="nav" aria-label="Formulas"></nav>
     <div class="side-foot">
       <button class="ghost" id="themeBtn"></button>

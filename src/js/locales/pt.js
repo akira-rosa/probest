@@ -20,12 +20,16 @@ I18N.pt = {
   phBody: "Esta página ainda não foi criada. As fórmulas, o gráfico e os controles ficarão aqui.",
   phLink: "Abrir a distribuição normal",
 
-  // ---- sidebar groups ----
-  "group.descriptive": "Estatística descritiva",
-  "group.probability": "Probabilidade",
-  "group.discrete": "Distribuições discretas",
-  "group.continuous": "Distribuições contínuas",
-  "group.inference": "Inferência",
+  // ---- sidebar folders ----
+  "folder.descriptive": "Estatística descritiva",
+  "folder.probability": "Probabilidade",
+  "folder.distributions": "Distribuições",
+  "folder.discrete": "Discretas",
+  "folder.continuous": "Contínuas",
+  "folder.inference": "Inferência",
+  pageCount: "{n} páginas",
+  collapseAll: "Recolher todas as pastas",
+  expandAll: "Expandir todas as pastas",
 
   // ---- sidebar pages ----
   "nav.mean": "Média, mediana e moda",

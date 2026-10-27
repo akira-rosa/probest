@@ -51,7 +51,7 @@ src/
     core/plot.js          canvas graph: pan, zoom, draggable markers
     locales/en.js         English strings
     locales/pt.js         Portuguese strings
-    nav.js                sidebar structure (NAV) and page registry (PAGES)
+    nav.js                sidebar folder tree (NAV), page registry (PAGES), tree helpers
     pages/normal.js       normal distribution page
     pages/placeholder.js  page shown for entries not built yet
     app.js                shell: sidebar, search, routing, theme, language — loaded last
@@ -63,7 +63,9 @@ that order. Avoid reusing a top-level name in two files.
 
 ## Adding a page
 
-1. **Sidebar:** add the page id to a group in `NAV` (`src/js/nav.js`).
+1. **Sidebar:** add the page id inside a folder in `NAV` (`src/js/nav.js`). A folder is
+   `{ folder: "<key>", items: [...] }` and can contain pages and other folders, to any depth.
+   A new folder also needs a `"folder.<key>"` label in each locale file.
 2. **Labels:** add `"nav.<id>"` and the page's strings to **both** `src/js/locales/en.js` and `pt.js`.
 3. **Page code:** create `src/js/pages/<id>.js` that registers `PAGES["<id>"] = function (root) { … }`.
    It renders into `root` and may return a cleanup function. Read strings with `t("key")` and show
@@ -72,6 +74,13 @@ that order. Avoid reusing a top-level name in two files.
 5. **Register the files** with a `<script>` / `<link>` tag in `src/index.html` (pages go before `app.js`).
 
 Entries in `NAV` without a registered page show the "not built yet" placeholder.
+
+## Sidebar
+
+The menu is a folder tree. Click a folder (or use → / ← on it) to open or close it; the button next to
+the search box collapses or expands everything. Open folders are remembered, the folders around the
+current page always open, and searching opens every folder with a match (searching a folder's name
+lists all of its pages).
 
 ## Adding a language
 

@@ -13,9 +13,10 @@
   width:28px;height:28px;border-radius:7px;display:grid;place-items:center;
   background:var(--ink);color:var(--bg);font-family:var(--math);font-size:18px;line-height:1;
 }
-.search{position:relative;display:block;margin:0 4px 14px}
+.side-tools{display:flex;gap:6px;margin:0 4px 12px}
+.search{position:relative;display:block;flex:1;min-width:0}
 .search input{
-  width:100%; height:34px; padding:0 52px 0 10px; border-radius:7px;
+  width:100%; height:34px; padding:0 50px 0 10px; border-radius:7px; font-size:14px;
   border:1px solid var(--line); background:var(--surface);
 }
 .search input::placeholder{color:var(--faint)}
@@ -23,20 +24,47 @@
   position:absolute; right:7px; top:50%; transform:translateY(-50%);
   font:11px var(--ui); color:var(--faint); border:1px solid var(--line); border-radius:4px; padding:1px 5px;
 }
+.icon-btn{
+  flex:none; width:34px; height:34px; display:grid; place-items:center; cursor:pointer;
+  border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--muted);
+}
+.icon-btn:hover{background:var(--hover);color:var(--ink)}
+.icon-btn svg{width:15px;height:15px}
+
+/* ---- folder tree ---- */
 nav{flex:1}
-.nav-group{margin-bottom:12px}
-.nav-group h3{font-size:12px;font-weight:600;color:var(--muted);margin:0 0 4px;padding:0 10px}
-.nav-group a{
-  display:flex; align-items:center; justify-content:space-between; gap:8px;
-  padding:5px 10px; border-radius:6px; color:var(--ink); text-decoration:none; font-size:14px;
-  position:relative;
+.folder-row{
+  display:flex; align-items:center; gap:6px; width:100%;
+  padding:5px 8px 5px 4px; border:0; border-radius:6px; background:none; cursor:pointer;
+  color:var(--ink); font-size:14px; font-weight:550; text-align:left;
 }
-.nav-group a:hover{background:var(--hover)}
-.nav-group a.soon{color:var(--faint)}
-.nav-group a[aria-current="page"]{background:var(--surface);color:var(--ink);font-weight:550;box-shadow:inset 0 0 0 1px var(--line)}
-.nav-group a[aria-current="page"]::before{
-  content:""; position:absolute; left:-6px; top:8px; bottom:8px; width:3px; border-radius:2px; background:var(--accent);
+.folder-row:hover{background:var(--hover)}
+.chev{width:12px;height:12px;flex:none;color:var(--faint);transition:transform .15s ease}
+.folder[data-open="true"] > .folder-row .chev{transform:rotate(90deg)}
+.ficon{display:grid;flex:none;color:var(--muted)}
+.ficon svg{width:16px;height:16px;grid-area:1 / 1}
+.ficon .open, .folder[data-open="true"] > .folder-row .ficon .closed{visibility:hidden}
+.folder[data-open="true"] > .folder-row .ficon .open{visibility:visible}
+.fname{flex:1;min-width:0}
+.fcount{font-size:11.5px;font-weight:400;color:var(--faint)}
+/* open/close animates the row height; closed bodies are inert so they can't be tabbed into */
+.folder-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .18s ease}
+.folder[data-open="true"] > .folder-body{grid-template-rows:1fr}
+.folder-inner{overflow:hidden;min-height:0;margin-left:9px;padding-left:7px;border-left:1px solid var(--line)}
+.folder[data-open="true"] > .folder-body > .folder-inner{padding-block:1px 4px}
+nav > .folder + .folder{margin-top:2px}
+
+.page-link{
+  display:block; padding:5px 8px; margin:1px 0; border-radius:6px;
+  color:var(--ink); text-decoration:none; font-size:14px;
 }
+.page-link:hover{background:var(--hover)}
+.page-link.soon{color:var(--faint)}
+.page-link[aria-current="page"]{
+  background:var(--surface); font-weight:550;
+  box-shadow:inset 2px 0 0 var(--accent), inset 0 0 0 1px var(--line);
+}
+.folder-row:focus-visible, .page-link:focus-visible{outline-offset:-2px}
 .nav-empty{padding:6px 10px;color:var(--faint);font-size:14px}
 .side-foot{border-top:1px solid var(--line);padding-top:10px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .side-foot .seg button{padding:0 9px;font-size:12px}
@@ -68,4 +96,4 @@ main{min-width:0;padding:34px 40px 48px}
   .topbar button{border:1px solid var(--line);background:var(--surface);border-radius:6px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
   main{padding:22px 16px 40px}
 }
-@media (prefers-reduced-motion:reduce){ .side{transition:none} }
+@media (prefers-reduced-motion:reduce){ .side, .chev, .folder-body{transition:none} }

@@ -20,12 +20,16 @@ I18N.en = {
   phBody: "This page isn’t built yet. Its formulas, graph and controls will go here.",
   phLink: "Open the normal distribution",
 
-  // ---- sidebar groups ----
-  "group.descriptive": "Descriptive statistics",
-  "group.probability": "Probability",
-  "group.discrete": "Discrete distributions",
-  "group.continuous": "Continuous distributions",
-  "group.inference": "Inference",
+  // ---- sidebar folders ----
+  "folder.descriptive": "Descriptive statistics",
+  "folder.probability": "Probability",
+  "folder.distributions": "Distributions",
+  "folder.discrete": "Discrete",
+  "folder.continuous": "Continuous",
+  "folder.inference": "Inference",
+  pageCount: "{n} pages",
+  collapseAll: "Collapse all folders",
+  expandAll: "Expand all folders",
 
   // ---- sidebar pages ----
   "nav.mean": "Mean, median and mode",
