@@ -29,6 +29,7 @@ class Plot {
   X(x){ return this.pad.l + (x - this.x0) / (this.x1 - this.x0) * this.pw; }
   Y(y){ return this.pad.t + this.ph - (y - this.y0) / (this.y1 - this.y0) * this.ph; }
   ix(px){ return this.x0 + (px - this.pad.l) / this.pw * (this.x1 - this.x0); }
+  iy(py){ return this.y0 + (this.pad.t + this.ph - py) / this.ph * (this.y1 - this.y0); }
   local(e){ const r = this.c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   /* Nearest handle: by x only (vertical markers), or by distance when the handle gives its pixel y (py). */
   hit(px, py){
@@ -48,7 +49,7 @@ class Plot {
   }
   move(e){
     const [px, py] = this.local(e);
-    if (this.drag?.type === "handle") this.o.onHandle?.(this.drag.key, this.ix(px));
+    if (this.drag?.type === "handle") this.o.onHandle?.(this.drag.key, this.ix(px), this.iy(py));
     else if (this.drag?.type === "pan"){
       const dx = (px - this.drag.px) / this.pw * (this.drag.x1 - this.drag.x0);
       this.x0 = this.drag.x0 - dx; this.x1 = this.drag.x1 - dx;

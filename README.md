@@ -30,6 +30,16 @@ Built so far:
   σ known or a pilot sample (t with n − 1 degrees of freedom), the p(1 − p) ≤ 1/4 bound, and the
   finite population correction n = N·n₀ / (N + n₀ − 1). Examples from Barbetta (Ex. 7.5),
   Bussab & Morettin (Ex. 10.13, 10.14) and the course slides.
+- **Addition rule and conditional probability** (Probability): a Venn diagram whose areas are
+  proportional to the probabilities, with an exact bar of the sample space underneath; drag a
+  circle to change P(A ∩ B), or snap to mutually exclusive or independent events. Probabilities can
+  be typed as fractions (1/6).
+- **Bayes' theorem** (Probability): a mosaic with one column per event Eᵢ, as wide as P(Eᵢ) and
+  filled up to P(F | Eᵢ), next to the bar of F split into the posteriors. Drag the levels and the
+  dividers, click a column to pick Eⱼ; up to eight events.
+- **Expected value** (Discrete random variables): E(X), V(X) and σ of any distribution typed as a
+  table; drag a bar to change its probability. Y = aX + b shows E(aX + b) = aE(X) + b and
+  V(aX + b) = a²V(X).
 - **Binomial, hypergeometric and Poisson distributions** (Discrete random variables): bar graph
   or cumulative steps; P(X = x), P(X ≤ x), P(X ≥ x) and P(a ≤ X ≤ b) with every term written out,
   mean and variance, inverse lookup and pinned curves for comparison.
@@ -41,6 +51,8 @@ Built so far:
 The six distribution pages share one template, `core/distpage.js`: each page in `pages/dist/` only
 gives its parameters, formulas, functions and examples. The data pages share `core/datapage.js`
 (data box, dot plot with draggable points) in the same way, with their configs in `pages/desc/`.
+The addition rule and conditional probability share `core/vennpage.js`; diagrams that are not x–y
+graphs use the `Board` canvas in `core/board.js`.
 
 ## Page format
 
@@ -96,6 +108,7 @@ src/
     shell.css             sidebar, mobile top bar, main area
     page.css              shared page layout: formula panel, graph card, controls, result box
     pages/data.css        data pages (data box, ordered values, quartile results)
+    pages/prob.css        probability pages (event tables, Venn, Y = aX + b)
     pages/sample-size.css sample size page
     pages/placeholder.css "not built yet" page
     pages/home.css        home page
@@ -109,12 +122,16 @@ src/
     core/plot.js          canvas graph: pan, zoom, draggable markers, custom axis ticks
     core/distpage.js      template for the distribution pages (graph, modes, formulas, R code)
     core/datapage.js      template for the data pages (data box, dot plot, Desc helpers)
+    core/board.js         canvas for diagrams (Venn, mosaic) and fraction input (parseProb)
+    core/vennpage.js      template for the two-event Venn pages
     core/ui.js            shared controls (numInput, setSlider, bindNudge) and page sections
                           (varsTableHtml, examplesHtml, codeHtml, sectionsHtml, bindCopy)
     locales/en.js         English strings
     locales/pt.js         Portuguese strings
     nav.js                sidebar folder tree (NAV), page registry (PAGES), tree helpers
     pages/desc/*.js       arithmetic mean, standard deviation, quartiles
+    pages/prob/*.js       addition rule, conditional probability, Bayes' theorem
+    pages/expected-value.js expected value and variance of a discrete variable
     pages/dist/*.js       binomial, hypergeometric, Poisson, uniform, exponential, normal
     pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet

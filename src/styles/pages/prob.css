@@ -1,0 +1,24 @@
+/* Probability pages: Venn diagram, Bayes mosaic, expected value table. */
+
+/* table of events / values: name, two numbers, remove button */
+.ev-table{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr) 24px;gap:6px 8px;align-items:center}
+.ev-table.xp{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 24px}
+.ev-h{font-size:13px;color:var(--muted);text-align:right;padding-right:9px}
+.ev-name{
+  min-width:40px;height:32px;border:1px solid var(--line);border-radius:6px;background:var(--bg);
+  color:var(--ink);cursor:pointer;font-size:15px;padding:0 8px;
+}
+.ev-name[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.ev-del{width:24px;height:24px;border:0;border-radius:5px;background:none;color:var(--faint);cursor:pointer;font-size:16px;line-height:1}
+.ev-del:hover:not(:disabled){background:var(--hover);color:var(--ink)}
+.ev-del:disabled{opacity:.3;cursor:default}
+.venn-page .note, .bayes-page .note, .ev-page .note{margin:10px 0 0}
+
+/* Y = aX + b */
+.ab-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ab-row label{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.group h2 math{font-weight:400;margin-left:4px}
+
+/* small text under a formula */
+.fnote{font-size:13.5px;color:var(--muted);margin:6px 0 0;font-family:var(--ui)}
+.venn-page .param{grid-template-columns:1fr 128px}
