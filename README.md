@@ -117,6 +117,7 @@ dist/index.html           the built app (generated — don't edit)
 src/
   index.html              page skeleton + the list of styles and scripts, in load order
   styles/
+    fonts.css             Inria Serif Bold for the app name, embedded (generated: see below)
     tokens.css            colours, fonts, light/dark themes
     base.css              reset, element defaults, shared typography
     components.css        buttons, segmented toggles, number fields, sliders
@@ -208,11 +209,21 @@ The version lives in two places that must match: `package.json` and `src/js/core
 (shown in the footer). The build stops with an error if they differ. Change the app name or the
 repository link in `app-info.js` too.
 
+## Brand font
+
+The app name is set in **Inria Serif Bold**, embedded in `src/styles/fonts.css` as a WOFF2 data URI
+so the single file needs no internet connection. It is subset to Basic Latin (U+0020–007E), about
+13 KB. To regenerate it, take `inria-serif-latin-700-normal.woff2` from the `@fontsource/inria-serif`
+npm package and run
+`pyftsubset <file> --unicodes="U+0020-007E" --flavor=woff2 --output-file=out.woff2`, then base64 it
+into the `src:` line.
+
 ## Browser support
 
 Recent Chrome, Edge, Firefox and Safari (MathML Core support is required for formulas).
 
 ## License
 
-[MIT](LICENSE) © 2026 L. Akira Rosa. The worked examples and formulas come from the books cited on each
+[MIT](LICENSE) © 2026 L. Akira Rosa. Inria Serif is © 2017 The Inria Serif Project Authors, used under
+the [SIL Open Font License 1.1](src/fonts/OFL-InriaSerif.txt). The worked examples and formulas come from the books cited on each
 page; the books themselves are not included.

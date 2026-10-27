@@ -10,6 +10,9 @@
 }
 .brand{display:flex;align-items:center;gap:10px;padding:2px 8px 16px;font-weight:600;letter-spacing:-.01em;color:var(--ink);text-decoration:none}
 .topbar-name{color:var(--ink);text-decoration:none}
+/* the app name, wherever it appears (sidebar, top bar, home, footer) */
+.app-name, .foot-name b{font-family:var(--brand);font-weight:700;letter-spacing:0}
+.app-name{font-size:17px}
 .mark{
   width:28px;height:28px;border-radius:7px;display:grid;place-items:center;
   background:var(--ink);color:var(--bg);font-family:var(--math);font-size:18px;line-height:1;
@@ -89,7 +92,7 @@ main{min-width:0;padding:34px 40px 28px;display:flex;flex-direction:column;min-h
   border-top:1px solid var(--line);font-size:13px;color:var(--muted);
 }
 .foot-row{display:flex;align-items:center;justify-content:space-between;gap:8px 20px;flex-wrap:wrap;margin-bottom:6px}
-.foot-name b{color:var(--ink);font-weight:600}
+.foot-name b{color:var(--ink);font-size:14.5px}
 .foot-ver{color:var(--faint);margin-left:4px}
 .foot-bottom{align-items:flex-end;flex-wrap:nowrap;margin-bottom:0}
 .foot-author{margin:0;color:var(--muted);white-space:nowrap}

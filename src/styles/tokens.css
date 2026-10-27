@@ -17,6 +17,7 @@
   --bar:#C7CCD4;
   --danger:#B42318;
   --ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --brand: "Inria Serif", Georgia, "Times New Roman", serif;
   --math: "STIX Two Math", "Cambria Math", "Latin Modern Math", "STIXGeneral", math, serif;
   --radius:8px;
   color-scheme: light;
