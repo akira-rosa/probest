@@ -95,9 +95,10 @@ nav{flex:1}
   content:""; position:absolute; left:-6px; top:8px; bottom:8px; width:3px; border-radius:2px; background:var(--accent);
 }
 .nav-empty{padding:6px 10px;color:var(--faint);font-size:14px}
-.side-foot{border-top:1px solid var(--line);padding-top:10px;margin-top:6px}
+.side-foot{border-top:1px solid var(--line);padding-top:10px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.side-foot .seg button{padding:0 9px;font-size:12px}
 .ghost{
-  display:flex;align-items:center;gap:8px;width:100%;
+  display:flex;align-items:center;gap:8px;flex:1;min-width:0;
   border:0;background:none;padding:7px 10px;border-radius:6px;cursor:pointer;color:var(--muted);font-size:14px;text-align:left;
 }
 .ghost:hover{background:var(--hover);color:var(--ink)}
@@ -276,6 +277,10 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;bac
     <nav id="nav" aria-label="Formulas"></nav>
     <div class="side-foot">
       <button class="ghost" id="themeBtn"></button>
+      <div class="seg" role="group" id="langSeg">
+        <button data-lang="en" title="English" lang="en" aria-pressed="false">EN</button>
+        <button data-lang="pt" title="Português" lang="pt-BR" aria-pressed="false">PT</button>
+      </div>
     </div>
   </aside>
 
@@ -300,7 +305,102 @@ function trim(v, d = 4){
   if (s === "-0") s = "0";
   return s;
 }
-const show = s => String(s).replace(/^-/, MINUS);          // pretty minus for display
+/* ============================================================
+   Language — every user-facing string lives here.
+   To add a language, add a block with the same keys.
+   ============================================================ */
+const I18N = {
+  en: {
+    htmlLang: "en", listSep: ", ", or: "or", and: "and",
+    search: "Find a formula", navLabel: "Formulas", openMenu: "Open menu", language: "Language",
+    darkTheme: "Dark theme", lightTheme: "Light theme",
+    notBuilt: "Not built yet", noMatch: "No formulas match “{q}”.",
+    phBody: "This page isn’t built yet. Its formulas, graph and controls will go here.",
+    phLink: "Open the normal distribution",
+    "group.descriptive": "Descriptive statistics", "group.probability": "Probability", "group.discrete": "Discrete distributions",
+    "group.continuous": "Continuous distributions", "group.inference": "Inference",
+    "nav.mean": "Mean, median and mode", "nav.spread": "Variance and standard deviation", "nav.quartiles": "Quartiles and box plot",
+    "nav.rules": "Probability rules", "nav.bayes": "Conditional probability and Bayes", "nav.counting": "Permutations and combinations",
+    "nav.binomial": "Binomial", "nav.poisson": "Poisson", "nav.geometric": "Geometric",
+    "nav.normal": "Normal", "nav.uniform": "Uniform", "nav.exponential": "Exponential", "nav.student-t": "Student’s t",
+    "nav.ci": "Confidence intervals", "nav.tests": "Hypothesis tests", "nav.regression": "Linear regression",
+    // normal page
+    "n.title": "Normal distribution",
+    "n.lede": "A symmetric, bell-shaped distribution described by its mean {mu} and standard deviation {sd}. Change the parameters, then drag the markers on the graph to measure probability.",
+    formulas: "Formulas", density: "Density", cumulative: "Cumulative", probability: "Probability",
+    graphType: "Graph type", fitView: "Fit view", fitTitle: "Double-clicking the graph also fits it",
+    pin: "Pin curve", pinTitle: "Keep a copy of this curve to compare against", clearPins: "Clear pins", unpin: "Remove pinned curve",
+    "n.graph": "Graph of the normal distribution",
+    hint: "Drag markers to move them. Scroll to zoom, drag to pan, double-click to fit.",
+    controls: "Controls", parameters: "Parameters", mean: "Mean", sd: "Standard deviation",
+    meanSlider: "Mean slider", sdSlider: "Standard deviation slider",
+    region: "Region", below: "Below", above: "Above", between: "Between", outside: "Outside", range: "Range",
+    "res.left": "{pct} of values are at or below {x}",
+    "res.right": "{pct} of values are at or above {x}",
+    "res.between": "{pct} of values fall between {a} and {b}",
+    "res.outside": "{pct} of values fall outside {a} to {b}",
+    zOf: "z-score of {v}", variance: "Variance σ²", medianMode: "Median and mode",
+    findX: "Find x from a probability", pRange: "between 0 and 1", markX: "Mark x on the graph",
+    invalid: "Enter a number"
+  },
+  pt: {
+    htmlLang: "pt-BR", listSep: "; ", or: "ou", and: "e",
+    search: "Buscar fórmula", navLabel: "Fórmulas", openMenu: "Abrir menu", language: "Idioma",
+    darkTheme: "Tema escuro", lightTheme: "Tema claro",
+    notBuilt: "Ainda não disponível", noMatch: "Nenhuma fórmula corresponde a “{q}”.",
+    phBody: "Esta página ainda não foi criada. As fórmulas, o gráfico e os controles ficarão aqui.",
+    phLink: "Abrir a distribuição normal",
+    "group.descriptive": "Estatística descritiva", "group.probability": "Probabilidade", "group.discrete": "Distribuições discretas",
+    "group.continuous": "Distribuições contínuas", "group.inference": "Inferência",
+    "nav.mean": "Média, mediana e moda", "nav.spread": "Variância e desvio padrão", "nav.quartiles": "Quartis e boxplot",
+    "nav.rules": "Regras de probabilidade", "nav.bayes": "Probabilidade condicional e Bayes", "nav.counting": "Permutações e combinações",
+    "nav.binomial": "Binomial", "nav.poisson": "Poisson", "nav.geometric": "Geométrica",
+    "nav.normal": "Normal", "nav.uniform": "Uniforme", "nav.exponential": "Exponencial", "nav.student-t": "t de Student",
+    "nav.ci": "Intervalos de confiança", "nav.tests": "Testes de hipótese", "nav.regression": "Regressão linear",
+    "n.title": "Distribuição normal",
+    "n.lede": "Uma distribuição simétrica, em forma de sino, descrita pela média {mu} e pelo desvio padrão {sd}. Altere os parâmetros e arraste os marcadores no gráfico para medir a probabilidade.",
+    formulas: "Fórmulas", density: "Densidade", cumulative: "Acumulada", probability: "Probabilidade",
+    graphType: "Tipo de gráfico", fitView: "Ajustar vista", fitTitle: "Clicar duas vezes no gráfico também ajusta a vista",
+    pin: "Fixar curva", pinTitle: "Guarda uma cópia desta curva para comparar", clearPins: "Limpar fixadas", unpin: "Remover curva fixada",
+    "n.graph": "Gráfico da distribuição normal",
+    hint: "Arraste os marcadores para movê-los. Role para dar zoom, arraste para mover, clique duas vezes para ajustar.",
+    controls: "Controles", parameters: "Parâmetros", mean: "Média", sd: "Desvio padrão",
+    meanSlider: "Controle deslizante da média", sdSlider: "Controle deslizante do desvio padrão",
+    region: "Região", below: "Abaixo", above: "Acima", between: "Entre", outside: "Fora", range: "Intervalo",
+    "res.left": "{pct} dos valores são menores ou iguais a {x}",
+    "res.right": "{pct} dos valores são maiores ou iguais a {x}",
+    "res.between": "{pct} dos valores estão entre {a} e {b}",
+    "res.outside": "{pct} dos valores estão fora do intervalo de {a} a {b}",
+    zOf: "Escore z de {v}", variance: "Variância σ²", medianMode: "Mediana e moda",
+    findX: "Encontrar x a partir de uma probabilidade", pRange: "entre 0 e 1", markX: "Marcar x no gráfico",
+    invalid: "Digite um número"
+  }
+};
+const langStore = {
+  get(){ try { return localStorage.getItem("sw-lang"); } catch { return null; } },
+  set(v){ try { localStorage.setItem("sw-lang", v); } catch {} }
+};
+let LANG = (() => {
+  const s = langStore.get(); if (I18N[s]) return s;
+  return /^pt\b/i.test(navigator.language || "") ? "pt" : "en";
+})();
+function t(key, vars){
+  let s = I18N[LANG][key] ?? I18N.en[key] ?? key;
+  if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => vars[k] ?? m);
+  return s;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* Numbers: Portuguese shows a decimal comma. Inputs accept either comma or dot. */
+const loc = s => LANG === "pt" ? String(s).replace(/\./g, ",") : String(s);
+const show = s => loc(s).replace(/^-/, MINUS);              // pretty minus + locale decimal, for display
+const fmtIn = (v, d = 4) => loc(trim(v, d));                 // value written into a text input
+function parseNum(str){
+  let s = String(str).trim().replace(/\s+/g, "").replace(/−/g, "-");
+  if (s.includes(",") && !s.includes(".")) s = s.replace(",", ".");
+  if (!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)) return null;
+  const v = parseFloat(s); return isFinite(v) ? v : null;
+}
 function fmtProb(p){
   if (!isFinite(p)) return "—";
   if (p === 0) return "0";
@@ -371,7 +471,7 @@ const Num = {
    MathML builder (formulas render natively, no library)
    ============================================================ */
 const M = {
-  n: v => { const s = String(v); return s.startsWith("-") ? `<mrow><mo form="prefix">${MINUS}</mo><mn>${s.slice(1)}</mn></mrow>` : `<mn>${s}</mn>`; },
+  n: v => { const s = loc(v); return s.startsWith("-") ? `<mrow><mo form="prefix">${MINUS}</mo><mn>${s.slice(1)}</mn></mrow>` : `<mn>${s}</mn>`; },
   i: s => `<mi>${s}</mi>`,
   up: s => `<mi mathvariant="normal">${s}</mi>`,
   o: s => `<mo>${s}</mo>`,
@@ -526,12 +626,13 @@ class Plot {
    Navigation — edit this list as formulas get added.
    Items with a matching entry in PAGES become live.
    ============================================================ */
+/* Labels come from I18N: "group.<key>" and "nav.<id>". */
 const NAV = [
-  { group: "Descriptive statistics", items: [["mean", "Mean, median and mode"], ["spread", "Variance and standard deviation"], ["quartiles", "Quartiles and box plot"]] },
-  { group: "Probability", items: [["rules", "Probability rules"], ["bayes", "Conditional probability and Bayes"], ["counting", "Permutations and combinations"]] },
-  { group: "Discrete distributions", items: [["binomial", "Binomial"], ["poisson", "Poisson"], ["geometric", "Geometric"]] },
-  { group: "Continuous distributions", items: [["normal", "Normal"], ["uniform", "Uniform"], ["exponential", "Exponential"], ["student-t", "Student’s t"]] },
-  { group: "Inference", items: [["ci", "Confidence intervals"], ["tests", "Hypothesis tests"], ["regression", "Linear regression"]] },
+  { key: "descriptive", items: ["mean", "spread", "quartiles"] },
+  { key: "probability", items: ["rules", "bayes", "counting"] },
+  { key: "discrete",    items: ["binomial", "poisson", "geometric"] },
+  { key: "continuous",  items: ["normal", "uniform", "exponential", "student-t"] },
+  { key: "inference",   items: ["ci", "tests", "regression"] },
 ];
 const PAGES = {};          // id -> (root) => cleanup fn
 const DEFAULT_PAGE = "normal";
@@ -540,7 +641,8 @@ const DEFAULT_PAGE = "normal";
    Page: Normal distribution
    ============================================================ */
 PAGES.normal = function NormalPage(root){
-  const S = { mu: 0, sd: 1, mode: "between", a: -1, b: 1, view: "pdf", pins: [] };
+  // State lives on the function so it survives re-renders (e.g. switching language).
+  const S = NormalPage.state || (NormalPage.state = { mu: 0, sd: 1, mode: "between", a: -1, b: 1, view: "pdf", pins: [], qp: "0.95", range: null });
   const { Phi, PhiInv, normPdf } = Num;
 
   const glyph = mode => {
@@ -554,70 +656,74 @@ PAGES.normal = function NormalPage(root){
       <path d="${line}" fill="none" stroke="currentColor" stroke-width="1.4"/>
       <path d="M1,16.5H33" stroke="currentColor" stroke-width="1" opacity=".5"/></svg>`;
   };
-  const MODES = [["left", "Below x", "P(X ≤ x)"], ["right", "Above x", "P(X ≥ x)"], ["between", "Between", "P(a ≤ X ≤ b)"], ["outside", "Outside", "P(X ≤ a or X ≥ b)"]];
+  const OR = t("or");
+  const MODES = [["left", t("below"), "P(X ≤ x)"], ["right", t("above"), "P(X ≥ x)"], ["between", t("between"), "P(a ≤ X ≤ b)"], ["outside", t("outside"), `P(X ≤ a ${OR} X ≥ b)`]];
+  const sym = s => `<span class="sym">${s}</span>`;
+  // Text inputs (not type=number) so both "1.5" and "1,5" are accepted. Arrow keys step by data-step.
+  const numInput = (id, step, extra = "") => `<input class="num" id="${id}" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" data-step="${step}" ${extra}>`;
 
   root.innerHTML = `
   <div class="page">
     <header class="page-head">
       <div>
-        <h1>Normal distribution</h1>
-        <p class="lede">A symmetric, bell-shaped distribution described by its mean <span class="sym">μ</span> and standard deviation <span class="sym">σ</span>. Change the parameters, then drag the markers on the graph to measure probability.</p>
+        <h1>${t("n.title")}</h1>
+        <p class="lede">${t("n.lede", { mu: sym("μ"), sd: sym("σ") })}</p>
       </div>
     </header>
 
-    <section class="formulas" aria-label="Formulas">
-      <div class="frow"><span class="flabel" id="defLabel">Density</span><div class="fmath" id="fDef"></div></div>
-      <div class="frow"><span class="flabel">Probability</span><div class="fmath" id="fProb"></div></div>
+    <section class="formulas" aria-label="${t("formulas")}">
+      <div class="frow"><span class="flabel" id="defLabel"></span><div class="fmath" id="fDef"></div></div>
+      <div class="frow"><span class="flabel">${t("probability")}</span><div class="fmath" id="fProb"></div></div>
     </section>
 
     <section class="work">
       <div class="plot-col">
         <div class="plot-bar">
-          <div class="seg" role="group" aria-label="Graph type">
-            <button data-view="pdf" aria-pressed="true">Density</button>
-            <button data-view="cdf" aria-pressed="false">Cumulative</button>
+          <div class="seg" role="group" aria-label="${t("graphType")}">
+            <button data-view="pdf" aria-pressed="true">${t("density")}</button>
+            <button data-view="cdf" aria-pressed="false">${t("cumulative")}</button>
           </div>
           <div class="bar-actions">
-            <button class="btn" id="fitBtn" title="Double-click the graph also fits">Fit view</button>
-            <button class="btn" id="pinBtn" title="Keep a copy of this curve to compare against">Pin curve</button>
-            <button class="btn" id="unpinBtn" hidden>Clear pins</button>
+            <button class="btn" id="fitBtn" title="${t("fitTitle")}">${t("fitView")}</button>
+            <button class="btn" id="pinBtn" title="${t("pinTitle")}">${t("pin")}</button>
+            <button class="btn" id="unpinBtn" hidden>${t("clearPins")}</button>
           </div>
         </div>
         <div class="plot-wrap">
-          <canvas id="plot" role="img" aria-label="Graph of the normal distribution"></canvas>
+          <canvas id="plot" role="img" aria-label="${t("n.graph")}"></canvas>
         </div>
         <div class="legend">
           <div class="chips" id="chips"></div>
-          <span class="hint" id="hint">Drag markers to move them. Scroll to zoom, drag to pan, double-click to fit.</span>
+          <span class="hint" id="hint">${t("hint")}</span>
           <span class="readout" id="readout" hidden></span>
         </div>
       </div>
 
-      <aside class="controls" aria-label="Controls">
+      <aside class="controls" aria-label="${t("controls")}">
         <div class="group">
-          <h2>Parameters</h2>
+          <h2>${t("parameters")}</h2>
           <div class="param">
-            <label for="muN"><span class="sym">μ</span>Mean</label>
-            <input class="num" id="muN" type="number" step="any" inputmode="decimal">
-            <input id="muR" type="range" min="-10" max="10" step="0.1" aria-label="Mean slider">
+            <label for="muN">${sym("μ")}${t("mean")}</label>
+            ${numInput("muN", 0.1)}
+            <input id="muR" type="range" min="-10" max="10" step="0.1" aria-label="${t("meanSlider")}">
           </div>
           <div class="param">
-            <label for="sdN"><span class="sym">σ</span>Standard deviation</label>
-            <input class="num" id="sdN" type="number" step="any" min="0" inputmode="decimal">
-            <input id="sdR" type="range" min="0.1" max="5" step="0.01" aria-label="Standard deviation slider">
+            <label for="sdN">${sym("σ")}${t("sd")}</label>
+            ${numInput("sdN", 0.1)}
+            <input id="sdR" type="range" min="0.1" max="5" step="0.01" aria-label="${t("sdSlider")}">
           </div>
         </div>
 
         <div class="group">
-          <h2>Probability</h2>
-          <div class="modes" role="group" aria-label="Region">
-            ${MODES.map(([k, l, t]) => `<button data-mode="${k}" title="${t}" aria-pressed="false">${glyph(k)}<span>${l}</span></button>`).join("")}
+          <h2>${t("probability")}</h2>
+          <div class="modes" role="group" aria-label="${t("region")}">
+            ${MODES.map(([k, l, tip]) => `<button data-mode="${k}" title="${tip}" aria-pressed="false">${glyph(k)}<span>${l}</span></button>`).join("")}
           </div>
           <div class="bounds" id="bounds">
-            <label id="aLbl"><span class="sym" id="aSym">a</span><input class="num" id="aN" type="number" step="any" inputmode="decimal"></label>
-            <label id="bLbl"><span class="sym">b</span><input class="num" id="bN" type="number" step="any" inputmode="decimal"></label>
+            <label id="aLbl"><span class="sym" id="aSym">a</span>${numInput("aN", 0.1)}</label>
+            <label id="bLbl"><span class="sym">b</span>${numInput("bN", 0.1)}</label>
           </div>
-          <div class="quick"><span>Range</span>
+          <div class="quick"><span>${t("range")}</span>
             <button class="btn" data-k="1">μ ± 1σ</button><button class="btn" data-k="2">μ ± 2σ</button><button class="btn" data-k="3">μ ± 3σ</button>
           </div>
         </div>
@@ -629,13 +735,13 @@ PAGES.normal = function NormalPage(root){
         </div>
 
         <div class="group">
-          <h2>Find x from a probability</h2>
+          <h2>${t("findX")}</h2>
           <div class="qrow">
             <label class="lbl" for="qp"><math><mi>P</mi><mo>(</mo><mi>X</mi><mo>≤</mo><mi>x</mi><mo>)</mo><mo>=</mo></math></label>
-            <input class="num" id="qp" type="number" step="any" min="0" max="1" value="0.95" inputmode="decimal">
+            ${numInput("qp", 0.01)}
             <span class="lbl"><math><mi>x</mi><mo>=</mo></math></span>
             <output class="qout" id="qx"></output>
-            <button class="btn" id="qUse">Mark x on the graph</button>
+            <button class="btn" id="qUse">${t("markX")}</button>
           </div>
         </div>
       </aside>
@@ -672,14 +778,14 @@ PAGES.normal = function NormalPage(root){
     const zv = v => M.n(((v - S.mu) / S.sd).toFixed(2));
 
     if (S.view === "pdf"){
-      el("defLabel").textContent = "Density";
+      el("defLabel").textContent = t("density");
       const gen = M.row(M.frac(M.n(1), M.row(sg, M.sqrt(M.row(M.n(2), M.up("π"))))),
         M.sup(M.up("e"), M.row(M.o(MINUS), M.frac(M.sup(M.paren(M.row(x, M.o(MINUS), mu_)), M.n(2)), M.row(M.n(2), M.sup(sg, M.n(2)))))));
       const sub = M.row(M.frac(M.n(1), M.row(M.n(sd), M.sqrt(M.row(M.n(2), M.up("π"))))),
         M.sup(M.up("e"), M.row(M.o(MINUS), M.frac(M.sup(M.paren(M.row(x, M.minus(mu))), M.n(2)), M.row(M.n(2), M.o("·"), M.sup(M.n(sd), M.n(2)))))));
       el("fDef").innerHTML = M.math(M.row(M.i("f"), M.paren(x), M.o("="), gen, M.o("="), sub));
     } else {
-      el("defLabel").textContent = "Cumulative";
+      el("defLabel").textContent = t("cumulative");
       const l1 = M.row(M.i("F"), M.paren(x), M.o("="), P, M.paren(M.row(X, M.o("≤"), x)), M.o("="), Phi_(gFrac("x")), M.o("="),
         Phi_(M.frac(M.row(x, M.minus(mu)), M.n(sd))));
       const l2 = M.row(Ph, M.paren(M.i("z")), M.o("="), M.frac(M.n(1), M.sqrt(M.row(M.n(2), M.up("π")))),
@@ -705,9 +811,9 @@ PAGES.normal = function NormalPage(root){
           M.o("="), Phi_(zv(hi)), M.o(MINUS), Phi_(zv(lo)), M.o("="), p);
         break;
       case "outside":
-        g = M.row(P, M.paren(M.row(X, M.o("≤"), M.i("a"), M.t("or"), X, M.o("≥"), M.i("b"))), M.o("="), M.n(1), M.o(MINUS),
+        g = M.row(P, M.paren(M.row(X, M.o("≤"), M.i("a"), M.t(OR), X, M.o("≥"), M.i("b"))), M.o("="), M.n(1), M.o(MINUS),
           M.brack(M.row(Phi_(gFrac("b")), M.o(MINUS), Phi_(gFrac("a")))));
-        s = M.row(P, M.paren(M.row(X, M.o("≤"), L, M.t("or"), X, M.o("≥"), H)), M.o("="), M.n(1), M.o(MINUS),
+        s = M.row(P, M.paren(M.row(X, M.o("≤"), L, M.t(OR), X, M.o("≥"), H)), M.o("="), M.n(1), M.o(MINUS),
           M.brack(M.row(Phi_(zv(hi)), M.o(MINUS), Phi_(zv(lo)))), M.o("="), p);
         break;
     }
@@ -717,29 +823,24 @@ PAGES.normal = function NormalPage(root){
   /* ---- result panel ---- */
   function renderResult(){
     const p = prob(), [lo, hi] = bounds(), z = v => show(((v - S.mu) / S.sd).toFixed(3));
-    el("pBig").textContent = fmtProb(p);
-    const pct = (p * 100).toFixed(p < 0.001 || p > 0.999 ? 4 : 2) + "%";
-    el("pSub").textContent = {
-      left: `${pct} of values are at or below ${show(trim(lo))}`,
-      right: `${pct} of values are at or above ${show(trim(lo))}`,
-      between: `${pct} of values fall between ${show(trim(lo))} and ${show(trim(hi))}`,
-      outside: `${pct} of values fall outside ${show(trim(lo))} to ${show(trim(hi))}`
-    }[S.mode];
-    const rows = twoSided() ? [["z-score of a", z(lo)], ["z-score of b", z(hi)]] : [["z-score of x", z(lo)]];
-    rows.push(["Variance σ²", show(trim(S.sd * S.sd, 4))], ["Median and mode", show(trim(S.mu, 4))]);
+    el("pBig").textContent = show(fmtProb(p));
+    const pct = show((p * 100).toFixed(p < 0.001 || p > 0.999 ? 4 : 2)) + "%";
+    el("pSub").textContent = t("res." + S.mode, { pct, x: show(trim(lo)), a: show(trim(lo)), b: show(trim(hi)) });
+    const rows = twoSided() ? [[t("zOf", { v: "a" }), z(lo)], [t("zOf", { v: "b" }), z(hi)]] : [[t("zOf", { v: "x" }), z(lo)]];
+    rows.push([t("variance"), show(trim(S.sd * S.sd, 4))], [t("medianMode"), show(trim(S.mu, 4))]);
     el("facts").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   }
 
   function renderQuantile(){
-    const p = parseFloat(qp.value), ok = p > 0 && p < 1;
+    const p = parseNum(qp.value), ok = p != null && p > 0 && p < 1;
     qp.setAttribute("aria-invalid", ok ? "false" : "true");
-    el("qx").textContent = ok ? show(trim(S.mu + S.sd * PhiInv(p), 4)) : "between 0 and 1";
+    el("qx").textContent = ok ? show(trim(S.mu + S.sd * PhiInv(p), 4)) : t("pRange");
   }
 
   function renderChips(){
-    const label = (m, s) => `μ = ${show(trim(m))}, σ = ${trim(s)}`;
+    const label = (m, s) => `μ = ${show(trim(m))}${t("listSep")}σ = ${show(trim(s))}`;
     el("chips").innerHTML = `<span class="chip"><span class="sw"></span>${label(S.mu, S.sd)}</span>` +
-      S.pins.map((p, i) => `<span class="chip pinned"><span class="sw"></span>${label(p.mu, p.sd)}<button data-unpin="${i}" aria-label="Remove pinned curve">×</button></span>`).join("");
+      S.pins.map((p, i) => `<span class="chip pinned"><span class="sw"></span>${label(p.mu, p.sd)}<button data-unpin="${i}" aria-label="${t("unpin")}">×</button></span>`).join("");
     el("unpinBtn").hidden = S.pins.length < 2;
   }
 
@@ -749,10 +850,10 @@ PAGES.normal = function NormalPage(root){
     r.value = v; r.style.setProperty("--p", ((v - r.min) / (r.max - r.min) * 100) + "%");
   }
   function syncInputs(skip){
-    if (skip !== muN) muN.value = trim(S.mu, 4);
-    if (skip !== sdN) sdN.value = trim(S.sd, 4);
-    if (skip !== aN) aN.value = trim(S.a, 4);
-    if (skip !== bN) bN.value = trim(S.b, 4);
+    if (skip !== muN) muN.value = fmtIn(S.mu);
+    if (skip !== sdN) sdN.value = fmtIn(S.sd);
+    if (skip !== aN) aN.value = fmtIn(S.a);
+    if (skip !== bN) bN.value = fmtIn(S.b);
     setSlider(muR, S.mu); setSlider(sdR, S.sd);
     $$(".modes button", root).forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === S.mode));
     $$(".seg button", root).forEach(b => b.setAttribute("aria-pressed", b.dataset.view === S.view));
@@ -855,12 +956,21 @@ PAGES.normal = function NormalPage(root){
       if (x == null){ r.hidden = true; return; }
       const d = Num.decimalsFor(Num.niceStep(plot.x1 - plot.x0, 200));
       r.hidden = false;
-      r.innerHTML = `<span>x <b>${show(x.toFixed(d))}</b></span><span>f(x) <b>${normPdf(x, S.mu, S.sd).toFixed(4)}</b></span><span>F(x) <b>${Phi((x - S.mu) / S.sd).toFixed(4)}</b></span>`;
+      r.innerHTML = `<span>x <b>${show(x.toFixed(d))}</b></span><span>f(x) <b>${show(normPdf(x, S.mu, S.sd).toFixed(4))}</b></span><span>F(x) <b>${show(Phi((x - S.mu) / S.sd).toFixed(4))}</b></span>`;
     }
   });
 
   /* ---- events ---- */
-  const num = inp => { const v = parseFloat(inp.value); return isFinite(v) ? v : null; };
+  const num = inp => parseNum(inp.value);
+  // Arrow keys nudge a number field (Shift = ×10), like a native number input.
+  $$(".num", root).forEach(inp => inp.addEventListener("keydown", e => {
+    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+    const v = num(inp); if (v == null) return;
+    e.preventDefault();
+    const step = +inp.dataset.step * (e.shiftKey ? 10 : 1), d = Math.max(0, Num.decimalsFor(step));
+    inp.value = loc(trim(v + (e.key === "ArrowUp" ? step : -step), Math.max(d, 4)));
+    inp.dispatchEvent(new Event("input")); inp.dispatchEvent(new Event("change"));
+  }));
   muR.addEventListener("input", () => { S.mu = +muR.value; update(); });
   sdR.addEventListener("input", () => { S.sd = +sdR.value; update(); });
   muN.addEventListener("input", () => { const v = num(muN); muN.setAttribute("aria-invalid", v == null); if (v != null){ S.mu = v; update(muN); } });
@@ -871,7 +981,7 @@ PAGES.normal = function NormalPage(root){
   bN.addEventListener("input", () => { const v = num(bN); if (v != null){ S.b = v; update(bN); } });
   aN.addEventListener("change", () => update());
   bN.addEventListener("change", () => update());
-  qp.addEventListener("input", renderQuantile);
+  qp.addEventListener("input", () => { S.qp = qp.value; renderQuantile(); });
 
   $$(".modes button", root).forEach(b => b.addEventListener("click", () => {
     const was = twoSided(); S.mode = b.dataset.mode;
@@ -891,15 +1001,17 @@ PAGES.normal = function NormalPage(root){
   el("unpinBtn").addEventListener("click", () => { S.pins = []; update(); });
   el("chips").addEventListener("click", e => { const i = e.target.dataset?.unpin; if (i != null){ S.pins.splice(+i, 1); update(); } });
   el("qUse").addEventListener("click", () => {
-    const p = parseFloat(qp.value); if (!(p > 0 && p < 1)) return;
+    const p = parseNum(qp.value); if (!(p > 0 && p < 1)) return;
     S.mode = "left"; S.a = +(S.mu + S.sd * PhiInv(p)).toFixed(6); update(); fitIfLost();
   });
 
   const onTheme = () => plot.draw();
   document.addEventListener("themechange", onTheme);
 
-  fit(); update();
-  return () => { plot.destroy(); document.removeEventListener("themechange", onTheme); };
+  qp.value = loc(S.qp.replace(",", "."));
+  if (S.range){ [plot.x0, plot.x1] = S.range; } else fit();
+  update();
+  return () => { S.range = [plot.x0, plot.x1]; plot.destroy(); document.removeEventListener("themechange", onTheme); };
 };
 
 /* ============================================================
@@ -908,8 +1020,8 @@ PAGES.normal = function NormalPage(root){
 function PlaceholderPage(root, label){
   root.innerHTML = `<div class="page"><div class="empty">
     <h1>${label}</h1>
-    <p>This page isn’t built yet. Its formulas, graph and controls will go here.</p>
-    <p><a href="#/${DEFAULT_PAGE}">Open the normal distribution</a></p>
+    <p>${t("phBody")}</p>
+    <p><a href="#/${DEFAULT_PAGE}">${t("phLink")}</a></p>
   </div></div>`;
 }
 
@@ -919,18 +1031,22 @@ function PlaceholderPage(root, label){
 const app = $("#app"), navEl = $("#nav"), mainEl = $("#main"), qEl = $("#q");
 let cleanup = null;
 
+/* Search matches labels in every language, accent-insensitive ("media" finds "Média"). */
+const fold = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const allLangs = key => Object.keys(I18N).map(l => I18N[l][key] || "").join(" ");
 function renderNav(filter = ""){
-  const f = filter.trim().toLowerCase(), cur = currentId();
+  const f = fold(filter.trim()), cur = currentId();
   const html = NAV.map(g => {
-    const items = g.items.filter(([, l]) => !f || l.toLowerCase().includes(f) || g.group.toLowerCase().includes(f));
+    const gText = fold(allLangs("group." + g.key));
+    const items = g.items.filter(id => !f || gText.includes(f) || fold(allLangs("nav." + id)).includes(f));
     if (!items.length) return "";
-    return `<div class="nav-group"><h3>${g.group}</h3>${items.map(([id, l]) =>
-      `<a href="#/${id}" class="${PAGES[id] ? "" : "soon"}" ${PAGES[id] ? "" : 'title="Not built yet"'} ${id === cur ? 'aria-current="page"' : ""}>${l}</a>`).join("")}</div>`;
+    return `<div class="nav-group"><h3>${t("group." + g.key)}</h3>${items.map(id =>
+      `<a href="#/${id}" class="${PAGES[id] ? "" : "soon"}" ${PAGES[id] ? "" : `title="${t("notBuilt")}"`} ${id === cur ? 'aria-current="page"' : ""}>${t("nav." + id)}</a>`).join("")}</div>`;
   }).join("");
-  navEl.innerHTML = html || `<p class="nav-empty">No formulas match “${filter.replace(/[<>&]/g, "")}”.</p>`;
+  navEl.innerHTML = html || `<p class="nav-empty">${t("noMatch", { q: esc(filter) })}</p>`;
 }
 function currentId(){ return (location.hash.replace(/^#\/?/, "").split("?")[0]) || DEFAULT_PAGE; }
-function labelFor(id){ for (const g of NAV) for (const [i, l] of g.items) if (i === id) return l; return null; }
+function labelFor(id){ return NAV.some(g => g.items.includes(id)) ? t("nav." + id) : null; }
 
 function route(){
   const id = currentId(), label = labelFor(id);
@@ -941,8 +1057,26 @@ function route(){
   document.title = (label || "Stats Workbench") + " · Stats Workbench";
   renderNav(qEl.value);
   closeNav();
-  mainEl.scrollTop = 0; window.scrollTo(0, 0);
+  if (!keepScroll){ mainEl.scrollTop = 0; window.scrollTo(0, 0); }
+  keepScroll = false;
 }
+let keepScroll = false;
+
+/* language */
+function applyShellText(){
+  document.documentElement.lang = t("htmlLang");
+  qEl.placeholder = t("search"); qEl.setAttribute("aria-label", t("search"));
+  navEl.setAttribute("aria-label", t("navLabel"));
+  $("#menuBtn").setAttribute("aria-label", t("openMenu"));
+  $("#langSeg").setAttribute("aria-label", t("language"));
+  $$("#langSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === LANG));
+  paintThemeBtn();
+}
+$$("#langSeg button").forEach(b => b.addEventListener("click", () => {
+  if (b.dataset.lang === LANG) return;
+  LANG = b.dataset.lang; langStore.set(LANG);
+  applyShellText(); keepScroll = true; route();
+}));
 
 qEl.addEventListener("input", () => renderNav(qEl.value));
 qEl.addEventListener("keydown", e => {
@@ -969,8 +1103,8 @@ const isDark = () => (document.documentElement.dataset.theme || (sysDark.matches
 function paintThemeBtn(){
   const d = isDark();
   $("#themeBtn").innerHTML = d
-    ? `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>Light theme`
-    : `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 9.5A5.5 5.5 0 1 1 6.5 2.5a4.5 4.5 0 0 0 7 7z"/></svg>Dark theme`;
+    ? `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>${t("lightTheme")}`
+    : `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 9.5A5.5 5.5 0 1 1 6.5 2.5a4.5 4.5 0 0 0 7 7z"/></svg>${t("darkTheme")}`;
 }
 const saved = store.get("sw-theme"); if (saved) document.documentElement.dataset.theme = saved;
 $("#themeBtn").addEventListener("click", () => {
@@ -979,7 +1113,7 @@ $("#themeBtn").addEventListener("click", () => {
   paintThemeBtn(); document.dispatchEvent(new Event("themechange"));
 });
 sysDark.addEventListener("change", () => { paintThemeBtn(); document.dispatchEvent(new Event("themechange")); });
-paintThemeBtn();
+applyShellText();
 
 window.addEventListener("hashchange", route);
 route();

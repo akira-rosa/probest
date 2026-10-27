@@ -27,6 +27,12 @@ changes the result.
 - Inverse lookup (find x from a probability)
 - Pin curves to compare parameter changes
 
+## Languages
+
+The app is available in **English** and **Português (Brasil)**: switch with the EN / PT buttons at the
+bottom of the sidebar. The choice is remembered; on first open it follows the browser's language.
+In Portuguese, numbers use a decimal comma, and number fields accept either `1,5` or `1.5`.
+
 ## How it's built
 
 Everything lives in `index.html`: plain HTML, CSS and JavaScript with no dependencies.
@@ -37,10 +43,16 @@ Everything lives in `index.html`: plain HTML, CSS and JavaScript with no depende
 
 ### Adding a page
 
-1. Add an entry to the `NAV` list (sidebar group, id, label).
+1. Add the page id to a group in the `NAV` list, and its label as `"nav.<id>"` in both language blocks of `I18N`.
 2. Register a page function under the same id: `PAGES.myId = function (root) { ...; return cleanup; }`.
    It receives the main element to render into and may return a cleanup function.
    Pages without a registered function show a "not built yet" placeholder.
+3. Put every visible string in `I18N` (same key in `en` and `pt`) and read it with `t("key")`.
+   Show numbers through `show()` so they get the right decimal separator.
+
+### Adding a language
+
+Copy the `en` block in `I18N`, translate the values, and add a button for it in `#langSeg`.
 
 ## Browser support
 
