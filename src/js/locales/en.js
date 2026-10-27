@@ -99,6 +99,8 @@ I18N.en = {
   markX: "Mark x on the graph",
 
   // ---- distribution pages (core/distpage.js and pages/dist/) ----
+  "anim.galton": "Galton board",
+  "anim.clt": "Central limit theorem",
   "flegend.v": "values from the controls",
   "flegend.r": "results",
   "d.viewPf": "Probabilities",
