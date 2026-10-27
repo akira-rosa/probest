@@ -122,8 +122,10 @@ function renderFooter(){
         <a href="${APP.repo}/blob/main/LICENSE" target="_blank" rel="noopener">${t("license", { l: APP.license })}</a>
       </span>
     </div>
-    <p class="foot-text">${t("footSources")}</p>
-    <p class="foot-author">${esc(APP.author)}</p>`;
+    <div class="foot-row foot-bottom">
+      <p class="foot-text">${t("footSources")}</p>
+      <p class="foot-author">${esc(APP.author)}</p>
+    </div>`;
 }
 
 /* ---------- theme ---------- */
