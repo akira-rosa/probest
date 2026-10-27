@@ -55,15 +55,12 @@ nav{flex:1}
 nav > .folder + .folder{margin-top:2px}
 
 .page-link{
-  display:block; padding:5px 8px; margin:1px 0; border-radius:6px;
+  display:block; padding:6px 10px; margin:1px 0; border-radius:8px;
   color:var(--ink); text-decoration:none; font-size:14px;
 }
 .page-link:hover{background:var(--hover)}
 .page-link.soon{color:var(--faint)}
-.page-link[aria-current="page"]{
-  background:var(--surface); font-weight:550;
-  box-shadow:inset 2px 0 0 var(--accent), inset 0 0 0 1px var(--line);
-}
+.page-link[aria-current="page"]{background:var(--surface);color:var(--ink);font-weight:500}
 .folder-row:focus-visible, .page-link:focus-visible{outline-offset:-2px}
 .nav-empty{padding:6px 10px;color:var(--faint);font-size:14px}
 .side-foot{border-top:1px solid var(--line);padding-top:10px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px}
