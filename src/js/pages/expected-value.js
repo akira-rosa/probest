@@ -29,9 +29,9 @@ PAGES["expected-value"] = function ExpectedValuePage(root){
 
   /* ---------- examples ---------- */
   const EXAMPLES = [
-    { id: "coins", rows: [["0", "1/4"], ["1", "1/2"], ["2", "1/4"]], source: "slides" },
+    { id: "coins", rows: [["0", "1/4"], ["1", "1/2"], ["2", "1/4"]], source: "" },
     { id: "die", rows: [1, 2, 3, 4, 5, 6].map(v => [String(v), "1/6"]), source: "Barbetta · 5.1.3" },
-    { id: "slides", rows: [["-2", "0.2"], ["0", "0.5"], ["2", "0.3"]], source: "slides" },
+    { id: "pm2", rows: [["-2", "0.2"], ["0", "0.5"], ["2", "0.3"]], source: "" },
     { id: "defects", rows: [["0", "0.36"], ["1", "0.48"], ["2", "0.16"]], source: () => `Barbetta · ${t("exercise")} 5.4` },
     { id: "profit", rows: [["6", "0.7"], ["0", "0.2"], ["-2", "0.1"]], source: () => `Barbetta · ${t("exercise")} 5.5` },
     { id: "profit1", rows: [["6", "0.7"], ["0", "0.2"], ["-2", "0.1"]], a: "1", b: "1", source: () => `Barbetta · ${t("exercise")} 5.5` },
@@ -43,7 +43,7 @@ PAGES["expected-value"] = function ExpectedValuePage(root){
     ? `<math>${EY_}<mo>=</mo>${M.n(trim(V.EY, 4))}<mo separator="true">;</mo><mspace width="0.4em"></mspace>${VY_}<mo>=</mo>${M.n(trim(V.VY, 4))}</math>`
     : `<math>${EX}<mo>=</mo>${M.n(trim(V.E, 4))}<mo separator="true">;</mo><mspace width="0.4em"></mspace>${VX}<mo>=</mo>${M.n(trim(V.V, 4))}</math>`;
   const exList = () => EXAMPLES.map(e => ({ id: e.id, title: t("ev.ex." + e.id),
-    source: typeof e.source === "function" ? e.source() : e.source === "slides" ? t("srcSlides") : e.source,
+    source: typeof e.source === "function" ? e.source() : e.source,
     answer: answer(values({ rows: e.rows, a: e.a ?? "1", b: e.b ?? "0" })) }));
   function loadExample(id){
     const e = EXAMPLES.find(x => x.id === id); if (!e) return;
@@ -91,11 +91,11 @@ PAGES["expected-value"] = function ExpectedValuePage(root){
       </aside>
     </section>
     <section class="formulas" aria-label="${t("formulas")}">
-      <h2>${t("formulas")}</h2>
+      ${formulasHead()}
       <div id="frows"></div>
       <div id="vars"></div>
     </section>
-    ${sectionsHtml({ about: t("ev.about"), notes: ["note.weights", "note.center", "note.shortcut", "note.linear"].map(k => t("ev." + k)), sources: ["src.barbetta", "src.bussab", "src.slides"].map(k => t("ev." + k)) })}
+    ${sectionsHtml({ about: t("ev.about"), notes: ["note.weights", "note.center", "note.shortcut", "note.linear"].map(k => t("ev." + k)), sources: ["src.barbetta", "src.bussab"].map(k => t("ev." + k)) })}
   </div>`;
   const el = id => $("#" + id, root);
   let V = values();
@@ -132,21 +132,21 @@ PAGES["expected-value"] = function ExpectedValuePage(root){
     if (!fromInput) syncInputs();
     el("err").hidden = !V.err; el("normBtn").hidden = V.err !== "ev.err.sum";
     if (V.err){ el("err").textContent = t(V.err, { s: show(trim(V.sum ?? 0, 4)) }); plot.draw(); return; }
-    const n4 = v => M.n(trim(v, 4)), xm = v => v < 0 ? M.paren(M.n(trim(v, 6))) : M.n(trim(v, 6));
+    const n4 = v => M.n(trim(v, 4)), v4 = v => M.v(trim(v, 4)), r4 = v => M.r(trim(v, 4)), xm = v => v < 0 ? M.paren(M.v(trim(v, 6))) : M.v(trim(v, 6));
     const px = M.row(M.i("p"), M.paren(M.i("x")));
     const terms = V.x.map((x, i) => M.row(xm(x), M.o("·"), probMath(V.raw[i][1], V.p[i])));
     const terms2 = V.x.map((x, i) => M.row(M.sup(xm(x), M.n(2)), M.o("·"), probMath(V.raw[i][1], V.p[i])));
     const rows = [
-      { label: t("ev.f.E"), chain: [EX, M.row(`<mo>∑</mo>`, M.i("x"), M.o("·"), px), sumTerms(terms, 6), n4(V.E)] },
+      { label: t("ev.f.E"), chain: [EX, M.row(`<mo>∑</mo>`, M.i("x"), M.o("·"), px), sumTerms(terms, 6), r4(V.E)] },
       { label: t("ev.f.V"), chain: [VX, M.row(`<mo>∑</mo>`, M.sup(M.i("x"), M.n(2)), M.o("·"), px, M.o(MINUS), M.sup(M.brack(EX), M.n(2))),
-        M.row(sumTerms(terms2, 6), M.o(MINUS), M.sup(xm(+trim(V.E, 4)), M.n(2))), M.row(n4(V.E2), M.o(MINUS), n4(V.E * V.E)), n4(V.V)] },
-      { label: t("ev.f.sd"), chain: [M.i("σ"), M.sqrt(VX), M.sqrt(n4(V.V)), n4(V.sd)] },
+        M.row(sumTerms(terms2, 6), M.o(MINUS), M.sup(xm(+trim(V.E, 4)), M.n(2))), M.row(n4(V.E2), M.o(MINUS), n4(V.E * V.E)), r4(V.V)] },
+      { label: t("ev.f.sd"), chain: [M.i("σ"), M.sqrt(VX), M.sqrt(v4(V.V)), r4(V.sd)] },
     ];
     if (V.tr){
-      const a = M.n(trim(V.a, 6)), b = V.b < 0 ? M.row(M.o(MINUS), M.n(trim(-V.b, 6))) : M.row(M.o("+"), M.n(trim(V.b, 6)));
+      const a = M.v(trim(V.a, 6)), b = V.b < 0 ? M.row(M.o(MINUS), M.v(trim(-V.b, 6))) : M.row(M.o("+"), M.v(trim(V.b, 6)));
       rows.push({ label: t("ev.f.Y"), html:
-        M.math(M.row(EY_, M.o("="), M.i("a"), EX, M.o("+"), M.i("b"), M.o("="), a, M.o("·"), n4(V.E), b, M.o("="), n4(V.EY))) +
-        M.math(M.row(VY_, M.o("="), M.sup(M.i("a"), M.n(2)), VX, M.o("="), M.sup(V.a < 0 ? M.paren(a) : a, M.n(2)), M.o("·"), n4(V.V), M.o("="), n4(V.VY))) });
+        M.math(M.row(EY_, M.o("="), M.i("a"), EX, M.o("+"), M.i("b"), M.o("="), a, M.o("·"), v4(V.E), b, M.o("="), r4(V.EY))) +
+        M.math(M.row(VY_, M.o("="), M.sup(M.i("a"), M.n(2)), VX, M.o("="), M.sup(V.a < 0 ? M.paren(a) : a, M.n(2)), M.o("·"), v4(V.V), M.o("="), r4(V.VY))) });
     }
     const box = el("frows");
     box.innerHTML = rows.map((r, i) => `<div class="frow"><span class="flabel">${r.label}</span><div class="fmath" data-row="${i}">${r.chain ? M.math(M.row(r.chain.join(M.o("=")))) : r.html}</div></div>`).join("");

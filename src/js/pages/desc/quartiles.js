@@ -27,7 +27,7 @@ const QUART_PAGE = {
 
   formulas(R){
     const n = M.i("n"), num = v => M.n(trim(v, 6)), r4 = v => M.n(trim(v, 4)), np1 = M.row(n, M.o("+"), M.n(1));
-    const nn = M.row(num(R.n), M.o("+"), M.n(1)), pos = M.text(t("qt.pos"));
+    const nn = M.row(M.v(R.n), M.o("+"), M.n(1)), pos = M.text(t("qt.pos")), vv = v => M.v(trim(v, 6));
     const posFrac = [
       [M.frac(np1, M.n(4)), M.frac(nn, M.n(4))],
       [M.frac(np1, M.n(2)), M.frac(nn, M.n(2))],
@@ -36,21 +36,21 @@ const QUART_PAGE = {
     const syms = [qSym.qi, qSym.md, qSym.qs], labels = ["qt.f.qi", "qt.f.md", "qt.f.qs"];
     const rows = [{ label: t("qt.f.sorted"), html: orderedHtml(R) }];
     [R.qi, R.md, R.qs].forEach((q, j) => {
-      const line1 = M.math(M.row(pos, M.o("="), posFrac[j][0], M.o("="), posFrac[j][1], M.o("="), r4(R.pos[j])));
+      const line1 = M.math(M.row(pos, M.o("="), posFrac[j][0], M.o("="), posFrac[j][1], M.o("="), M.r(trim(R.pos[j], 4))));
       let line2;
-      if (!q.f) line2 = M.math(M.row(syms[j](), M.o("="), M.ord(q.k), M.o("="), num(q.v)));
+      if (!q.f) line2 = M.math(M.row(syms[j](), M.o("="), M.ord(q.k), M.o("="), M.r(trim(q.v, 6))));
       else {
-        const a = R.s[q.k - 1], b = R.s[q.k], f = M.n(trim(q.f, 4));
+        const a = R.s[q.k - 1], b = R.s[q.k], f = M.v(trim(q.f, 4));
         line2 = M.math(M.row(syms[j](), M.o("="), M.ord(q.k), M.o("+"), f, M.o("·"), M.paren(M.row(M.ord(q.k + 1), M.o(MINUS), M.ord(q.k))),
-          M.o("="), num(a), M.o("+"), f, M.o("·"), M.paren(M.row(num(b), M.o(MINUS), nv(a))), M.o("="), r4(q.v)));
+          M.o("="), vv(a), M.o("+"), f, M.o("·"), M.paren(M.row(vv(b), M.o(MINUS), nv(a))), M.o("="), M.r(trim(q.v, 4))));
       }
       rows.push({ label: t(labels[j]), html: line1 + line2 });
     });
     const k15 = M.n("1.5"), dq = qSym.dq();
     rows.push({ label: t("qt.f.box"), html:
-      M.math(M.row(dq, M.o("="), qSym.qs(), M.o(MINUS), qSym.qi(), M.o("="), num(R.qs.v), M.o(MINUS), nv(R.qi.v), M.o("="), r4(R.dq))) +
-      M.math(M.row(qSym.qi(), M.o(MINUS), k15, dq, M.o("="), num(R.qi.v), M.o(MINUS), k15, M.o("·"), r4(R.dq), M.o("="), r4(R.lf))) +
-      M.math(M.row(qSym.qs(), M.o("+"), k15, dq, M.o("="), num(R.qs.v), M.o("+"), k15, M.o("·"), r4(R.dq), M.o("="), r4(R.uf))) });
+      M.math(M.row(dq, M.o("="), qSym.qs(), M.o(MINUS), qSym.qi(), M.o("="), vv(R.qs.v), M.o(MINUS), nv(R.qi.v), M.o("="), M.r(trim(R.dq, 4)))) +
+      M.math(M.row(qSym.qi(), M.o(MINUS), k15, dq, M.o("="), vv(R.qi.v), M.o(MINUS), k15, M.o("·"), M.v(trim(R.dq, 4)), M.o("="), M.r(trim(R.lf, 4)))) +
+      M.math(M.row(qSym.qs(), M.o("+"), k15, dq, M.o("="), vv(R.qs.v), M.o("+"), k15, M.o("·"), M.v(trim(R.dq, 4)), M.o("="), M.r(trim(R.uf, 4)))) });
     return rows;
   },
 
@@ -138,7 +138,7 @@ const QUART_PAGE = {
     { id: "bm", data: [15, 5, 3, 8, 10, 2, 7, 11, 12], source: "Bussab & Morettin · Ex. 3.5" },
   ],
   notes: ["note.pos", "note.even", "note.resist", "note.box", "note.methods"],
-  sources: ["src.barbetta", "src.bussab", "src.slides"],
+  sources: ["src.barbetta", "src.bussab"],
 };
 const qSym = {
   qi: () => M.sub(M.i("q"), M.i("i")), qs: () => M.sub(M.i("q"), M.i("s")),

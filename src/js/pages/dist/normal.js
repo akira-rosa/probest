@@ -28,14 +28,14 @@
     math: {
       general: () => M.row(M.frac(M.n(1), M.row(M.i("σ"), M.sqrt(M.row(M.n(2), M.up("π"))))),
         M.sup(M.up("e"), M.row(M.o(MINUS), M.frac(M.sup(M.paren(M.row(M.i("x"), M.o(MINUS), M.i("μ"))), M.n(2)), M.row(M.n(2), M.sup(M.i("σ"), M.n(2))))))),
-      at: (_, P) => M.row(M.frac(M.n(1), M.row(M.n(trim(P.sigma, 4)), M.sqrt(M.row(M.n(2), M.up("π"))))),
-        M.sup(M.up("e"), M.row(M.o(MINUS), M.frac(M.sup(M.paren(M.row(M.i("x"), M.minus(trim(P.mu, 4)))), M.n(2)), M.row(M.n(2), M.o("·"), M.sup(M.n(trim(P.sigma, 4)), M.n(2))))))),
+      at: (_, P) => M.row(M.frac(M.n(1), M.row(M.v(trim(P.sigma, 4)), M.sqrt(M.row(M.n(2), M.up("π"))))),
+        M.sup(M.up("e"), M.row(M.o(MINUS), M.frac(M.sup(M.paren(M.row(M.i("x"), M.vminus(trim(P.mu, 4)))), M.n(2)), M.row(M.n(2), M.o("·"), M.sup(M.v(trim(P.sigma, 4)), M.n(2))))))),
       cdfSteps: (v, P, O) => [
-        M.row(M.up("Φ"), M.paren(M.frac(M.row(M.n(trim(v, 4)), M.minus(trim(P.mu, 4))), M.n(trim(P.sigma, 4))))),
+        M.row(M.up("Φ"), M.paren(M.frac(M.row(M.v(trim(v, 4)), M.vminus(trim(P.mu, 4))), M.v(trim(P.sigma, 4))))),
         M.row(M.up("Φ"), M.paren(M.n(O?.zTable ? zOf(v, P, O).toFixed(2) : trim(zOf(v, P, O), 4)))),
       ],
-      mean: { general: () => M.i("μ"), sub: P => M.n(trim(P.mu, 4)) },
-      variance: { general: () => M.sup(M.i("σ"), M.n(2)), sub: P => M.sup(M.n(trim(P.sigma, 4)), M.n(2)) },
+      mean: { general: () => M.i("μ"), sub: P => M.v(trim(P.mu, 4)) },
+      variance: { general: () => M.sup(M.i("σ"), M.n(2)), sub: P => M.sup(M.v(trim(P.sigma, 4)), M.n(2)) },
     },
     extraVars: (P, S) => {
       const z = M.i("z"), out = [];
@@ -49,15 +49,15 @@
     r: { d: "dnorm", p: "pnorm", q: "qnorm", args: P => `mean = ${trim(P.mu, 6)}, sd = ${trim(P.sigma, 6)}`, mean: P => `${trim(P.mu, 6)}`,
          note: (_, O) => O.zTable ? t("nor.r.note") : null },
     examples: [
-      { id: "current",   set: { P: { mu: 10, sigma: 2 }, mode: "ge", a: 13 },              source: "slides" },
-      { id: "current911", set: { P: { mu: 10, sigma: 2 }, mode: "between", a: 9, b: 11 },  source: "slides" },
+      { id: "current",   set: { P: { mu: 10, sigma: 2 }, mode: "ge", a: 13 },              source: "" },
+      { id: "current911", set: { P: { mu: 10, sigma: 2 }, mode: "between", a: 9, b: 11 },  source: "" },
       { id: "tiles",     set: { P: { mu: 2.5, sigma: 0.6 }, mode: "between", a: 2, b: 3.5 }, source: "Barbetta · Ex. 6.6" },
       { id: "z042",      set: { P: { mu: 0, sigma: 1 }, mode: "le", a: 0.42 },             source: "Barbetta · Ex. 6.4" },
       { id: "z042b",     set: { P: { mu: 0, sigma: 1 }, mode: "between", a: -0.42, b: 0.42 }, source: "Barbetta · Ex. 6.4" },
-      { id: "tax",       set: { P: { mu: 60000, sigma: 10000 }, mode: "ge", a: 75000 },    source: "slides" },
-      { id: "tax5070",   set: { P: { mu: 60000, sigma: 10000 }, mode: "between", a: 50000, b: 70000 }, source: "slides" },
+      { id: "tax",       set: { P: { mu: 60000, sigma: 10000 }, mode: "ge", a: 75000 },    source: "" },
+      { id: "tax5070",   set: { P: { mu: 60000, sigma: 10000 }, mode: "between", a: 50000, b: 70000 }, source: "" },
     ],
     notes: ["note.z", "note.table", "note.rule"],
-    sources: ["src.barbetta", "src.bussab", "src.slides"],
+    sources: ["src.barbetta", "src.bussab"],
   });
 })();

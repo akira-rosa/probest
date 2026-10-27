@@ -1,6 +1,4 @@
 /* Home (landing) page. */
-.home-head{max-width:66ch;margin:5vh 0 40px}
-.home-head h1{font-family:var(--brand);font-weight:700;font-size:44px;letter-spacing:-.01em;margin:0}
 .topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:30px 36px}
 .topic h2{font-size:13.5px;font-weight:600;color:var(--muted);margin:0 0 8px;padding-top:12px;border-top:1px solid var(--line)}
 .topic ul{list-style:none;margin:0;padding:0}
@@ -8,4 +6,11 @@
 .topic li a:hover{color:var(--accent)}
 .topic li a.soon{color:var(--faint)}
 .topic li a.soon:hover{color:var(--muted)}
-@media (max-width:620px){ .home-head h1{font-size:32px} .home-head{margin-top:2vh} }
+/* the home page fills the space down to the footer; the animation takes what is left */
+.home{flex:1;display:flex;flex-direction:column;padding-top:4vh}
+.home-anim{position:relative;flex:1;min-height:170px;max-height:440px;margin-top:32px}
+.home-anim canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.anim-label{position:absolute;left:0;top:0;font-size:12.5px;color:var(--muted);text-decoration:none;transition:opacity .2s}
+.anim-label:hover{color:var(--accent)}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:620px){ .home{padding-top:0} .home-anim{min-height:170px} }

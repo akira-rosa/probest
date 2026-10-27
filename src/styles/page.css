@@ -13,6 +13,14 @@
 .fmath math{display:block;margin:0;text-align:left}
 .fmath math + math{margin-top:10px}
 .fmath math.res{color:var(--muted)}
+/* formula applied to the current numbers: values from the controls in blue, results in bold */
+.fmath mn.v, .fmath mo.v{color:var(--accent)}
+.fmath mn.r{font-weight:700;color:var(--ink)}
+.fhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.formulas .fhead h2{font-size:15px;font-weight:600;margin:0 0 2px}
+.flegend{display:flex;align-items:baseline;gap:6px;font-size:12.5px;color:var(--muted)}
+.flegend .lg-v{font-family:var(--math);font-size:15px;color:var(--accent)}
+.flegend .lg-r{font-family:var(--math);font-size:15px;font-weight:700;color:var(--ink);margin-left:10px}
 
 /* workspace */
 .work{display:grid;grid-template-columns:minmax(0,1fr) 312px;gap:18px;align-items:start}

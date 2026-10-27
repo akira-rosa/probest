@@ -22,17 +22,17 @@ const SD_PAGE = {
   formulas(R){
     const xb = M.bar("x"), xi = M.sub(M.i("x"), M.i("i")), n = M.i("n"), num = v => M.n(trim(v, 6)), r4 = v => M.n(trim(v, 4));
     const V = sdSym.v(R), Sd = sdSym.s(R);
-    const D = R.pop ? n : M.row(n, M.o(MINUS), M.n(1)), Dn = R.pop ? num(R.n) : M.row(num(R.n), M.o(MINUS), M.n(1));
+    const D = R.pop ? n : M.row(n, M.o(MINUS), M.n(1)), Dn = R.pop ? M.v(R.n) : M.row(M.v(R.n), M.o(MINUS), M.n(1));
     const dev = M.sup(M.paren(M.row(xi, M.o(MINUS), xb)), M.n(2));
-    const devTerms = R.xs.map(x => M.sup(M.paren(M.row(M.n(trim(x, 6)), M.o(MINUS), nv(+trim(R.mean, 4)))), M.n(2)));
+    const devTerms = R.xs.map(x => M.sup(M.paren(M.row(M.v(trim(x, 6)), M.o(MINUS), nv(+trim(R.mean, 4)))), M.n(2)));
     return [
-      { label: t("sdp.f.mean"), chain: [xb, M.frac(M.row(M.sum(), xi), n), M.frac(num(R.sum), num(R.n)), r4(R.mean)] },
-      { label: t("sdp.f.var"), chain: [V, M.frac(M.row(M.sum(), dev), D), M.frac(sumTerms(devTerms, 6), Dn), M.frac(r4(R.ss), num(R.d)), r4(R.v)] },
-      { label: t("sdp.f.sd"), chain: [Sd, M.sqrt(V), M.sqrt(r4(R.v)), r4(R.s)] },
+      { label: t("sdp.f.mean"), chain: [xb, M.frac(M.row(M.sum(), xi), n), M.frac(num(R.sum), M.v(R.n)), M.r(trim(R.mean, 4))] },
+      { label: t("sdp.f.var"), chain: [V, M.frac(M.row(M.sum(), dev), D), M.frac(sumTerms(devTerms, 6), Dn), M.frac(r4(R.ss), num(R.d)), M.r(trim(R.v, 4))] },
+      { label: t("sdp.f.sd"), chain: [Sd, M.sqrt(V), M.sqrt(M.v(trim(R.v, 4))), M.r(trim(R.s, 4))] },
       { label: t("sdp.f.short"), chain: [Sd,
         M.sqrt(M.frac(M.row(M.sum(), M.sup(xi, M.n(2)), M.o(MINUS), n, M.sup(xb, M.n(2))), D)),
-        M.sqrt(M.frac(M.row(num(R.sx2), M.o(MINUS), num(R.n), M.o("·"), M.sup(nv(+trim(R.mean, 4)), M.n(2))), Dn)),
-        r4(R.s)] },
+        M.sqrt(M.frac(M.row(num(R.sx2), M.o(MINUS), M.v(R.n), M.o("·"), M.sup(nv(+trim(R.mean, 4)), M.n(2))), Dn)),
+        M.r(trim(R.s, 4))] },
     ];
   },
 
@@ -96,7 +96,7 @@ const SD_PAGE = {
     { id: "bmD", data: [3, 5, 5, 7], O: { div: "n" }, source: "Bussab & Morettin · 3.2" },
   ],
   notes: ["note.n1", "note.units", "note.short", "note.outlier", "note.shift"],
-  sources: ["src.barbetta", "src.bussab", "src.slides"],
+  sources: ["src.barbetta", "src.bussab"],
 };
 /* s and s² (sample, n − 1), or dp(X) and var(X) as in Bussab & Morettin (n). */
 const sdSym = {

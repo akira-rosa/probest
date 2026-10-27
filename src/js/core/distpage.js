@@ -70,7 +70,7 @@ function distPage(cfg){
 
     /* ---------- examples ---------- */
     const queryMath = st => {
-      const X = M.i("X"), x = M.n(trim(st.a, 4)), y = M.n(trim(st.b ?? st.a, 4)), P_ = M.i("P");
+      const X = M.i("X"), x = M.v(trim(st.a, 4)), y = M.v(trim(st.b ?? st.a, 4)), P_ = M.i("P");
       const in_ = { eq: M.row(X, M.o("="), x), le: M.row(X, M.o("≤"), x), ge: M.row(X, M.o("≥"), x),
         between: M.row(x, M.o("≤"), X, M.o("≤"), y), outside: M.row(X, M.o("≤"), x, M.t(t("or")), X, M.o("≥"), y) }[st.mode];
       return M.row(P_, M.paren(in_));
@@ -78,7 +78,7 @@ function distPage(cfg){
     const exState = e => ({ ...S, P: { ...defaults(), ...e.set.P }, O: { ...S.O, ...(e.set.O || {}) }, mode: e.set.mode, a: e.set.a, b: e.set.b ?? e.set.a });
     const exList = () => cfg.examples.map(e => {
       const st = exState(e);
-      return { id: e.id, title: K("ex." + e.id), source: e.source === "slides" ? t("srcSlides") : e.source, answer: `<math>${queryMath(st)}<mo>=</mo>${M.prob(prob(st))}</math>` };
+      return { id: e.id, title: K("ex." + e.id), source: e.source, answer: `<math>${queryMath(st)}<mo>=</mo>${M.prob(prob(st))}</math>` };
     });
     function loadExample(id){
       const e = cfg.examples.find(x => x.id === id); if (!e) return;
@@ -163,7 +163,7 @@ function distPage(cfg){
       </section>
 
       <section class="formulas" aria-label="${t("formulas")}">
-        <h2>${t("formulas")}</h2>
+        ${formulasHead()}
         <div class="frow"><span class="flabel">${discrete ? t("d.pf") : t("d.pdf")}</span><div class="fmath" id="fPf"></div></div>
         <div class="frow"><span class="flabel">${t("d.prob")}</span><div class="fmath" id="fProb"></div></div>
         <div class="frow"><span class="flabel">${t("d.moments")}</span><div class="fmath" id="fMom"></div></div>
@@ -182,7 +182,7 @@ function distPage(cfg){
 
     /* ---------- formulas ---------- */
     const X_ = M.i("X"), P_ = M.i("P"), E_ = M.row(M.i("E"), M.paren(X_)), V_ = M.row(M.i("V"), M.paren(X_));
-    const pv = v => M.prob(v);
+    const pv = v => M.rprob(v);   // final results in bold; values from the controls are blue (M.v)
     function termList(lo, hi){
       const out = []; for (let k = lo; k <= hi; k++) out.push(M.n(cfg.pf(k, P()).toFixed(4)));
       return out.join(M.o("+"));
@@ -191,19 +191,19 @@ function distPage(cfg){
       const PP = P(), x = M.i("x"), val = prob(), [lo, hi] = support(PP);
       const fx = discrete ? M.row(M.i("p"), M.paren(x)) : M.row(M.i("f"), M.paren(x));
       const pf = discrete
-        ? M.row(fx, M.o("="), cfg.math.general(), M.o("="), M.row(M.i("p"), M.paren(M.n(String(S.a)))), M.o("="), cfg.math.at(S.a, PP),
+        ? M.row(fx, M.o("="), cfg.math.general(), M.o("="), M.row(M.i("p"), M.paren(M.v(String(S.a)))), M.o("="), cfg.math.at(S.a, PP),
             ...(cfg.math.atNum ? [M.o("="), cfg.math.atNum(S.a, PP)] : []), M.o("="), pv(cfg.pf(S.a, PP)))
         : M.row(fx, M.o("="), cfg.math.general(), M.o("="), cfg.math.at(null, PP));
       el("fPf").innerHTML = M.math(pf);
 
-      const q = queryMath(S), a = Math.min(S.a, S.b), b = Math.max(S.a, S.b), F = v => M.row(M.i("F"), M.paren(M.n(trim(v, 4))));
+      const q = queryMath(S), a = Math.min(S.a, S.b), b = Math.max(S.a, S.b), F = v => M.row(M.i("F"), M.paren(M.v(trim(v, 4))));
       let chain;
       if (discrete){
         const many = n => n > 7;
         if (S.mode === "eq") chain = [q, cfg.math.at(S.a, PP), ...(cfg.math.atNum ? [cfg.math.atNum(S.a, PP)] : []), pv(val)];
         else if (S.mode === "le") chain = S.a < lo ? [q, M.n(0)] : many(S.a - lo + 1) ? [q, F(S.a), pv(val)] : [q, termList(lo, S.a), pv(val)];
         else if (S.mode === "ge"){
-          const below = M.row(P_, M.paren(M.row(X_, M.o("≤"), M.n(String(S.a - 1)))));
+          const below = M.row(P_, M.paren(M.row(X_, M.o("≤"), M.v(String(S.a - 1)))));
           chain = S.a <= lo ? [q, M.n(1)] : many(S.a - lo)
             ? [q, M.row(M.n(1), M.o(MINUS), below), M.row(M.n(1), M.o(MINUS), F(S.a - 1)), pv(val)]
             : [q, M.row(M.n(1), M.o(MINUS), below), M.row(M.n(1), M.o(MINUS), M.paren(termList(lo, S.a - 1))), pv(val)];
@@ -230,8 +230,8 @@ function distPage(cfg){
       if (box.scrollWidth > box.clientWidth + 2) box.innerHTML = M.chain(chain, 2);
 
       el("fMom").innerHTML =
-        M.math(M.row(E_, M.o("="), cfg.math.mean.general(), M.o("="), cfg.math.mean.sub(PP), M.o("="), M.n(trim(cfg.mean(PP), 4)))) +
-        M.math(M.row(V_, M.o("="), cfg.math.variance.general(), M.o("="), cfg.math.variance.sub(PP), M.o("="), M.n(trim(cfg.variance(PP), 4))));
+        M.math(M.row(E_, M.o("="), cfg.math.mean.general(), M.o("="), cfg.math.mean.sub(PP), M.o("="), M.r(trim(cfg.mean(PP), 4)))) +
+        M.math(M.row(V_, M.o("="), cfg.math.variance.general(), M.o("="), cfg.math.variance.sub(PP), M.o("="), M.r(trim(cfg.variance(PP), 4))));
     }
 
     function renderVars(){

@@ -17,20 +17,20 @@ PAGES["uniform"] = distPage({
   variance: P => (P.beta - P.alpha) ** 2 / 12,
   math: {
     general: () => M.frac(M.n(1), M.row(M.i("β"), M.o(MINUS), M.i("α"))),
-    at: (_, P) => M.row(M.frac(M.n(1), M.row(M.n(trim(P.beta, 4)), M.minus(trim(P.alpha, 4)))), M.o("="), M.sig(1 / (P.beta - P.alpha))),
-    cdfSteps: (v, P) => [M.frac(M.row(M.n(trim(v, 4)), M.minus(trim(P.alpha, 4))), M.row(M.n(trim(P.beta, 4)), M.minus(trim(P.alpha, 4))))],
-    mean: { general: () => M.frac(M.row(M.i("α"), M.o("+"), M.i("β")), M.n(2)), sub: P => M.frac(M.row(M.n(trim(P.alpha, 4)), M.o("+"), M.n(trim(P.beta, 4))), M.n(2)) },
+    at: (_, P) => M.row(M.frac(M.n(1), M.row(M.v(trim(P.beta, 4)), M.vminus(trim(P.alpha, 4)))), M.o("="), M.sig(1 / (P.beta - P.alpha)).replace(/<mn>/g, '<mn class="r">')),
+    cdfSteps: (v, P) => [M.frac(M.row(M.v(trim(v, 4)), M.vminus(trim(P.alpha, 4))), M.row(M.v(trim(P.beta, 4)), M.vminus(trim(P.alpha, 4))))],
+    mean: { general: () => M.frac(M.row(M.i("α"), M.o("+"), M.i("β")), M.n(2)), sub: P => M.frac(M.row(M.v(trim(P.alpha, 4)), M.o("+"), M.v(trim(P.beta, 4))), M.n(2)) },
     variance: {
       general: () => M.frac(M.sup(M.paren(M.row(M.i("β"), M.o(MINUS), M.i("α"))), M.n(2)), M.n(12)),
-      sub: P => M.frac(M.sup(M.paren(M.row(M.n(trim(P.beta, 4)), M.minus(trim(P.alpha, 4)))), M.n(2)), M.n(12)),
+      sub: P => M.frac(M.sup(M.paren(M.row(M.v(trim(P.beta, 4)), M.vminus(trim(P.alpha, 4)))), M.n(2)), M.n(12)),
     },
   },
   r: { d: "dunif", p: "punif", q: "qunif", args: P => `min = ${trim(P.alpha, 6)}, max = ${trim(P.beta, 6)}`, mean: P => `(${trim(P.alpha, 6)} + ${trim(P.beta, 6)}) / 2` },
   examples: [
-    { id: "current",   set: { P: { alpha: 0, beta: 20 }, mode: "between", a: 5, b: 10 }, source: "slides" },
-    { id: "current10", set: { P: { alpha: 0, beta: 20 }, mode: "le", a: 10 },            source: "slides" },
+    { id: "current",   set: { P: { alpha: 0, beta: 20 }, mode: "between", a: 5, b: 10 }, source: "" },
+    { id: "current10", set: { P: { alpha: 0, beta: 20 }, mode: "le", a: 10 },            source: "" },
     { id: "spinner",   set: { P: { alpha: 0, beta: 360 }, mode: "between", a: 0, b: 90 }, source: "Barbetta · Ex. 6.2" },
   ],
   notes: ["note.flat", "note.center"],
-  sources: ["src.barbetta", "src.bussab", "src.slides"],
+  sources: ["src.barbetta", "src.bussab"],
 });

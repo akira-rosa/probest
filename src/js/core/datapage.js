@@ -45,7 +45,8 @@ function sumTerms(terms, max = 8){
   return M.row([...terms.slice(0, 3), M.o("⋯"), terms[terms.length - 1]].join(M.o("+")));
 }
 /* A data value as MathML, in parentheses when negative (for "x − x̄" and sums). */
-const nv = (v, d = 6) => v < 0 ? M.paren(M.n(trim(v, d))) : M.n(trim(v, d));
+/* A value going into a formula (blue), in parentheses when negative. */
+const nv = (v, d = 6) => v < 0 ? M.paren(M.v(trim(v, d))) : M.v(trim(v, d));
 
 /* The R vector of the data, wrapped to lines of about 64 characters. */
 function rVector(xs, name = "x"){
@@ -73,7 +74,7 @@ function dataPage(cfg){
     /* ---------- examples ---------- */
     const exO = e => ({ ...Object.fromEntries([...(cfg.options || []), ...(cfg.segs || [])].map(o => [o.key, o.def])), ...(e.O || {}) });
     const exList = () => cfg.examples.map(e => ({
-      id: e.id, title: K("ex." + e.id), source: e.source === "slides" ? t("srcSlides") : e.source,
+      id: e.id, title: K("ex." + e.id), source: e.source,
       answer: cfg.answer(cfg.compute(e.data, exO(e)), exO(e))
     }));
     function loadExample(id){
@@ -128,7 +129,7 @@ function dataPage(cfg){
       </section>
 
       <section class="formulas" aria-label="${t("formulas")}">
-        <h2>${t("formulas")}</h2>
+        ${formulasHead()}
         <div id="frows"></div>
         <div id="vars"></div>
       </section>

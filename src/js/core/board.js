@@ -70,11 +70,11 @@ function parseProb(str){
   if (m){ const a = parseNum(m[1]), b = parseNum(m[2]); return a != null && b ? a / b : null; }
   return parseNum(s);
 }
-/* A probability as MathML: a fraction stays a fraction, a decimal is shown with up to 4 decimals. */
+/* A probability going into a formula, as MathML (blue): a fraction stays a fraction, a decimal has up to 4 decimals. */
 function probMath(raw, v = parseProb(raw)){
   const m = String(raw ?? "").trim().match(/^([^/]+)\/([^/]+)$/);
-  if (m) return M.frac(M.n(trim(parseNum(m[1]), 6)), M.n(trim(parseNum(m[2]), 6)));
-  return M.n(trim(v, 4));
+  if (m) return M.frac(M.v(trim(parseNum(m[1]), 6)), M.v(trim(parseNum(m[2]), 6)));
+  return M.v(trim(v, 4));
 }
 /* Text for an input: fractions as typed, decimals in the language's format. */
 const probIn = raw => /\//.test(String(raw)) ? String(raw) : loc(String(raw));

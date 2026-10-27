@@ -10,11 +10,11 @@ PAGES["ci-proportion"] = ciPage({
   examples: [
     { id: "systems95", set: { conf: 95, n: 400, y: 240 }, source: "Barbetta · Ex. 7.3" },
     { id: "systems99", set: { conf: 99, n: 400, y: 240 }, source: "Barbetta · Ex. 7.3" },
-    { id: "happy", set: { conf: 95, n: 164, y: 35 }, source: "slides" },
-    { id: "brand", set: { conf: 95, n: 200, y: 140 }, source: "slides" },
+    { id: "happy", set: { conf: 95, n: 164, y: 35 }, source: "" },
+    { id: "brand", set: { conf: 95, n: 200, y: 140 }, source: "" },
     { id: "buildings", set: { conf: 95, n: 200, y: 110 }, source: () => `Barbetta · ${t("exercise")} 7.10` },
     { id: "pads", set: { conf: 95, n: 600, y: 18 }, source: () => `Barbetta · ${t("exercise")} 7.11` },
   ],
   notes: ["note.large", "note.width", "note.pct", "note.size"],
-  sources: ["src.barbetta", "src.bussab", "src.slides"],
+  sources: ["src.barbetta", "src.bussab"],
 });

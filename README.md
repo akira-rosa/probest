@@ -1,7 +1,7 @@
 # Probest Workbench
 
 A portable statistics and probability calculator. The finished app is **one HTML file**
-([`dist/index.html`](dist/index.html)) that runs in any modern browser — no install, no internet connection.
+([`dist/probest.html`](dist/probest.html)) that runs in any modern browser — no install, no internet connection.
 
 Each page pairs the formula (general form and with your values substituted), an
 interactive graph, and controls for the variables, so you can see how every input
@@ -9,7 +9,7 @@ changes the result. Available in English and Português (Brasil).
 
 ## Using the app
 
-Open `dist/index.html` in a browser, or copy that one file anywhere (USB stick, email, shared drive).
+Open `dist/probest.html` in a browser, or copy that one file anywhere (USB stick, email, shared drive).
 
 ## Pages
 
@@ -43,7 +43,7 @@ stay out of the menu until they are built.
 - **Sample size** (Estimation): the reference page for the format below. Mean or proportion,
   σ known or a pilot sample (t with n − 1 degrees of freedom), the p(1 − p) ≤ 1/4 bound, and the
   finite population correction n = N·n₀ / (N + n₀ − 1). Examples from Barbetta (Ex. 7.5),
-  Bussab & Morettin (Ex. 10.13, 10.14) and the course slides.
+  Bussab & Morettin (Ex. 10.13, 10.14).
 - **Addition rule and conditional probability** (Probability): a Venn diagram whose areas are
   proportional to the probabilities, with an exact bar of the sample space underneath; drag a
   circle to change P(A ∩ B), or snap to mutually exclusive or independent events. Probabilities can
@@ -77,13 +77,14 @@ The interactive part comes first:
 1. **Title.**
 2. **Graph, controls and result**: the graph can be dragged and zoomed; the result box shows the
    answer and the intermediate values.
-3. **Formulas**: the general formula next to the same formula with the current values, updated live,
+3. **Formulas**: the general formula next to the same formula with the current values, updated live
+   (values from the controls in blue with `M.v()`, results in bold with `M.r()`, constants unchanged),
    followed by a table defining every variable in the formula with its current value
    (`varsTableHtml()` in `core/ui.js`).
 4. **Sections** (`sectionsHtml()` in `core/ui.js`):
    - **About**: a short explanation of what the page calculates, then **Good to know**: rules and
      remarks from the books (rounding, assumptions, shortcuts).
-   - **Examples**: worked examples from Barbetta, Bussab & Morettin or the course slides,
+   - **Examples**: worked examples, mostly from Barbetta and Bussab & Morettin,
      loaded with one click, each showing its answer and source.
    - **In R**: the same calculation as R code with the current values, with a copy button.
    - **Sources**: book, section, equations and examples used.
@@ -100,20 +101,20 @@ The source is split into small files under `src/`. You don't need to build while
 When you're done, build the single file:
 
 ```sh
-npm run build        # or: node build.js        -> dist/index.html
+npm run build        # or: node build.js        -> dist/probest.html
 npm run watch        # or: node build.js --watch (rebuilds on every save)
 ```
 
 The build needs only [Node.js](https://nodejs.org) 16 or newer — there are no packages to install.
-`dist/index.html` is committed on purpose, so the latest app can be downloaded straight from GitHub.
+`dist/probest.html` is committed on purpose, so the latest app can be downloaded straight from GitHub.
 Rebuild before committing.
 
 ## Project layout
 
 ```
-build.js                  joins src/ into dist/index.html
+build.js                  joins src/ into dist/probest.html
 package.json              npm run build / npm run watch
-dist/index.html           the built app (generated — don't edit)
+dist/probest.html         the built app (generated — don't edit)
 src/
   index.html              page skeleton + the list of styles and scripts, in load order
   styles/

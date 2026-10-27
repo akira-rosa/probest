@@ -20,14 +20,14 @@ const MEAN_PAGE = {
     const xb = M.bar("x"), xi = M.sub(M.i("x"), M.i("i")), n = M.i("n"), num = v => M.n(trim(v, 6));
     const rows = [{ label: t("mean.f.mean"), chain: [
       xb, M.frac(M.row(M.sum(), xi), n),
-      M.frac(sumTerms(R.xs.map(v => nv(v))), num(R.n)),
-      M.frac(num(R.sum), num(R.n)), num(trim(R.mean, 4))] }];
+      M.frac(sumTerms(R.xs.map(v => nv(v))), M.v(R.n)),
+      M.frac(num(R.sum), M.v(R.n)), M.r(trim(R.mean, 4))] }];
     if (R.freq.length < R.n){
       const xj = M.sub(M.i("x"), M.i("j")), nj = M.sub(M.i("n"), M.i("j"));
-      const terms = R.freq.map(([v, c]) => M.row(nv(v), M.o("·"), M.n(String(c))));
+      const terms = R.freq.map(([v, c]) => M.row(nv(v), M.o("·"), M.v(String(c))));
       rows.push({ label: t("mean.f.freq"), chain: [
         xb, M.frac(M.row(M.sum(M.row(M.i("j"), M.o("="), M.n(1)), M.i("k")), xj, nj), n),
-        M.frac(sumTerms(terms, 6), num(R.n)), num(trim(R.mean, 4))] });
+        M.frac(sumTerms(terms, 6), M.v(R.n)), M.r(trim(R.mean, 4))] });
     }
     return rows;
   },
@@ -88,6 +88,6 @@ const MEAN_PAGE = {
     { id: "bm67", data: [15, 5, 3, 8, 10, 2, 7, 11, 12, 67], O: { median: true }, source: "Bussab & Morettin · Ex. 3.5" },
   ],
   notes: ["note.balance", "note.outlier", "note.freq", "note.units"],
-  sources: ["src.barbetta", "src.bussab", "src.slides"],
+  sources: ["src.barbetta", "src.bussab"],
 };
 PAGES["mean"] = dataPage(MEAN_PAGE);

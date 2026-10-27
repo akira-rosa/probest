@@ -30,14 +30,14 @@ PAGES["bayes"] = function BayesPage(root){
   /* ---------- examples ---------- */
   const EXAMPLES = [
     { id: "suppliers", rows: [["0.25", "0.1"], ["0.25", "0.1"], ["0.25", "0.2"], ["0.25", "0.4"]], target: 3, source: "Barbetta · Ex. 4.12" },
-    { id: "assembler", rows: [["0.30", "0.10"], ["0.70", "0.05"]], target: 0, source: "slides" },
+    { id: "assembler", rows: [["0.30", "0.10"], ["0.70", "0.05"]], target: 0, source: "" },
     { id: "clients", rows: [["0.10", "0.01"], ["0.15", "0.02"], ["0.15", "0.005"], ["0.40", "0.02"], ["0.20", "0.08"]], target: 4, source: () => `Barbetta · ${t("exercise")} 4.11` },
   ];
   const Ej = j => M.sub(M.i("E"), M.n(String(j + 1))), Ei = M.sub(M.i("E"), M.i("i")), F = M.i("F");
   const P = Ev.P, given = Ev.given;
   const exList = () => EXAMPLES.map(e => {
     const V = values({ rows: e.rows, target: e.target });
-    return { id: e.id, title: t("bayes.ex." + e.id), source: typeof e.source === "function" ? e.source() : e.source === "slides" ? t("srcSlides") : e.source,
+    return { id: e.id, title: t("bayes.ex." + e.id), source: typeof e.source === "function" ? e.source() : e.source,
       answer: `<math>${P(given(Ej(e.target), F))}<mo>=</mo>${M.n(trim(V.post[e.target], 4))}</math>` };
   });
   function loadExample(id){
@@ -72,12 +72,12 @@ PAGES["bayes"] = function BayesPage(root){
       </aside>
     </section>
     <section class="formulas" aria-label="${t("formulas")}">
-      <h2>${t("formulas")}</h2>
+      ${formulasHead()}
       <div class="frow"><span class="flabel">${t("bayes.f.total")}</span><div class="fmath" id="fTotal"></div></div>
       <div class="frow"><span class="flabel">${t("bayes.f.bayes")}</span><div class="fmath" id="fBayes"></div></div>
       <div id="vars"></div>
     </section>
-    ${sectionsHtml({ about: t("bayes.about"), notes: ["note.partition", "note.prior", "note.total", "note.click"].map(k => t("bayes." + k)), sources: ["src.barbetta", "src.bussab", "src.slides"].map(k => t("bayes." + k)) })}
+    ${sectionsHtml({ about: t("bayes.about"), notes: ["note.partition", "note.prior", "note.total", "note.click"].map(k => t("bayes." + k)), sources: ["src.barbetta", "src.bussab"].map(k => t("bayes." + k)) })}
   </div>`;
   const el = id => $("#" + id, root);
   let V = values();
@@ -110,10 +110,10 @@ PAGES["bayes"] = function BayesPage(root){
     if (!fromInput) syncRows(); else $$(".ev-name", root).forEach(b => b.setAttribute("aria-pressed", +b.dataset.target === S.target));
     el("err").hidden = !V.err;
     if (V.err){ el("err").textContent = t(V.err, { s: show(trim(V.sum ?? 0, 4)) }); board.draw(); return; }
-    const n4 = v => M.n(trim(v, 4)), j = V.j;
+    const n4 = v => M.n(trim(v, 4)), v4 = v => M.v(trim(v, 4)), r4 = v => M.r(trim(v, 4)), j = V.j;
     const terms = V.p.map((_, i) => M.row(probMath(V.raw[i][0], V.p[i]), M.o("·"), probMath(V.raw[i][1], V.l[i])));
-    const total = [P(F), M.row(M.sum(M.row(M.i("i"), M.o("="), M.n(1)), M.i("k")), P(Ei), M.o("·"), P(given(F, Ei))), sumTerms(terms, 5), n4(V.PF)];
-    const bayes = [P(given(Ej(j), F)), M.frac(M.row(P(Ej(j)), M.o("·"), P(given(F, Ej(j)))), P(F)), M.frac(terms[j], n4(V.PF)), n4(V.post[j])];
+    const total = [P(F), M.row(M.sum(M.row(M.i("i"), M.o("="), M.n(1)), M.i("k")), P(Ei), M.o("·"), P(given(F, Ei))), sumTerms(terms, 5), r4(V.PF)];
+    const bayes = [P(given(Ej(j), F)), M.frac(M.row(P(Ej(j)), M.o("·"), P(given(F, Ej(j)))), P(F)), M.frac(terms[j], v4(V.PF)), r4(V.post[j])];
     for (const [id, chain] of [["fTotal", total], ["fBayes", bayes]]){
       const f = el(id); f.innerHTML = M.math(M.row(chain.join(M.o("="))));
       if (f.scrollWidth > f.clientWidth + 2) f.innerHTML = M.chain(chain, 2);

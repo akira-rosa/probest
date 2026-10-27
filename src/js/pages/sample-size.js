@@ -43,12 +43,12 @@ PAGES["sample-size"] = function SampleSizePage(root){
 
   /* ---------- worked examples ---------- */
   const EXAMPLES = [
-    { id: "cct",      set: { target: "prop", conf: 95, epsProp: 0.02, worst: true, finite: true, N: 3000 },              source: t("ss.srcSlides") },
-    { id: "mayor45",  set: { target: "prop", conf: 95, epsProp: 0.02, worst: false, p: 0.45, finite: false },            source: t("ss.srcSlides") },
-    { id: "mayor",    set: { target: "prop", conf: 95, epsProp: 0.03, worst: true, finite: false },                       source: t("ss.srcSlides") },
+    { id: "cct",      set: { target: "prop", conf: 95, epsProp: 0.02, worst: true, finite: true, N: 3000 },              source: "" },
+    { id: "mayor45",  set: { target: "prop", conf: 95, epsProp: 0.02, worst: false, p: 0.45, finite: false },            source: "" },
+    { id: "mayor",    set: { target: "prop", conf: 95, epsProp: 0.03, worst: true, finite: false },                       source: "" },
     { id: "brand",    set: { target: "prop", conf: 95, epsProp: 0.03, worst: false, p: 0.6, finite: false },             source: "Bussab & Morettin · Ex. 10.14" },
     { id: "pilot",    set: { target: "mean", conf: 95, epsMean: 0.5, sigma: 4, sigmaSrc: "known", finite: false },        source: "Bussab & Morettin · Ex. 10.13" },
-    { id: "tv",       set: { target: "mean", conf: 95, epsMean: 0.25, sigma: 1.87, sigmaSrc: "known", finite: false },    source: t("ss.srcSlides") },
+    { id: "tv",       set: { target: "mean", conf: 95, epsMean: 0.25, sigma: 1.87, sigmaSrc: "known", finite: false },    source: "" },
     { id: "hardness", set: { target: "mean", conf: 99, epsMean: 0.3, sigma: 0.7352, sigmaSrc: "pilot", pilotN: 10, finite: false }, source: "Barbetta · Ex. 7.5" },
   ];
   const exState = e => ({ ...S, zTable: true, ...e.set });
@@ -158,7 +158,7 @@ PAGES["sample-size"] = function SampleSizePage(root){
     </section>
 
     <section class="formulas" aria-label="${t("formulas")}">
-      <h2>${t("formulas")}</h2>
+      ${formulasHead()}
       <div class="frow"><span class="flabel">${t("ss.initial")}</span><div class="fmath" id="fN0"></div></div>
       <div class="frow"><span class="flabel" id="fNLabel"></span><div class="fmath" id="fN"></div></div>
       <div id="vars"></div>
@@ -167,7 +167,7 @@ PAGES["sample-size"] = function SampleSizePage(root){
     ${sectionsHtml({
       about: t("ss.lede", { eps: sym("ε"), gamma: sym("γ"), N: sym("N") }),
       notes: [t("ss.note.round"), t("ss.note.sigma"), t("ss.note.p"), t("ss.note.two"), t("ss.note.N")],
-      sources: [t("ss.src.barbetta"), t("ss.src.bussab"), t("ss.src.slides")],
+      sources: [t("ss.src.barbetta"), t("ss.src.bussab")],
     })}
   </div>`;
 
@@ -179,7 +179,8 @@ PAGES["sample-size"] = function SampleSizePage(root){
   /* ---------- formulas ---------- */
   const critSym = R => M.sub(M.i(R.usesT ? "t" : "z"), M.i("γ"));
   function renderFormulas(R){
-    const c2 = M.subsup(M.i(R.usesT ? "t" : "z"), M.i("γ"), M.n(2)), sq = v => M.sup(M.n(v), M.n(2)), dot = M.o("·");
+    // in the application, values from the controls are blue (M.v) and results bold (M.r)
+    const c2 = M.subsup(M.i(R.usesT ? "t" : "z"), M.i("γ"), M.n(2)), sq = v => M.sup(M.v(v), M.n(2)), dot = M.o("·");
     const n0_ = M.sub(M.i("n"), M.n(0)), N_ = M.i("N"), e = trim(R.eps, 6), cs = trim(R.crit, R.usesT || S.zTable ? 3 : 5);
     const sd = R.usesT ? "s" : "σ";
     let gen, sub;
@@ -192,23 +193,23 @@ PAGES["sample-size"] = function SampleSizePage(root){
     } else {
       const p = trim(S.p, 4);
       gen = M.frac(M.row(c2, M.i("p"), M.paren(M.row(M.n(1), M.o(MINUS), M.i("p")))), M.sup(M.i("ε"), M.n(2)));
-      sub = M.frac(M.row(sq(cs), dot, M.n(p), dot, M.paren(M.row(M.n(1), M.o(MINUS), M.n(p)))), sq(e));
+      sub = M.frac(M.row(sq(cs), dot, M.v(p), dot, M.paren(M.row(M.n(1), M.o(MINUS), M.v(p)))), sq(e));
     }
-    let html = M.math(M.row(n0_, M.o("="), gen, M.o("="), sub, M.o("="), M.n(nf(R.n0))));
+    let html = M.math(M.row(n0_, M.o("="), gen, M.o("="), sub, M.o("="), M.r(nf(R.n0))));
     if (!R.mean && S.worst) html += M.math(M.row(M.i("p"), M.paren(M.row(M.n(1), M.o(MINUS), M.i("p"))), M.o("≤"), M.frac(M.n(1), M.n(4))), "res");
-    if (R.usesT) html += M.math(M.row(critSym(R), M.t(t("ss.withDf")), M.text(t("dfAbbr")), M.o("="), M.i("n"), M.o(MINUS), M.n(1), M.o("="), M.n(String(R.df))), "res");
+    if (R.usesT) html += M.math(M.row(critSym(R), M.t(t("ss.withDf")), M.text(t("dfAbbr")), M.o("="), M.i("n"), M.o(MINUS), M.n(1), M.o("="), M.v(String(S.pilotN)), M.o(MINUS), M.n(1), M.o("="), M.r(String(R.df))), "res");
     el("fN0").innerHTML = html;
 
     el("fNLabel").textContent = S.finite ? t("ss.finite") : t("ss.infinite");
-    const then = [M.o("⇒"), M.i("n"), M.o("="), M.n(String(R.size))];
+    const then = [M.o("⇒"), M.i("n"), M.o("="), M.r(String(R.size))];
     if (S.finite){
       const Ns = String(S.N), n0s = nf(R.n0);
       el("fN").innerHTML = M.math(M.row(
         M.i("n"), M.o("="), M.frac(M.row(N_, n0_), M.row(N_, M.o("+"), n0_, M.o(MINUS), M.n(1))),
-        M.o("="), M.frac(M.row(M.n(Ns), dot, M.n(n0s)), M.row(M.n(Ns), M.o("+"), M.n(n0s), M.o(MINUS), M.n(1))),
+        M.o("="), M.frac(M.row(M.v(Ns), dot, M.v(n0s)), M.row(M.v(Ns), M.o("+"), M.v(n0s), M.o(MINUS), M.n(1))),
         M.o("="), M.n(nf(R.n)), ...then));
     } else {
-      el("fN").innerHTML = M.math(M.row(M.i("n"), M.o("="), n0_, M.o("="), M.n(nf(R.n0)), ...then));
+      el("fN").innerHTML = M.math(M.row(M.i("n"), M.o("="), n0_, M.o("="), M.v(nf(R.n0)), ...then));
     }
   }
 

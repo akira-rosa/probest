@@ -47,7 +47,7 @@ function pairPage(cfg){
 
     /* ---------- examples ---------- */
     const exList = () => cfg.examples.map(e => ({ id: e.id, title: K("ex." + e.id),
-      source: typeof e.source === "function" ? e.source() : e.source === "slides" ? t("srcSlides") : e.source,
+      source: typeof e.source === "function" ? e.source() : e.source,
       answer: cfg.answer(cfg.compute(e.data, { ...S, ...(e.set || {}) })) }));
     function loadExample(id){
       const e = cfg.examples.find(x => x.id === id); if (!e) return;
@@ -82,7 +82,7 @@ function pairPage(cfg){
         </aside>
       </section>
       <section class="formulas" aria-label="${t("formulas")}">
-        <h2>${t("formulas")}</h2>
+        ${formulasHead()}
         <div id="frows"></div>
         <div id="vars"></div>
       </section>

@@ -87,7 +87,7 @@ PAGES["chi-square"] = function ChiSquarePage(root){
       <div class="ctable-wrap"><table class="ctable" id="ctable"></table></div>
     </section>
     <section class="formulas" aria-label="${t("formulas")}">
-      <h2>${t("formulas")}</h2>
+      ${formulasHead()}
       <div id="frows"></div>
       <div id="vars"></div>
     </section>
@@ -139,26 +139,27 @@ PAGES["chi-square"] = function ChiSquarePage(root){
 
   /* ---------- render ---------- */
   function renderFormulas(){
-    const [i, j] = S.sel, n3 = v => M.n(trim(v, 3)), sub = (s, a, b) => M.sub(M.i(s), M.row(M.n(String(a)), M.n(String(b))));
+    const [i, j] = S.sel, n3 = v => M.v(trim(v, 3)), r3 = v => M.r(trim(v, 3)), vs = v => M.v(String(v)),   // values blue, results bold
+      sub = (s, a, b) => M.sub(M.i(s), M.row(M.n(String(a)), M.n(String(b))));
     const rows = [];
     rows.push({ label: t("test.f.hyp"), html: `<p class="fhyp"><b>H<sub>0</sub>:</b> ${t("chi.h0")}<br><b>H<sub>1</sub>:</b> ${t("chi.h1")}</p>` });
     rows.push({ label: t("chi.f.E", { c: `${nm(S.rows[i])} · ${nm(S.cols[j])}` }), chain: [sub("E", i + 1, j + 1),
       M.frac(M.row(M.text(t("chi.rowTot")), M.o("×"), M.text(t("chi.colTot"))), M.i("n")),
-      M.frac(M.row(M.n(String(R.rt[i])), M.o("·"), M.n(String(R.ct[j]))), M.n(String(R.n))), n3(R.E[i][j])] });
+      M.frac(M.row(vs(R.rt[i]), M.o("·"), vs(R.ct[j])), vs(R.n)), r3(R.E[i][j])] });
     const term = (o, e) => R.yates
-      ? M.frac(M.sup(M.paren(M.row(`<mo>|</mo>`, M.n(String(o)), M.o(MINUS), n3(e), `<mo>|</mo>`, M.o(MINUS), M.n("0.5"))), M.n(2)), n3(e))
-      : M.frac(M.sup(M.paren(M.row(M.n(String(o)), M.o(MINUS), n3(e))), M.n(2)), n3(e));
+      ? M.frac(M.sup(M.paren(M.row(`<mo>|</mo>`, vs(o), M.o(MINUS), n3(e), `<mo>|</mo>`, M.o(MINUS), M.n("0.5"))), M.n(2)), n3(e))
+      : M.frac(M.sup(M.paren(M.row(vs(o), M.o(MINUS), n3(e))), M.n(2)), n3(e));
     const gen = R.yates
       ? M.frac(M.sup(M.paren(M.row(`<mo>|</mo>`, sub("O", "i", "j"), M.o(MINUS), sub("E", "i", "j"), `<mo>|</mo>`, M.o(MINUS), M.n("0.5"))), M.n(2)), sub("E", "i", "j"))
       : M.frac(M.sup(M.paren(M.row(sub("O", "i", "j"), M.o(MINUS), sub("E", "i", "j"))), M.n(2)), sub("E", "i", "j"));
     const allTerms = R.terms.flat().map(v => n3(v));
-    rows.push({ label: t("chi.f.cell"), chain: [M.row(M.text(t("chi.term")), M.paren(M.row(M.n(String(i + 1)), M.o(","), M.n(String(j + 1))))), term(S.O[i][j], R.E[i][j]), n3(R.terms[i][j])] });
+    rows.push({ label: t("chi.f.cell"), chain: [M.row(M.text(t("chi.term")), M.paren(M.row(M.n(String(i + 1)), M.o(","), M.n(String(j + 1))))), term(S.O[i][j], R.E[i][j]), r3(R.terms[i][j])] });
     rows.push({ label: t("chi.f.Q"), chain: [M.sup(M.i("q"), M.n(2)), M.row(M.sum(M.row(M.i("i"), M.o("="), M.n(1)), M.i("L")), M.sum(M.row(M.i("j"), M.o("="), M.n(1)), M.i("C")), gen),
-      sumTerms(allTerms, 6), n3(R.q)] });
+      sumTerms(allTerms, 6), r3(R.q)] });
     rows.push({ label: t("chi.f.df"), chain: [M.text(t("dfAbbr")), M.row(M.paren(M.row(M.i("L"), M.o(MINUS), M.n(1))), M.paren(M.row(M.i("C"), M.o(MINUS), M.n(1)))),
-      M.row(M.paren(M.row(M.n(String(R.L)), M.o(MINUS), M.n(1))), M.paren(M.row(M.n(String(R.Cn)), M.o(MINUS), M.n(1)))), M.n(String(R.df))] });
-    rows.push({ label: t("test.f.p"), html: M.math(M.row(M.i("p"), M.o("="), M.i("P"), M.paren(M.row(M.sup(M.i("χ"), M.n(2)), M.o(">"), n3(R.q))), M.o("="), M.prob(R.p))) +
-      M.math(M.row(M.sub(M.sup(M.i("χ"), M.n(2)), M.i("c")), M.o("="), n3(R.crit), M.t(";"), M.sup(M.i("q"), M.n(2)), M.o(R.reject ? ">" : "≤"), M.sub(M.sup(M.i("χ"), M.n(2)), M.i("c")), M.o("⇒"), M.text(R.reject ? t("test.reject") : t("test.accept"))), "res") });
+      M.row(M.paren(M.row(vs(R.L), M.o(MINUS), M.n(1))), M.paren(M.row(vs(R.Cn), M.o(MINUS), M.n(1)))), M.r(String(R.df))] });
+    rows.push({ label: t("test.f.p"), html: M.math(M.row(M.i("p"), M.o("="), M.i("P"), M.paren(M.row(M.sup(M.i("χ"), M.n(2)), M.o(">"), n3(R.q))), M.o("="), M.rprob(R.p))) +
+      M.math(M.row(M.sub(M.sup(M.i("χ"), M.n(2)), M.i("c")), M.o("="), r3(R.crit), M.t(";"), M.sup(M.i("q"), M.n(2)), M.o(R.reject ? ">" : "≤"), M.sub(M.sup(M.i("χ"), M.n(2)), M.i("c")), M.o("⇒"), M.text(R.reject ? t("test.reject") : t("test.accept"))), "res") });
     const box = el("frows");
     box.innerHTML = rows.map((r, k) => `<div class="frow"><span class="flabel">${r.label}</span><div class="fmath" data-row="${k}">${r.chain ? M.math(M.row(r.chain.join(M.o("=")))) : r.html}</div></div>`).join("");
     rows.forEach((r, k) => { if (!r.chain) return; const f = $(`[data-row="${k}"]`, box); if (f.scrollWidth > f.clientWidth + 2) f.innerHTML = M.chain(r.chain, 2); });

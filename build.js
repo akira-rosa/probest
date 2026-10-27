@@ -2,7 +2,7 @@
 /*
   Build: join src/ into one self-contained HTML file.
 
-    node build.js              -> dist/index.html
+    node build.js              -> dist/probest.html
     node build.js --watch      -> rebuild whenever a file in src/ changes
     node build.js --out x.html -> choose the output file
 
@@ -22,7 +22,7 @@ const ENTRY = path.join(SRC, "index.html");
 const args = process.argv.slice(2);
 const watch = args.includes("--watch") || args.includes("-w");
 const outArg = args.indexOf("--out");
-const OUT = path.resolve(ROOT, outArg >= 0 && args[outArg + 1] ? args[outArg + 1] : "dist/index.html");
+const OUT = path.resolve(ROOT, outArg >= 0 && args[outArg + 1] ? args[outArg + 1] : "dist/probest.html");
 
 const isLocal = href => !/^([a-z]+:)?\/\//i.test(href) && !href.startsWith("data:");
 const rel = p => path.relative(ROOT, p).split(path.sep).join("/");

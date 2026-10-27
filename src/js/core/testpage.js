@@ -48,14 +48,14 @@ function testPage(cfg){
     const P_ = mean ? M.i("μ") : M.i("p"), p0 = mean ? M.sub(M.i("μ"), M.n(0)) : M.sub(M.i("p"), M.n(0));
     const sSym = R => M.i(R.usesT ? "t" : "z"), cSym = R => M.sub(M.i(R.usesT ? "t" : "z"), M.i("c"));
     const relSym = { ne: "≠", gt: ">", lt: "<" };
-    const H = (k, rel) => M.row(M.sub(M.i("H"), M.n(k)), M.o(":"), P_, M.o(rel), M.n(trim(mean ? S.mu0 : S.p0, 6)));
+    const H = (k, rel) => M.row(M.sub(M.i("H"), M.n(k)), M.o(":"), P_, M.o(rel), M.v(trim(mean ? S.mu0 : S.p0, 6)));
     const decision = R => R.reject ? t("test.reject") : t("test.accept");
 
     /* ---------- examples ---------- */
     const exState = e => ({ ...S, zTable: true, cc: true, ...e.set });
     const exList = () => cfg.examples.map(e => {
       const st = exState(e), R = compute(st);
-      return { id: e.id, title: K("ex." + e.id), source: typeof e.source === "function" ? e.source() : e.source === "slides" ? t("srcSlides") : e.source,
+      return { id: e.id, title: K("ex." + e.id), source: typeof e.source === "function" ? e.source() : e.source,
         answer: `<math>${sSym(R)}<mo>=</mo>${M.n(trim(R.s, R.table ? 2 : 3))}<mo separator="true">;</mo><mspace width="0.4em"></mspace><mi>p</mi><mo>=</mo>${M.prob(R.p)}</math> · ${decision(R)}` };
     });
     function loadExample(id){
@@ -112,7 +112,7 @@ function testPage(cfg){
         </aside>
       </section>
       <section class="formulas" aria-label="${t("formulas")}">
-        <h2>${t("formulas")}</h2>
+        ${formulasHead()}
         <div id="frows"></div>
         <div id="vars"></div>
       </section>
@@ -123,33 +123,34 @@ function testPage(cfg){
 
     /* ---------- render ---------- */
     function renderFormulas(){
-      const n4 = v => M.n(trim(v, 4)), num = v => M.n(trim(v, 6)), sq = v => M.sqrt(v), rows = [];
+      // values from the controls in blue, results in bold
+      const n4 = v => M.n(trim(v, 4)), num = v => M.v(trim(v, 6)), r4 = v => M.r(trim(v, 4)), sq = v => M.sqrt(v), rows = [];
       rows.push({ label: t("test.f.hyp"), html: M.math(M.row(H(0, "="), M.t(""), H(1, relSym[S.h1]))) });
       if (mean){
         const sd = M.i(R.usesT ? "s" : "σ");
         rows.push({ label: t("test.f.stat"), chain: [sSym(R),
           M.frac(M.row(M.paren(M.row(M.bar("x"), M.o(MINUS), p0)), M.o("·"), sq(M.i("n"))), sd),
           M.frac(M.row(M.paren(M.row(num(S.xbar), M.o(MINUS), nv(S.mu0))), M.o("·"), sq(num(S.n))), num(S.sd)),
-          n4(R.stat), ...(R.table ? [`<mo>≈</mo>${M.n(trim(R.s, 2))}`] : [])] });
+          R.table ? n4(R.stat) : r4(R.stat), ...(R.table ? [`<mo>≈</mo>${M.r(trim(R.s, 2))}`] : [])] });
       } else {
         const np = S.n * S.p0;
-        rows.push({ label: K("f.sample"), html: M.math(M.row(M.i("p̂"), M.o("="), M.frac(M.i("y"), M.i("n")), M.o("="), M.frac(num(S.y), num(S.n)), M.o("="), n4(R.pHat))) +
+        rows.push({ label: K("f.sample"), html: M.math(M.row(M.i("p̂"), M.o("="), M.frac(M.i("y"), M.i("n")), M.o("="), M.frac(num(S.y), num(S.n)), M.o("="), r4(R.pHat))) +
           M.math(M.row(M.i("n"), M.sub(M.i("p"), M.n(0)), M.o("="), n4(np), M.o(","), M.t(""), M.i("n"), M.paren(M.row(M.n(1), M.o(MINUS), M.sub(M.i("p"), M.n(0)))), M.o("="), n4(S.n - np)), "res") });
-        if (S.cc && R.yAdj !== S.y) rows.push({ label: K("f.cc"), chain: [M.i("y′"), M.row(M.i("y"), M.o(R.yAdj < S.y ? MINUS : "+"), M.n("0.5")), M.row(num(S.y), M.o(R.yAdj < S.y ? MINUS : "+"), M.n("0.5")), num(R.yAdj)] });
+        if (S.cc && R.yAdj !== S.y) rows.push({ label: K("f.cc"), chain: [M.i("y′"), M.row(M.i("y"), M.o(R.yAdj < S.y ? MINUS : "+"), M.n("0.5")), M.row(num(S.y), M.o(R.yAdj < S.y ? MINUS : "+"), M.n("0.5")), M.r(trim(R.yAdj, 6))] });
         const yy = S.cc ? M.i("y′") : M.i("y");
         rows.push({ label: t("test.f.stat"), chain: [M.i("z"),
           M.frac(M.row(yy, M.o(MINUS), M.i("n"), M.sub(M.i("p"), M.n(0))), sq(M.row(M.i("n"), M.sub(M.i("p"), M.n(0)), M.paren(M.row(M.n(1), M.o(MINUS), M.sub(M.i("p"), M.n(0))))))),
-          M.frac(M.row(num(R.yAdj), M.o(MINUS), num(S.n), M.o("·"), num(S.p0)), sq(M.row(num(S.n), M.o("·"), num(S.p0), M.o("·"), n4(1 - S.p0)))),
-          n4(R.stat), ...(R.table ? [`<mo>≈</mo>${M.n(trim(R.s, 2))}`] : [])] });
+          M.frac(M.row(num(R.yAdj), M.o(MINUS), num(S.n), M.o("·"), num(S.p0)), sq(M.row(num(S.n), M.o("·"), num(S.p0), M.o("·"), M.v(trim(1 - S.p0, 4))))),
+          R.table ? n4(R.stat) : r4(R.stat), ...(R.table ? [`<mo>≈</mo>${M.r(trim(R.s, 2))}`] : [])] });
       }
       // p-value
-      const Z = R.usesT ? M.i("T") : M.i("Z"), absS = M.n(trim(Math.abs(R.s), R.table ? 2 : 4));
+      const Z = R.usesT ? M.i("T") : M.i("Z"), absS = M.v(trim(Math.abs(R.s), R.table ? 2 : 4));
       const tailP = M.row(M.i("P"), M.paren(M.row(Z, M.o(">"), absS)));
-      const pChain = S.h1 === "ne" ? [M.i("p"), M.row(M.n(2), M.o("·"), tailP), M.row(M.n(2), M.o("·"), n4(R.tail)), n4(R.p)]
-        : [M.i("p"), M.row(M.i("P"), M.paren(M.row(Z, M.o(S.h1 === "gt" ? ">" : "<"), M.n(trim(R.s, R.table ? 2 : 4))))), n4(R.p)];
+      const pChain = S.h1 === "ne" ? [M.i("p"), M.row(M.n(2), M.o("·"), tailP), M.row(M.n(2), M.o("·"), n4(R.tail)), M.rprob(R.p)]
+        : [M.i("p"), M.row(M.i("P"), M.paren(M.row(Z, M.o(S.h1 === "gt" ? ">" : "<"), M.v(trim(R.s, R.table ? 2 : 4))))), M.rprob(R.p)];
       rows.push({ label: t("test.f.p"), html: M.math(M.row(pChain.join(M.o("=")))) +
-        M.math(M.row(M.i("p"), M.o(R.reject ? "<" : "≥"), M.i("α"), M.o("="), M.n(trim(R.a, 4)), M.o("⇒"), M.text(decision(R))), "res") });
-      const critM = S.h1 === "ne" ? M.row(M.o("±"), M.n(trim(R.crit, 3))) : M.n(trim(S.h1 === "lt" ? -R.crit : R.crit, 3));
+        M.math(M.row(M.i("p"), M.o(R.reject ? "<" : "≥"), M.i("α"), M.o("="), M.v(trim(R.a, 4)), M.o("⇒"), M.text(decision(R))), "res") });
+      const critM = S.h1 === "ne" ? M.row(M.o("±"), M.r(trim(R.crit, 3))) : M.r(trim(S.h1 === "lt" ? -R.crit : R.crit, 3));
       rows.push({ label: t("test.f.crit"), html: M.math(M.row(cSym(R), M.o("="), critM, ...(R.usesT ? [M.t(`(${t("dfAbbr")} = ${R.df})`)] : []))) +
         `<p class="fnote">${R.reject ? t("test.inReject") : t("test.inAccept")}</p>` });
       const box = el("frows");

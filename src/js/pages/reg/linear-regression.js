@@ -39,21 +39,21 @@ PAGES["linear-regression"] = pairPage({
   yExtra: R => [R.y0],
 
   formulas(R){
-    const n = M.i("n"), sum = s => M.row(`<mo>∑</mo>`, s), x = M.i("x"), y = M.i("y"), num = v => M.n(trim(v, 4)), sq = v => M.sup(v, M.n(2)), dot = M.o("·");
-    const nn = M.n(String(R.n)), yh = M.i("ŷ");
-    const line = (bv, xv) => M.row(num(R.a), bv < 0 ? M.o(MINUS) : M.o("+"), num(Math.abs(bv)), xv);
+    const n = M.i("n"), sum = s => M.row(`<mo>∑</mo>`, s), x = M.i("x"), y = M.i("y"), num = v => M.n(trim(v, 4)), vv = v => M.v(trim(v, 4)), rr = v => M.r(trim(v, 4)), sq = v => M.sup(v, M.n(2)), dot = M.o("·");   // values blue, results bold
+    const nn = M.v(String(R.n)), yh = M.i("ŷ");
+    const line = (bv, xv) => M.row(vv(R.a), bv < 0 ? M.o(MINUS) : M.o("+"), vv(Math.abs(bv)), xv);
     document.querySelector("#extrap")?.toggleAttribute("hidden", !R.extrap);
     return [
       { label: t("reg.f.b"), chain: [M.i("b"),
         M.frac(M.row(n, sum(M.row(x, y)), M.o(MINUS), M.paren(sum(x)), M.paren(sum(y))), M.row(n, sum(sq(x)), M.o(MINUS), sq(M.paren(sum(x))))),
-        M.frac(M.row(nn, dot, num(R.sxy), M.o(MINUS), nv(+trim(R.sx, 4)), dot, nv(+trim(R.sy, 4))), M.row(nn, dot, num(R.sxx), M.o(MINUS), sq(nv(+trim(R.sx, 4))))),
-        M.frac(num(R.Sxy), num(R.Sxx)), num(R.b)] },
+        M.frac(M.row(nn, dot, vv(R.sxy), M.o(MINUS), nv(+trim(R.sx, 4)), dot, nv(+trim(R.sy, 4))), M.row(nn, dot, vv(R.sxx), M.o(MINUS), sq(nv(+trim(R.sx, 4))))),
+        M.frac(num(R.Sxy), num(R.Sxx)), rr(R.b)] },
       { label: t("reg.f.a"), chain: [M.i("a"), M.frac(M.row(sum(y), M.o(MINUS), M.i("b"), sum(x)), n),
-        M.frac(M.row(num(R.sy), M.o(MINUS), nv(+trim(R.b, 4)), dot, nv(+trim(R.sx, 4))), nn), num(R.a)] },
+        M.frac(M.row(vv(R.sy), M.o(MINUS), nv(+trim(R.b, 4)), dot, nv(+trim(R.sx, 4))), nn), rr(R.a)] },
       { label: t("reg.f.line"), html: M.math(M.row(yh, M.o("="), M.i("a"), M.o("+"), M.i("b"), x, M.o("="), line(R.b, x))) },
-      { label: t("reg.f.pred", { x: show(trim(R.x0, 4)) }), chain: [M.row(yh), line(R.b, M.row(dot, nv(R.x0))), num(R.y0)] },
+      { label: t("reg.f.pred", { x: show(trim(R.x0, 4)) }), chain: [M.row(yh), line(R.b, M.row(dot, nv(R.x0))), rr(R.y0)] },
       { label: t("reg.f.res"), html: M.math(M.row(M.sub(M.i("e"), M.i("i")), M.o("="), M.sub(y, M.i("i")), M.o(MINUS), M.sub(yh, M.i("i")), M.t(";"),
-          sum(sq(M.sub(M.i("e"), M.i("i")))), M.o("="), num(R.sse))) },
+          sum(sq(M.sub(M.i("e"), M.i("i")))), M.o("="), rr(R.sse))) },
     ];
   },
   vars: R => [

@@ -21,16 +21,16 @@ PAGES["hypergeometric"] = distPage({
   math: {
     general: () => M.frac(M.row(M.binom(M.i("r"), M.i("x")), M.binom(M.row(M.i("N"), M.o(MINUS), M.i("r")), M.row(M.i("n"), M.o(MINUS), M.i("x")))),
       M.binom(M.i("N"), M.i("n"))),
-    at: (x, P) => M.frac(M.row(M.binom(M.n(P.r), M.n(x)), M.binom(M.n(P.N - P.r), M.n(P.n - x))), M.binom(M.n(P.N), M.n(P.n))),
+    at: (x, P) => M.frac(M.row(M.binom(M.v(P.r), M.v(x)), M.binom(M.v(P.N - P.r), M.v(P.n - x))), M.binom(M.v(P.N), M.v(P.n))),
     atNum: (x, P) => {
       const big = v => v > 1e15 ? M.sig(v) : M.n(String(v));
       return M.frac(M.row(big(Num.choose(P.r, x)), M.o("·"), big(Num.choose(P.N - P.r, P.n - x))), big(Num.choose(P.N, P.n)));
     },
-    mean: { general: () => M.row(M.i("n"), M.frac(M.i("r"), M.i("N"))), sub: P => M.row(M.n(P.n), M.o("·"), M.frac(M.n(P.r), M.n(P.N))) },
+    mean: { general: () => M.row(M.i("n"), M.frac(M.i("r"), M.i("N"))), sub: P => M.row(M.v(P.n), M.o("·"), M.frac(M.v(P.r), M.v(P.N))) },
     variance: {
       general: () => M.row(M.i("n"), M.i("p"), M.paren(M.row(M.n(1), M.o(MINUS), M.i("p"))), M.frac(M.row(M.i("N"), M.o(MINUS), M.i("n")), M.row(M.i("N"), M.o(MINUS), M.n(1)))),
-      sub: P => { const p = trim(P.r / P.N, 4); return M.row(M.n(P.n), M.o("·"), M.n(p), M.o("·"), M.n(trim(1 - P.r / P.N, 4)), M.o("·"),
-        M.frac(M.row(M.n(P.N), M.o(MINUS), M.n(P.n)), M.row(M.n(P.N), M.o(MINUS), M.n(1)))); },
+      sub: P => { const p = trim(P.r / P.N, 4); return M.row(M.v(P.n), M.o("·"), M.v(p), M.o("·"), M.v(trim(1 - P.r / P.N, 4)), M.o("·"),
+        M.frac(M.row(M.v(P.N), M.o(MINUS), M.v(P.n)), M.row(M.v(P.N), M.o(MINUS), M.n(1)))); },
     },
   },
   extraVars: P => [[M.row(M.i("p"), M.o("="), M.frac(M.i("r"), M.i("N"))), t("hyp.sym.pRatio"), show(trim(P.r / P.N, 4))]],
@@ -39,8 +39,8 @@ PAGES["hypergeometric"] = distPage({
   examples: [
     { id: "cards", set: { P: { N: 30, r: 3, n: 5 }, mode: "ge", a: 1 },   source: "Barbetta · Ex. 5.3" },
     { id: "lot20", set: { P: { N: 20, r: 5, n: 4 }, mode: "eq", a: 2 },   source: "Bussab & Morettin · Ex. 5.8" },
-    { id: "lot100", set: { P: { N: 100, r: 10, n: 10 }, mode: "eq", a: 0 }, source: "slides" },
+    { id: "lot100", set: { P: { N: 100, r: 10, n: 10 }, mode: "eq", a: 0 }, source: "" },
   ],
   notes: ["note.when", "note.approx"],
-  sources: ["src.barbetta", "src.bussab", "src.slides"],
+  sources: ["src.barbetta", "src.bussab"],
 });

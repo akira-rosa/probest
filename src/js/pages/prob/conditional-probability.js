@@ -9,13 +9,13 @@ PAGES["conditional-probability"] = vennPage({
   state: { A: "350/6850", B: "1550/6850", AB: "50/6850", example: "milk" },
 
   formulas(V){
-    const P = Ev.P, r = V.raw, A = Ev.A(), B = Ev.B(), n4 = v => M.n(trim(v, 4));
+    const P = Ev.P, r = V.raw, A = Ev.A(), B = Ev.B(), n4 = v => M.n(trim(v, 4)), v4 = v => M.v(trim(v, 4)), r4 = v => M.r(trim(v, 4));
     const rows = [
-      { label: t("cond.f.cond"), chain: [P(Ev.given(A, B)), M.frac(P(Ev.and()), P(B)), M.frac(probMath(r.AB), probMath(r.B)), n4(V.AgB)] },
-      { label: t("cond.f.product"), chain: [P(Ev.and()), M.row(P(B), M.o("·"), P(Ev.given(A, B))), M.row(n4(V.B), M.o("·"), n4(V.AgB)), n4(V.AB)] },
+      { label: t("cond.f.cond"), chain: [P(Ev.given(A, B)), M.frac(P(Ev.and()), P(B)), M.frac(probMath(r.AB), probMath(r.B)), r4(V.AgB)] },
+      { label: t("cond.f.product"), chain: [P(Ev.and()), M.row(P(B), M.o("·"), P(Ev.given(A, B))), M.row(v4(V.B), M.o("·"), v4(V.AgB)), r4(V.AB)] },
     ];
-    if (V.A > 0) rows.push({ label: t("cond.f.other"), chain: [P(Ev.given(B, A)), M.frac(P(Ev.and()), P(A)), M.frac(probMath(r.AB), probMath(r.A)), n4(V.BgA)] });
-    rows.push({ label: t("cond.f.indep"), html: M.math(M.row(P(Ev.given(A, B)), M.o("="), n4(V.AgB), M.o(V.indep ? "=" : "≠"), n4(V.A), M.o("="), P(A))) +
+    if (V.A > 0) rows.push({ label: t("cond.f.other"), chain: [P(Ev.given(B, A)), M.frac(P(Ev.and()), P(A)), M.frac(probMath(r.AB), probMath(r.A)), r4(V.BgA)] });
+    rows.push({ label: t("cond.f.indep"), html: M.math(M.row(P(Ev.given(A, B)), M.o("="), v4(V.AgB), M.o(V.indep ? "=" : "≠"), v4(V.A), M.o("="), P(A))) +
       `<p class="fnote">${V.indep ? t("cond.indepYes") : t("cond.indepNo")}</p>` });
     return rows;
   },
@@ -41,9 +41,9 @@ PAGES["conditional-probability"] = vennPage({
     { id: "milk", set: { A: "350/6850", B: "1550/6850", AB: "50/6850" }, source: "Barbetta · Ex. 4.7" },
     { id: "diceA", set: { A: "6/36", B: "10/36", AB: "2/36" }, source: "Barbetta · Ex. 4.8" },
     { id: "diceB", set: { A: "10/36", B: "6/36", AB: "2/36" }, source: "Barbetta · Ex. 4.8" },
-    { id: "employees", set: { A: "0.20", B: "0.30", AB: "0.12" }, source: "slides" },
+    { id: "employees", set: { A: "0.20", B: "0.30", AB: "0.12" }, source: "" },
     { id: "die", set: { A: "1/2", B: "2/3", AB: "1/3" }, source: "Barbetta · 4.2" },
   ],
   notes: ["note.space", "note.order", "note.product", "note.indep"],
-  sources: ["src.barbetta", "src.bussab", "src.slides"],
+  sources: ["src.barbetta", "src.bussab"],
 });

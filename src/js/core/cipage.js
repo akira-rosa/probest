@@ -51,7 +51,7 @@ function ciPage(cfg){
     const exState = e => ({ ...S, zTable: true, ref: "", ...e.set });
     const exList = () => cfg.examples.map(e => {
       const R = compute(exState(e));
-      return { id: e.id, title: K("ex." + e.id), source: typeof e.source === "function" ? e.source() : e.source === "slides" ? t("srcSlides") : e.source,
+      return { id: e.id, title: K("ex." + e.id), source: typeof e.source === "function" ? e.source() : e.source,
         answer: `<math>${IC()}<mo>=</mo>${M.paren(M.row(M.n(trim(R.lo, dec(R))), M.o(usesComma() ? ";" : ","), M.n(trim(R.hi, dec(R)))))}</math>` };
     });
     function loadExample(id){
@@ -111,7 +111,7 @@ function ciPage(cfg){
         </aside>
       </section>
       <section class="formulas" aria-label="${t("formulas")}">
-        <h2>${t("formulas")}</h2>
+        ${formulasHead()}
         <div id="frows"></div>
         <div id="vars"></div>
       </section>
@@ -122,19 +122,19 @@ function ciPage(cfg){
 
     /* ---------- render ---------- */
     function renderFormulas(){
-      const n4 = v => M.n(trim(v, 4)), num = v => M.n(trim(v, 6)), cs = M.n(trim(R.crit, S.zTable ? 3 : 5));
+      const n4 = v => M.v(trim(v, 4)), num = v => M.v(trim(v, 6)), r4 = v => M.r(trim(v, 4)), cs = M.v(trim(R.crit, S.zTable ? 3 : 5));   // values blue, results bold
       const sq = M.sqrt(M.i("n")), rows = [];
-      if (!mean) rows.push({ label: K("f.phat"), chain: [M.i("p̂"), M.frac(M.i("y"), M.i("n")), M.frac(num(S.y), num(S.n)), n4(R.pHat)] });
+      if (!mean) rows.push({ label: K("f.phat"), chain: [M.i("p̂"), M.frac(M.i("y"), M.i("n")), M.frac(num(S.y), num(S.n)), r4(R.pHat)] });
       rows.push({ label: t("ci.f.se"), chain: mean
-        ? [seSym(R), M.frac(M.i(R.usesT ? "s" : "σ"), sq), M.frac(num(S.sd), M.sqrt(num(S.n))), n4(R.se)]
+        ? [seSym(R), M.frac(M.i(R.usesT ? "s" : "σ"), sq), M.frac(num(S.sd), M.sqrt(num(S.n))), r4(R.se)]
         : [seSym(R), M.sqrt(M.frac(M.row(M.i("p̂"), M.paren(M.row(M.n(1), M.o(MINUS), M.i("p̂")))), M.i("n"))),
-           M.sqrt(M.frac(M.row(n4(R.pHat), M.o("·"), n4(1 - R.pHat)), num(S.n))), n4(R.se)] });
+           M.sqrt(M.frac(M.row(n4(R.pHat), M.o("·"), n4(1 - R.pHat)), num(S.n))), r4(R.se)] });
       const pm = M.o("±");
       rows.push({ label: t("ci.f.ci"), chain: [IC(), M.row(est(), pm, critSym(R), M.o("·"), seSym(R)),
-        M.row(n4(R.c), pm, cs, M.o("·"), n4(R.se)), M.row(n4(R.c), pm, n4(R.eps))] });
+        M.row(n4(R.c), pm, cs, M.o("·"), n4(R.se)), M.row(n4(R.c), pm, r4(R.eps))] });
       rows.push({ label: t("ci.f.limits"), html: M.math(M.row(
         M.paren(M.row(est(), M.o(MINUS), M.i("ε"), M.o(usesComma() ? ";" : ","), est(), M.o("+"), M.i("ε"))), M.o("="),
-        M.paren(M.row(M.n(trim(R.lo, dec(R))), M.o(usesComma() ? ";" : ","), M.n(trim(R.hi, dec(R)))))))
+        M.paren(M.row(M.r(trim(R.lo, dec(R))), M.o(usesComma() ? ";" : ","), M.r(trim(R.hi, dec(R)))))))
         + (R.usesT ? M.math(M.row(critSym(R), M.t(t("ss.withDf")), M.text(t("dfAbbr")), M.o("="), M.i("n"), M.o(MINUS), M.n(1), M.o("="), M.n(String(R.df))), "res") : "") });
       const box = el("frows");
       box.innerHTML = rows.map((r, i) => `<div class="frow"><span class="flabel">${r.label}</span><div class="fmath" data-row="${i}">${r.chain ? M.math(M.row(r.chain.join(M.o("=")))) : r.html}</div></div>`).join("");

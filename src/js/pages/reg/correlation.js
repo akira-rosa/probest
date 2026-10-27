@@ -23,23 +23,23 @@ PAGES["correlation"] = pairPage({
   },
 
   formulas(R){
-    const n = M.i("n"), sum = s => M.row(`<mo>∑</mo>`, s), x = M.i("x"), y = M.i("y"), num = v => M.n(trim(v, 4)), sq = v => M.sup(v, M.n(2));
+    const n = M.i("n"), sum = s => M.row(`<mo>∑</mo>`, s), x = M.i("x"), y = M.i("y"), num = v => M.n(trim(v, 4)), vv = v => M.v(trim(v, 4)), rr = v => M.r(trim(v, 4)), sq = v => M.sup(v, M.n(2));   // values blue, results bold
     const xy = M.row(x, y), dot = M.o("·");
     const gen = M.frac(M.row(n, sum(xy), M.o(MINUS), M.paren(sum(x)), M.paren(sum(y))),
       M.row(M.sqrt(M.row(n, sum(sq(x)), M.o(MINUS), sq(M.paren(sum(x))))), dot, M.sqrt(M.row(n, sum(sq(y)), M.o(MINUS), sq(M.paren(sum(y)))))));
-    const nn = M.n(String(R.n));
-    const subst = M.frac(M.row(nn, dot, num(R.sxy), M.o(MINUS), nv(+trim(R.sx, 4)), dot, nv(+trim(R.sy, 4))),
-      M.row(M.sqrt(M.row(nn, dot, num(R.sxx), M.o(MINUS), sq(nv(+trim(R.sx, 4))))), dot, M.sqrt(M.row(nn, dot, num(R.syy), M.o(MINUS), sq(nv(+trim(R.sy, 4)))))));
+    const nn = M.v(String(R.n));
+    const subst = M.frac(M.row(nn, dot, vv(R.sxy), M.o(MINUS), nv(+trim(R.sx, 4)), dot, nv(+trim(R.sy, 4))),
+      M.row(M.sqrt(M.row(nn, dot, vv(R.sxx), M.o(MINUS), sq(nv(+trim(R.sx, 4))))), dot, M.sqrt(M.row(nn, dot, vv(R.syy), M.o(MINUS), sq(nv(+trim(R.sy, 4)))))));
     const sums = [[sum(x), R.sx], [sum(y), R.sy], [sum(sq(x)), R.sxx], [sum(sq(y)), R.syy], [sum(xy), R.sxy]]
-      .map(([s, v]) => M.row(s, M.o("="), num(v))).join(M.t(""));
-    const ttM = isFinite(R.tt) ? num(R.tt) : M.o("∞");
+      .map(([s, v]) => M.row(s, M.o("="), rr(v))).join(M.t(""));
+    const ttM = isFinite(R.tt) ? rr(R.tt) : M.o("∞");
     return [
       { label: t("corr.f.sums"), html: M.math(M.row(n, M.o("="), nn, M.t(""), sums)) },
-      { label: t("corr.f.r"), chain: [rSym(), gen, subst, M.frac(num(R.Sxy), M.row(M.sqrt(num(R.Sxx)), dot, M.sqrt(num(R.Syy)))), num(R.r)] },
+      { label: t("corr.f.r"), chain: [rSym(), gen, subst, M.frac(num(R.Sxy), M.row(M.sqrt(num(R.Sxx)), dot, M.sqrt(num(R.Syy)))), rr(R.r)] },
       { label: t("corr.f.test"), html: M.math(M.row(M.i("t"), M.o("="), M.frac(M.row(rSym(), M.sqrt(M.row(n, M.o(MINUS), M.n(2)))), M.sqrt(M.row(M.n(1), M.o(MINUS), M.sup(rSym(), M.n(2))))),
-          M.o("="), M.frac(M.row(num(R.r), dot, M.sqrt(M.n(String(R.df)))), M.sqrt(M.row(M.n(1), M.o(MINUS), sq(nv(+trim(R.r, 4)))))), M.o("="), ttM,
+          M.o("="), M.frac(M.row(vv(R.r), dot, M.sqrt(M.v(String(R.df)))), M.sqrt(M.row(M.n(1), M.o(MINUS), sq(nv(+trim(R.r, 4)))))), M.o("="), ttM,
           M.t(`(${t("dfAbbr")} = ${R.df})`))) +
-        M.math(M.row(M.i("p"), M.o("="), M.prob(R.p), M.t(";"), M.row(M.o("|"), rSym(), M.o("|")), M.o(Math.abs(R.r) > R.rc ? ">" : "≤"), M.n(trim(R.rc, 3)),
+        M.math(M.row(M.i("p"), M.o("="), M.rprob(R.p), M.t(";"), M.row(M.o("|"), rSym(), M.o("|")), M.o(Math.abs(R.r) > R.rc ? ">" : "≤"), M.n(trim(R.rc, 3)),
           M.o("⇒"), M.text(Math.abs(R.r) > R.rc ? t("corr.signif") : t("corr.notSignif"))), "res") },
     ];
   },

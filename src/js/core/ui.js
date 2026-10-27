@@ -37,7 +37,7 @@ function examplesHtml(list, active){
     <button class="example" type="button" data-ex="${e.id}" aria-pressed="${e.id === active}">
       <span class="ex-title">${e.title}</span>
       <span class="ex-answer">${e.answer}</span>
-      <span class="ex-source">${e.source}</span>
+      ${e.source ? `<span class="ex-source">${e.source}</span>` : ""}
     </button>`).join("")}</div>`;
 }
 function markExample(box, active){
@@ -78,6 +78,8 @@ const varsTableHtml = rows => `<table class="vars-table">
   <thead><tr><th>${t("varSymbol")}</th><th>${t("varMeaning")}</th><th>${t("varValue")}</th></tr></thead>
   <tbody>${rows.map(([m, d, v]) => `<tr><td class="v-sym"><math>${m}</math></td><td class="v-desc">${d}</td><td class="v-val">${v ?? ""}</td></tr>`).join("")}</tbody>
 </table>`;
+/* Heading of the formula card, with the key to the colours used in the applied formulas. */
+const formulasHead = () => `<div class="fhead"><h2>${t("formulas")}</h2><span class="flegend"><span class="lg-v">${show("1.96")}</span>${t("flegend.v")}<span class="lg-r">384</span>${t("flegend.r")}</span></div>`;
 const listHtml = (items, cls) => `<ul class="${cls}">${items.map(i => `<li>${i}</li>`).join("")}</ul>`;
 
 /* The standard block below the formulas: About (short explanation + good to know), Examples, In R, Sources.

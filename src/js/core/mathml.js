@@ -4,6 +4,11 @@
    ============================================================ */
 const M = {
   n: v => { const s = loc(v); return s.startsWith("-") ? `<mrow><mo form="prefix">${MINUS}</mo><mn>${s.slice(1)}</mn></mrow>` : `<mn>${s}</mn>`; },
+  /* A value taken from the controls (blue), and a result of the calculation (bold). */
+  v: v => M.n(v).replace(/<mn>/g, '<mn class="v">').replace('<mo form="prefix">', '<mo form="prefix" class="v">'),
+  r: v => M.n(v).replace(/<mn>/g, '<mn class="r">'),
+  vminus: v => `<mo>${MINUS}</mo>` + (String(v).startsWith("-") ? M.paren(M.v(v)) : M.v(v)),
+  rprob: p => M.prob(p).replace(/<mn>/g, '<mn class="r">'),
   i: s => `<mi>${s}</mi>`,
   up: s => `<mi mathvariant="normal">${s}</mi>`,
   o: s => `<mo>${s}</mo>`,
