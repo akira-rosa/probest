@@ -13,10 +13,9 @@
 /* the app name, wherever it appears (sidebar, top bar, home, footer) */
 .app-name, .foot-name b{font-family:var(--brand);font-weight:700;letter-spacing:0}
 .app-name{font-size:17px}
-.mark{
-  width:28px;height:28px;border-radius:7px;display:grid;place-items:center;
-  background:var(--ink);color:var(--bg);font-family:var(--math);font-size:18px;line-height:1;
-}
+/* logo: a box plot on a dark rounded square (also the favicon, in src/index.html) */
+.mark{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;background:var(--ink);color:var(--bg);flex:none}
+.mark svg{width:28px;height:28px;display:block}
 .side-tools{display:flex;gap:6px;margin:0 4px 12px}
 .search{position:relative;display:block;flex:1;min-width:0}
 .search input{
