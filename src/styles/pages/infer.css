@@ -1,0 +1,43 @@
+/* Estimation and hypothesis tests: intervals, decisions, contingency table. */
+.note.warn{color:var(--danger);margin:8px 0 0}
+.note.warn[hidden]{display:none}
+.note.seg-note{margin:10px 0 0}
+.ci-big{font-size:26px;letter-spacing:-.01em}
+.test-big{font-size:26px;color:var(--ink)}
+.test-big.rej{color:var(--danger)}
+.chip.rej .sw{height:10px;border:0;background:var(--danger);opacity:.35;border-radius:2px}
+.chip.pval .sw{height:10px;border:0;background:var(--fill);border-radius:2px}
+.fhyp{margin:0;font-size:15px;line-height:1.7;color:var(--ink)}
+.fhyp b{font-weight:600}
+
+/* table size */
+.size-row{display:grid;grid-template-columns:auto 30px 28px 30px;align-items:center;gap:6px 8px;font-size:14px;color:var(--muted)}
+.size-row b{text-align:center;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.btn.sq{width:30px;height:30px;padding:0;justify-content:center}
+
+/* contingency table */
+.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.card-head h2{margin:0}
+.card-head .hint{font-size:13px}
+.ctable-wrap{overflow-x:auto;padding-bottom:14px}
+.ctable{border-collapse:separate;border-spacing:4px;font-variant-numeric:tabular-nums}
+.ctable th, .ctable td{padding:0;text-align:center;vertical-align:middle;font-size:13.5px}
+.ctable thead th{font-weight:500}
+.ctable .nm{width:100%;min-width:84px;height:30px;border:1px solid transparent;border-radius:6px;background:none;color:var(--muted);
+  font:500 13px var(--ui);text-align:center;padding:0 6px}
+.ctable tbody th .nm{text-align:left}
+.ctable .nm:hover, .ctable .nm:focus{border-color:var(--line);background:var(--bg)}
+.ctable td.cell{
+  position:relative;min-width:104px;border-radius:7px;padding:6px 6px 5px;cursor:pointer;
+  background:color-mix(in srgb, var(--accent) calc(var(--heat, 0) * 22%), var(--bg));
+  border:1px solid transparent;
+}
+.ctable td.cell.sel{border-color:var(--accent)}
+.ctable .cnt{width:100%;height:30px;text-align:center;background:var(--surface)}
+.ctable .exp, .ctable .ctr{display:block;font-size:11.5px;line-height:1.35;color:var(--muted);margin-top:3px}
+.ctable .ctr{color:var(--accent);font-weight:600}
+.ctable td.low .exp{color:var(--danger)}
+.ctable .tot{min-width:70px;color:var(--muted);font-weight:500;padding:0 8px}
+.ctable tfoot th{color:var(--muted);font-weight:500;text-align:left;padding-left:8px}
+.ctable tbody th{padding-right:2px}
+.ctable-card .card-head h2{font-size:15px;font-weight:600}

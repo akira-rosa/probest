@@ -26,6 +26,17 @@ Built so far:
   point, the standard deviation as the band x̄ ± s with every deviation, and the quartiles as a box
   plot with the outliers. The standard deviation page divides by n − 1 or by n (Bussab & Morettin's
   var(X)); the quartiles follow Barbetta's (n + 1)/4 positions, the same as R's `type = 6`.
+- **Confidence intervals for the mean and for a proportion** (Estimation): the sampling
+  distribution centred on the estimate with the central area γ; drag the centre, or a limit to
+  change the confidence level. z or t (n − 1 degrees of freedom), table rounding to 3 decimals, and
+  an optional reference value (is 350 ml inside the interval?).
+- **Tests for a mean and for a proportion** (Hypothesis tests): the distribution of the statistic
+  under H₀ with the rejection region and the p-value area; drag the statistic to see the decision
+  change. One- or two-sided, z or t, continuity correction for proportions, and Barbetta's table
+  rounding (z to 2 decimals, areas to 4) so the p-values match the book.
+- **Chi-square test of independence** (Hypothesis tests): an editable contingency table up to 6 × 6
+  showing each cell's expected count and its share of q², the chi-square curve with the critical
+  value, and Yates' correction for 2 × 2 tables.
 - **Sample size** (Estimation): the reference page for the format below. Mean or proportion,
   σ known or a pilot sample (t with n − 1 degrees of freedom), the p(1 − p) ≤ 1/4 bound, and the
   finite population correction n = N·n₀ / (N + n₀ − 1). Examples from Barbetta (Ex. 7.5),
@@ -52,7 +63,8 @@ The six distribution pages share one template, `core/distpage.js`: each page in 
 gives its parameters, formulas, functions and examples. The data pages share `core/datapage.js`
 (data box, dot plot with draggable points) in the same way, with their configs in `pages/desc/`.
 The addition rule and conditional probability share `core/vennpage.js`; diagrams that are not x–y
-graphs use the `Board` canvas in `core/board.js`.
+graphs use the `Board` canvas in `core/board.js`. The two interval pages share `core/cipage.js` and
+the two one-sample tests share `core/testpage.js`.
 
 ## Page format
 
@@ -109,6 +121,7 @@ src/
     page.css              shared page layout: formula panel, graph card, controls, result box
     pages/data.css        data pages (data box, ordered values, quartile results)
     pages/prob.css        probability pages (event tables, Venn, Y = aX + b)
+    pages/infer.css       intervals and tests (decision, contingency table)
     pages/sample-size.css sample size page
     pages/placeholder.css "not built yet" page
     pages/home.css        home page
@@ -124,6 +137,8 @@ src/
     core/datapage.js      template for the data pages (data box, dot plot, Desc helpers)
     core/board.js         canvas for diagrams (Venn, mosaic) and fraction input (parseProb)
     core/vennpage.js      template for the two-event Venn pages
+    core/cipage.js        template for the confidence interval pages
+    core/testpage.js      template for the one-sample test pages
     core/ui.js            shared controls (numInput, setSlider, bindNudge) and page sections
                           (varsTableHtml, examplesHtml, codeHtml, sectionsHtml, bindCopy)
     locales/en.js         English strings
@@ -132,6 +147,8 @@ src/
     pages/desc/*.js       arithmetic mean, standard deviation, quartiles
     pages/prob/*.js       addition rule, conditional probability, Bayes' theorem
     pages/expected-value.js expected value and variance of a discrete variable
+    pages/est/*.js        confidence intervals for the mean and for a proportion
+    pages/tests/*.js      tests for a mean and a proportion, chi-square test of independence
     pages/dist/*.js       binomial, hypergeometric, Poisson, uniform, exponential, normal
     pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet
@@ -176,7 +193,7 @@ the values, add its `<script>` tag to `src/index.html`, and add a button for it 
 - **Graphs** are drawn on a `<canvas>` by the reusable `Plot` class.
 - **Numerics:** normal CDF via the Hart / West double-precision approximation; its inverse via
   Acklam's algorithm with a Halley refinement step. Student's t through the regularized incomplete
-  beta function; binomial coefficients through log-gamma, so large n stays accurate.
+  beta function, chi-square through the regularized incomplete gamma function; binomial coefficients through log-gamma, so large n stays accurate.
 - **Languages:** the choice is remembered; on first open it follows the browser's language.
   In Portuguese, numbers use a decimal comma and number fields accept either `1,5` or `1.5`.
 

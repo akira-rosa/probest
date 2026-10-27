@@ -120,3 +120,40 @@ Object.assign(Num, {
     return Math.round(r);
   },
 });
+
+/* ---------- chi-square (through the regularized incomplete gamma function) ---------- */
+Object.assign(Num, {
+  /* P(a, x): regularized lower incomplete gamma, by series or continued fraction (Numerical Recipes). */
+  gammaP(a, x){
+    if (x <= 0) return 0;
+    const lg = Num.lgamma(a);
+    if (x < a + 1){
+      let sum = 1 / a, del = sum, ap = a;
+      for (let i = 0; i < 1000; i++){ ap += 1; del *= x / ap; sum += del; if (Math.abs(del) < Math.abs(sum) * 1e-15) break; }
+      return Math.min(1, sum * Math.exp(-x + a * Math.log(x) - lg));
+    }
+    let b = x + 1 - a, c = 1 / 1e-300, d = 1 / b, h = d;
+    for (let i = 1; i < 1000; i++){
+      const an = -i * (i - a); b += 2;
+      d = an * d + b; if (Math.abs(d) < 1e-300) d = 1e-300;
+      c = b + an / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+      d = 1 / d; const del = d * c; h *= del;
+      if (Math.abs(del - 1) < 1e-15) break;
+    }
+    return Math.max(0, 1 - Math.exp(-x + a * Math.log(x) - lg) * h);
+  },
+  chiCdf(x, df){ return x <= 0 ? 0 : Num.gammaP(df / 2, x / 2); },
+  chiPdf(x, df){
+    if (x < 0) return 0;
+    if (x === 0) return df === 2 ? 0.5 : df < 2 ? Infinity : 0;
+    return Math.exp((df / 2 - 1) * Math.log(x) - x / 2 - (df / 2) * Math.LN2 - Num.lgamma(df / 2));
+  },
+  /* Inverse of chiCdf by bisection on a bracket that is widened as needed. */
+  chiInv(p, df){
+    if (p <= 0) return 0; if (p >= 1) return Infinity;
+    let lo = 0, hi = Math.max(1, df);
+    while (Num.chiCdf(hi, df) < p) hi *= 2;
+    for (let i = 0; i < 200; i++){ const m = (lo + hi) / 2; Num.chiCdf(m, df) < p ? lo = m : hi = m; if (hi - lo < 1e-12 * Math.max(1, hi)) break; }
+    return (lo + hi) / 2;
+  },
+});

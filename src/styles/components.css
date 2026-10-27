@@ -28,4 +28,5 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;bac
 /* checkbox with label */
 .check{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:1.35;color:var(--muted);cursor:pointer}
 .check input{margin:2px 0 0;accent-color:var(--accent);flex:none}
+.check[hidden]{display:none}
 .num:disabled, input[type=range]:disabled{opacity:.5;cursor:not-allowed}
