@@ -1,0 +1,36 @@
+/* Theme tokens: colours, fonts, radius. Light by default, dark via system or toggle. */
+:root{
+  --bg:#F5F6F3;
+  --side:#ECEEEA;
+  --surface:#FFFFFF;
+  --ink:#1B2029;
+  --muted:#5F6672;
+  --faint:#9AA0A8;
+  --line:#DCDFD9;
+  --grid:#ECEEE9;
+  --hover:#E3E6E0;
+  --accent:#2448D8;
+  --accent-ink:#FFFFFF;
+  --accent-soft:rgba(36,72,216,.10);
+  --fill:rgba(36,72,216,.16);
+  --pin:#8E949C;
+  --danger:#B42318;
+  --ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --math: "STIX Two Math", "Cambria Math", "Latin Modern Math", "STIXGeneral", math, serif;
+  --radius:8px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#171A1F; --side:#121418; --surface:#1D2127; --ink:#E7E9EC; --muted:#A1A7B0; --faint:#6E757F;
+    --line:#2C3139; --grid:#242830; --hover:#262B33; --accent:#7D97FF; --accent-ink:#0E1220;
+    --accent-soft:rgba(125,151,255,.12); --fill:rgba(125,151,255,.20); --pin:#7A818B; --danger:#F97066;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#171A1F; --side:#121418; --surface:#1D2127; --ink:#E7E9EC; --muted:#A1A7B0; --faint:#6E757F;
+  --line:#2C3139; --grid:#242830; --hover:#262B33; --accent:#7D97FF; --accent-ink:#0E1220;
+  --accent-soft:rgba(125,151,255,.12); --fill:rgba(125,151,255,.20); --pin:#7A818B; --danger:#F97066;
+  color-scheme: dark;
+}

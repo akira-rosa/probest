@@ -1,0 +1,6 @@
+/* placeholder page */
+.empty{
+  max-width:520px;margin:12vh auto 0;text-align:left;
+}
+.empty p{color:var(--muted)}
+.empty a{color:var(--accent)}

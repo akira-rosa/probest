@@ -1,0 +1,96 @@
+/* Normal distribution page (also the template layout for future pages). */
+/* formulas: the centrepiece */
+.formulas{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:6px 22px; margin-bottom:18px;
+}
+.frow{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px;align-items:center;padding:14px 0}
+.frow + .frow{border-top:1px solid var(--grid)}
+.flabel{font-size:13px;color:var(--muted)}
+.fmath{overflow-x:auto;overflow-y:hidden;font-size:21px;padding:2px 0;scrollbar-width:thin}
+.fmath math{display:block;margin:0;text-align:left}
+.fmath math + math{margin-top:10px}
+.fmath math.res{color:var(--muted)}
+
+/* workspace */
+.work{display:grid;grid-template-columns:minmax(0,1fr) 312px;gap:18px;align-items:start}
+.plot-col{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 12px 10px; min-width:0;
+}
+.plot-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:0 2px 10px}
+.bar-actions{display:flex;gap:6px;flex-wrap:wrap}
+.plot-wrap{position:relative;height:clamp(300px,50vh,520px)}
+canvas#plot{width:100%;height:100%;display:block;touch-action:pan-y;cursor:crosshair}
+canvas#plot.dragging{cursor:ew-resize}
+canvas#plot.panning{cursor:grabbing}
+.readout{display:flex;gap:14px;font-size:13px;color:var(--muted)}
+.readout b{font-weight:500;color:var(--ink)}
+.readout[hidden]{display:none}
+.legend{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 4px 0;font-size:13px;color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:2px 4px 2px 8px;border-radius:5px;background:var(--bg)}
+.chip .sw{width:18px;height:0;border-top:2px solid var(--accent)}
+.chip.pinned .sw{border-top:2px dashed var(--pin)}
+.chip button{border:0;background:none;cursor:pointer;color:var(--faint);padding:0 4px;font-size:15px;line-height:1}
+.chip button:hover{color:var(--ink)}
+.chip:not(.pinned){padding-right:8px}
+.hint{color:var(--faint)}
+.hint[hidden]{display:none}
+
+/* controls column */
+.controls{display:flex;flex-direction:column;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.group{padding:16px 18px}
+.group + .group{border-top:1px solid var(--line)}
+.group h2{font-size:13px;font-weight:600;margin:0 0 12px;color:var(--ink)}
+.param{display:grid;grid-template-columns:1fr 96px;align-items:center;gap:6px 10px;margin-bottom:14px}
+.param:last-child{margin-bottom:0}
+.param label{font-size:14px;color:var(--muted)}
+.param input[type=range]{grid-column:1 / -1}
+
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.modes button{
+  display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px 5px;
+  border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer;color:var(--muted);font-size:11.5px;
+}
+.modes button:hover{background:var(--hover)}
+.modes button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.modes svg{width:34px;height:18px;display:block}
+.bounds{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bounds label{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px}
+.bounds label[hidden]{display:none}
+.bounds.single{grid-template-columns:1fr}
+.quick{display:flex;gap:6px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.quick span{font-size:12.5px;color:var(--muted);margin-right:2px}
+.quick .btn{height:26px;padding:0 8px;font-size:12.5px}
+
+.result{background:var(--accent-soft)}
+.p-big{font-size:34px;font-weight:600;letter-spacing:-.02em;line-height:1.1;color:var(--ink)}
+.p-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:14px 0 0;font-size:13.5px}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;text-align:right}
+.qrow{display:grid;grid-template-columns:auto 96px;gap:8px 10px;align-items:center;font-size:14px}
+.qrow .lbl{color:var(--muted)}
+.qrow .lbl math{font-size:16px}
+.qout{font-size:15px;text-align:right;padding-right:9px}
+.qrow .btn{grid-column:1 / -1;justify-self:start;margin-top:4px}
+
+@media (max-width:1080px){
+  .work{grid-template-columns:1fr}
+  .controls{display:grid;grid-template-columns:1fr 1fr}
+  .controls .group + .group{border-top:0}
+  .controls .group{border-top:1px solid var(--line)}
+  .controls .group:nth-child(-n+2){border-top:0}
+  .controls .group:nth-child(even){border-left:1px solid var(--line)}
+}
+@media (max-width:860px){
+  .frow{grid-template-columns:1fr;gap:6px}
+  .fmath{font-size:18px}
+  .formulas{padding:4px 16px}
+}
+@media (max-width:620px){
+  .controls{display:flex}
+  .controls .group:nth-child(even){border-left:0}
+  .controls .group + .group{border-top:1px solid var(--line)}
+}

@@ -1,0 +1,26 @@
+/* Reusable controls: buttons, segmented toggles, number fields, sliders. */
+.btn{
+  height:30px;padding:0 11px;border-radius:6px;border:1px solid var(--line);background:var(--surface);
+  cursor:pointer;font-size:13px;white-space:nowrap;
+}
+.btn:hover{background:var(--hover)}
+.btn[hidden]{display:none}
+.seg{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:2px;gap:2px}
+.seg button{border:0;background:none;height:26px;padding:0 11px;border-radius:5px;cursor:pointer;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+
+/* number field */
+.num{
+  width:100%;height:32px;padding:0 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);
+  text-align:right;font-variant-numeric:tabular-nums;
+}
+.num:focus{background:var(--surface)}
+.num[aria-invalid="true"]{border-color:var(--danger);color:var(--danger)}
+
+/* range slider */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:none;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(var(--accent),var(--accent)) 0/var(--p,50%) 100% no-repeat, var(--line)}
+input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:3px;border-radius:2px;background:var(--accent)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6.5px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
