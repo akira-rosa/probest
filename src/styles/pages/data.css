@@ -1,0 +1,32 @@
+/* Pages computed from a list of data values: mean, standard deviation, quartiles. */
+.plot-title{font-size:13px;color:var(--muted);padding:6px 4px}
+.group-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.group-head h2{margin-bottom:10px}
+.count{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.data-in{
+  display:block;width:100%;min-height:96px;resize:vertical;padding:8px 10px;
+  border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);
+  font:13.5px/1.55 var(--ui);font-variant-numeric:tabular-nums;
+}
+.data-in:focus{background:var(--surface)}
+.data-in[aria-invalid="true"]{border-color:var(--danger)}
+.data-page .note{margin:8px 0 0}
+.data-actions{display:flex;gap:6px;margin-top:10px}
+.data-page .facts dd{white-space:normal}
+
+/* ordered data with positions (quartiles) */
+.ordered{display:flex;flex-wrap:wrap;gap:4px;padding:2px 0}
+.ordered span{
+  display:inline-flex;flex-direction:column;align-items:center;min-width:34px;padding:2px 6px 3px;
+  border-radius:5px;background:var(--bg);font-size:14px;line-height:1.25;font-variant-numeric:tabular-nums;
+}
+.ordered i{font-style:normal;font-size:10.5px;color:var(--faint)}
+.ordered .on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.ordered .on i{color:var(--accent)}
+.ordered .out{color:var(--danger)}
+.data-page .plot-wrap{height:clamp(280px,40vh,400px)}
+.qtrio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.qtrio span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.qtrio b{font-size:26px;font-weight:600;overflow-wrap:anywhere}
+.qtrio math{font-size:15px;color:var(--muted);font-weight:400}
+.p-sub:empty{display:none}

@@ -21,6 +21,11 @@ and is named after it; pages not built yet show a placeholder. Ideas for later p
 
 Built so far:
 
+- **Arithmetic mean, standard deviation and quartiles** (Descriptive statistics): type or paste
+  the data, then drag any point of the dot plot to change it. The mean is drawn as the balance
+  point, the standard deviation as the band x̄ ± s with every deviation, and the quartiles as a box
+  plot with the outliers. The standard deviation page divides by n − 1 or by n (Bussab & Morettin's
+  var(X)); the quartiles follow Barbetta's (n + 1)/4 positions, the same as R's `type = 6`.
 - **Sample size** (Estimation): the reference page for the format below. Mean or proportion,
   σ known or a pilot sample (t with n − 1 degrees of freedom), the p(1 − p) ≤ 1/4 bound, and the
   finite population correction n = N·n₀ / (N + n₀ − 1). Examples from Barbetta (Ex. 7.5),
@@ -34,7 +39,8 @@ Built so far:
   in Barbetta's Table 3, so the answers match the book.
 
 The six distribution pages share one template, `core/distpage.js`: each page in `pages/dist/` only
-gives its parameters, formulas, functions and examples.
+gives its parameters, formulas, functions and examples. The data pages share `core/datapage.js`
+(data box, dot plot with draggable points) in the same way, with their configs in `pages/desc/`.
 
 ## Page format
 
@@ -89,6 +95,7 @@ src/
     components.css        buttons, segmented toggles, number fields, sliders
     shell.css             sidebar, mobile top bar, main area
     page.css              shared page layout: formula panel, graph card, controls, result box
+    pages/data.css        data pages (data box, ordered values, quartile results)
     pages/sample-size.css sample size page
     pages/placeholder.css "not built yet" page
     pages/home.css        home page
@@ -101,11 +108,13 @@ src/
     core/mathml.js        builder for formulas (M.frac, M.sqrt, …)
     core/plot.js          canvas graph: pan, zoom, draggable markers, custom axis ticks
     core/distpage.js      template for the distribution pages (graph, modes, formulas, R code)
+    core/datapage.js      template for the data pages (data box, dot plot, Desc helpers)
     core/ui.js            shared controls (numInput, setSlider, bindNudge) and page sections
                           (varsTableHtml, examplesHtml, codeHtml, sectionsHtml, bindCopy)
     locales/en.js         English strings
     locales/pt.js         Portuguese strings
     nav.js                sidebar folder tree (NAV), page registry (PAGES), tree helpers
+    pages/desc/*.js       arithmetic mean, standard deviation, quartiles
     pages/dist/*.js       binomial, hypergeometric, Poisson, uniform, exponential, normal
     pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet

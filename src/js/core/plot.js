@@ -30,25 +30,29 @@ class Plot {
   Y(y){ return this.pad.t + this.ph - (y - this.y0) / (this.y1 - this.y0) * this.ph; }
   ix(px){ return this.x0 + (px - this.pad.l) / this.pw * (this.x1 - this.x0); }
   local(e){ const r = this.c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
-  hit(px){
+  /* Nearest handle: by x only (vertical markers), or by distance when the handle gives its pixel y (py). */
+  hit(px, py){
     let best = null, bd = 12;
-    for (const h of (this.o.handles?.() || [])){ const d = Math.abs(this.X(h.x) - px); if (d < bd){ bd = d; best = h; } }
+    for (const h of (this.o.handles?.() || [])){
+      const d = h.py != null ? Math.hypot(this.X(h.x) - px, h.py - py) : Math.abs(this.X(h.x) - px);
+      if (d < (h.r ?? bd) && d < bd){ bd = d; best = h; }
+    }
     return best;
   }
   down(e){
     if (e.button !== 0) return;
-    const [px] = this.local(e), h = this.hit(px);
+    const [px, py] = this.local(e), h = this.hit(px, py);
     this.c.setPointerCapture(e.pointerId);
     this.drag = h ? { type: "handle", key: h.key } : { type: "pan", px, x0: this.x0, x1: this.x1 };
     this.c.classList.add(h ? "dragging" : "panning");
   }
   move(e){
-    const [px] = this.local(e);
+    const [px, py] = this.local(e);
     if (this.drag?.type === "handle") this.o.onHandle?.(this.drag.key, this.ix(px));
     else if (this.drag?.type === "pan"){
       const dx = (px - this.drag.px) / this.pw * (this.drag.x1 - this.drag.x0);
       this.x0 = this.drag.x0 - dx; this.x1 = this.drag.x1 - dx;
-    } else this.c.style.cursor = this.hit(px) ? "ew-resize" : "";
+    } else { const h = this.hit(px, py); this.c.style.cursor = h ? (h.py != null ? "grab" : "ew-resize") : ""; }
     const inside = px >= this.pad.l && px <= this.w - this.pad.r;
     this.hover = inside ? this.ix(px) : null; this.o.onHover?.(this.hover);
     this.draw();

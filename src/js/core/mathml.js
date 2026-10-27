@@ -20,6 +20,10 @@ const M = {
   paren: a => `<mrow><mo>(</mo>${a}<mo>)</mo></mrow>`,
   brack: a => `<mrow><mo>[</mo>${a}<mo>]</mo></mrow>`,
   minus: v => `<mo>${MINUS}</mo>` + (String(v).startsWith("-") ? M.paren(M.n(v)) : M.n(v)),
+  /* x̄, the summation sign with limits i = 1 … n, and the k-th ordered value x₍ₖ₎ */
+  bar: s => `<mover accent="true"><mi>${s}</mi><mo stretchy="false">¯</mo></mover>`,
+  sum: (from = M.row(M.i("i"), M.o("="), M.n(1)), to = M.i("n")) => `<munderover><mo>∑</mo>${from}${to}</munderover>`,
+  ord: k => M.sub(M.i("x"), M.paren(typeof k === "number" ? M.n(String(k)) : k)),
   math: (a, cls = "") => `<math display="block"${cls ? ` class="${cls}"` : ""}>${a}</math>`,
   /* A number with 4 significant digits (scientific notation when tiny). */
   sig(v){
