@@ -90,7 +90,7 @@ main{min-width:0;padding:34px 40px 28px;display:flex;flex-direction:column;min-h
 .foot-row{display:flex;align-items:center;justify-content:space-between;gap:8px 20px;flex-wrap:wrap;margin-bottom:6px}
 .foot-name b{color:var(--ink);font-weight:600}
 .foot-ver{color:var(--faint);margin-left:4px}
-.foot-author{margin-left:10px}
+.foot-author{margin:12px 0 0;color:var(--muted)}
 .foot-links{display:flex;gap:18px;flex-wrap:wrap}
 .foot-links a{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
 .foot-links a:hover{color:var(--ink);text-decoration:underline}
