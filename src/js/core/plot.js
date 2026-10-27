@@ -69,7 +69,7 @@ class Plot {
   colors(){
     return { ink: cssVar("--ink"), muted: cssVar("--muted"), faint: cssVar("--faint"), line: cssVar("--line"),
              grid: cssVar("--grid"), accent: cssVar("--accent"), fill: cssVar("--fill"), pin: cssVar("--pin"),
-             surface: cssVar("--surface"), font: cssVar("--ui") };
+             surface: cssVar("--surface"), bar: cssVar("--bar"), font: cssVar("--ui") };
   }
   clip(fn){ const c = this.ctx; c.save(); c.beginPath(); c.rect(this.pad.l, this.pad.t - 1, this.pw, this.ph + 1); c.clip(); fn(c); c.restore(); }
   /* opts (all optional): xTicks / yTicks: tick values to use instead of automatic ones;
@@ -118,6 +118,26 @@ class Plot {
     const c = this.ctx, px = Math.round(this.X(x)) + .5;
     c.save(); c.setLineDash(dash); c.strokeStyle = color; c.lineWidth = width;
     c.beginPath(); c.moveTo(px, this.Y(this.y0)); c.lineTo(px, this.Y(Math.min(y1, this.y1))); c.stroke(); c.restore();
+  }
+  /* Bars of a discrete distribution: pts = [{ x, y, on }]; "on" bars are highlighted. */
+  bars(pts, C, w = 0.62){
+    this.clip(c => {
+      const base = this.Y(this.y0), minW = 1.5;
+      for (const b of pts){
+        const l = this.X(b.x - w / 2), r = this.X(b.x + w / 2), top = this.Y(b.y);
+        c.fillStyle = b.on ? C.accent : C.bar;
+        c.fillRect(Math.min(l, (l + r) / 2 - minW / 2), top, Math.max(minW, r - l), base - top);
+      }
+    });
+  }
+  /* Draggable marker: vertical line up to y, a knob at y, and a label pill (row 0 or 1) at the top. */
+  marker(x, y, label, C, row = 0){
+    if (x < this.x0 || x > this.x1) return;
+    const c = this.ctx, px = this.X(x), py = this.Y(y);
+    this.vline(x, C.accent, [], y, 1.5);
+    c.fillStyle = C.surface; c.strokeStyle = C.accent; c.lineWidth = 2;
+    c.beginPath(); c.arc(px, py, 5, 0, Math.PI * 2); c.fill(); c.stroke();
+    this.pill(px, row ? 30 : 6, label, C, true);
   }
   pill(x, y, text, C, strong){
     const c = this.ctx; c.font = `${strong ? 600 : 500} 12px ${C.font}`;

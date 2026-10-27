@@ -25,9 +25,16 @@ Built so far:
   σ known or a pilot sample (t with n − 1 degrees of freedom), the p(1 − p) ≤ 1/4 bound, and the
   finite population correction n = N·n₀ / (N + n₀ − 1). Examples from Barbetta (Ex. 7.5),
   Bussab & Morettin (Ex. 10.13, 10.14) and the course slides.
-- **Normal distribution** (Continuous random variables): density and cumulative graphs, probability
-  below / above / between / outside, z-scores, inverse lookup, pinned curves. To be updated to the
-  new format.
+- **Binomial, hypergeometric and Poisson distributions** (Discrete random variables): bar graph
+  or cumulative steps; P(X = x), P(X ≤ x), P(X ≥ x) and P(a ≤ X ≤ b) with every term written out,
+  mean and variance, inverse lookup and pinned curves for comparison.
+- **Uniform, exponential and normal distributions** (Continuous random variables): density or
+  cumulative graph with the shaded area; probability below / above / between / outside, inverse
+  lookup and pinned curves. The normal page can round z to 2 decimals and the tail area to 4, as
+  in Barbetta's Table 3, so the answers match the book.
+
+The six distribution pages share one template, `core/distpage.js`: each page in `pages/dist/` only
+gives its parameters, formulas, functions and examples.
 
 ## Page format
 
@@ -82,7 +89,6 @@ src/
     components.css        buttons, segmented toggles, number fields, sliders
     shell.css             sidebar, mobile top bar, main area
     page.css              shared page layout: formula panel, graph card, controls, result box
-    pages/normal.css      normal distribution page
     pages/sample-size.css sample size page
     pages/placeholder.css "not built yet" page
     pages/home.css        home page
@@ -94,12 +100,13 @@ src/
     core/numerics.js      maths: normal and Student's t (pdf, cdf, inverse), axis ticks
     core/mathml.js        builder for formulas (M.frac, M.sqrt, …)
     core/plot.js          canvas graph: pan, zoom, draggable markers, custom axis ticks
+    core/distpage.js      template for the distribution pages (graph, modes, formulas, R code)
     core/ui.js            shared controls (numInput, setSlider, bindNudge) and page sections
                           (varsTableHtml, examplesHtml, codeHtml, sectionsHtml, bindCopy)
     locales/en.js         English strings
     locales/pt.js         Portuguese strings
     nav.js                sidebar folder tree (NAV), page registry (PAGES), tree helpers
-    pages/normal.js       normal distribution page
+    pages/dist/*.js       binomial, hypergeometric, Poisson, uniform, exponential, normal
     pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet
     pages/home.js         home page: what the app is and every formula by topic
@@ -142,7 +149,8 @@ the values, add its `<script>` tag to `src/index.html`, and add a button for it 
 - **Formulas** use MathML, which modern browsers render natively.
 - **Graphs** are drawn on a `<canvas>` by the reusable `Plot` class.
 - **Numerics:** normal CDF via the Hart / West double-precision approximation; its inverse via
-  Acklam's algorithm with a Halley refinement step.
+  Acklam's algorithm with a Halley refinement step. Student's t through the regularized incomplete
+  beta function; binomial coefficients through log-gamma, so large n stays accurate.
 - **Languages:** the choice is remembered; on first open it follows the browser's language.
   In Portuguese, numbers use a decimal comma and number fields accept either `1,5` or `1.5`.
 

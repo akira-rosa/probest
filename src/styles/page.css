@@ -127,3 +127,28 @@ canvas#plot.panning{cursor:grabbing}
 @media (max-width:620px){
   .vars-table th, .vars-table td{padding:7px 6px}
 }
+
+/* ---- shared controls: probability query, bounds, inverse lookup ---- */
+.qmodes{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.qmodes button{
+  height:34px;padding:0 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);
+  cursor:pointer;color:var(--muted);font-size:14px;
+}
+.qmodes button math{font-size:15px}
+.qmodes button:hover{background:var(--hover)}
+.qmodes button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.bounds{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bounds label{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px}
+.bounds label[hidden]{display:none}
+.bounds.single{grid-template-columns:1fr}
+.qrow{display:grid;grid-template-columns:auto 96px;gap:8px 10px;align-items:center;font-size:14px}
+.qrow .lbl{color:var(--muted)}
+.qrow .lbl math{font-size:16px}
+.qout{font-size:15px;text-align:right;padding-right:9px}
+.qrow .btn{grid-column:1 / -1;justify-self:start;margin-top:4px}
+.check-top{margin-top:12px}
+.note{font-size:12.5px;line-height:1.4;color:var(--faint);margin:-6px 0 14px}
+.note.err{color:var(--danger);margin:4px 0 0}
+.note.err[hidden]{display:none}
+.p-sub math{font-size:15px}
+.ex-answer math{font-size:13.5px}

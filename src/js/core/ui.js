@@ -53,7 +53,7 @@ function codeHtml(code){
   return `<pre class="code"><code>${body}</code></pre>`;
 }
 /* Pad code so trailing comments line up: rLine("n0 <- 1", "initial size"). */
-const rLine = (code, comment, width = 30) => comment ? code.padEnd(width) + "# " + comment : code;
+const rLine = (code, comment, width = 30) => comment ? (code.length >= width ? code + "  " : code.padEnd(width)) + "# " + comment : code;
 
 /* Copy buttons inside el (bind once per page render). */
 function bindCopy(el){

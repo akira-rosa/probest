@@ -108,3 +108,15 @@ Object.assign(Num, {
     return x;
   },
 });
+
+/* ---------- counting ---------- */
+Object.assign(Num, {
+  /* log of the binomial coefficient C(n, k), exact enough for any n. */
+  lchoose(n, k){ return k < 0 || k > n ? -Infinity : Num.lgamma(n + 1) - Num.lgamma(k + 1) - Num.lgamma(n - k + 1); },
+  /* C(n, k) as a whole number (exact for small n). */
+  choose(n, k){
+    if (k < 0 || k > n) return 0; k = Math.min(k, n - k);
+    let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i;
+    return Math.round(r);
+  },
+});
