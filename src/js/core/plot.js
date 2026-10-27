@@ -72,9 +72,14 @@ class Plot {
              surface: cssVar("--surface"), font: cssVar("--ui") };
   }
   clip(fn){ const c = this.ctx; c.save(); c.beginPath(); c.rect(this.pad.l, this.pad.t - 1, this.pw, this.ph + 1); c.clip(); fn(c); c.restore(); }
-  grid(C){
-    const c = this.ctx, xt = Num.ticks(this.x0, this.x1, Math.max(3, this.pw / 90)), yt = Num.ticks(this.y0, this.y1, Math.max(3, this.ph / 60));
-    const xd = Num.decimalsFor(xt.step), yd = Num.decimalsFor(yt.step);
+  /* opts (all optional): xTicks / yTicks: tick values to use instead of automatic ones;
+     xFmt / yFmt: v => label text. */
+  grid(C, opts = {}){
+    const c = this.ctx;
+    const xt = opts.xTicks ? { values: opts.xTicks } : Num.ticks(this.x0, this.x1, Math.max(3, this.pw / 90));
+    const yt = opts.yTicks ? { values: opts.yTicks } : Num.ticks(this.y0, this.y1, Math.max(3, this.ph / 60));
+    const xd = xt.step ? Num.decimalsFor(xt.step) : 2, yd = yt.step ? Num.decimalsFor(yt.step) : 2;
+    const xFmt = opts.xFmt || (v => show(v.toFixed(xd))), yFmt = opts.yFmt || (v => show(v.toFixed(yd)));
     c.lineWidth = 1; c.strokeStyle = C.grid; c.beginPath();
     for (const v of xt.values){ const x = Math.round(this.X(v)) + .5; c.moveTo(x, this.pad.t); c.lineTo(x, this.pad.t + this.ph); }
     for (const v of yt.values){ const y = Math.round(this.Y(v)) + .5; c.moveTo(this.pad.l, y); c.lineTo(this.pad.l + this.pw, y); }
@@ -84,9 +89,9 @@ class Plot {
     c.moveTo(this.pad.l + .5, this.pad.t); c.lineTo(this.pad.l + .5, this.pad.t + this.ph); c.stroke();
     c.fillStyle = C.muted; c.font = `11.5px ${C.font}`;
     c.textAlign = "center"; c.textBaseline = "top";
-    for (const v of xt.values) c.fillText(show(v.toFixed(xd)), this.X(v), this.pad.t + this.ph + 8);
+    for (const v of xt.values) c.fillText(xFmt(v), this.X(v), this.pad.t + this.ph + 8);
     c.textAlign = "right"; c.textBaseline = "middle";
-    for (const v of yt.values) c.fillText(show(v.toFixed(yd)), this.pad.l - 8, this.Y(v));
+    for (const v of yt.values) c.fillText(yFmt(v), this.pad.l - 8, this.Y(v));
   }
   curve(f, { color, width = 2, dash = [] }){
     this.clip(c => {

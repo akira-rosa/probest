@@ -21,8 +21,6 @@ PAGES.normal = function NormalPage(root){
   const OR = t("or");
   const MODES = [["left", t("below"), "P(X ≤ x)"], ["right", t("above"), "P(X ≥ x)"], ["between", t("between"), "P(a ≤ X ≤ b)"], ["outside", t("outside"), `P(X ≤ a ${OR} X ≥ b)`]];
   const sym = s => `<span class="sym">${s}</span>`;
-  // Text inputs (not type=number) so both "1.5" and "1,5" are accepted. Arrow keys step by data-step.
-  const numInput = (id, step, extra = "") => `<input class="num" id="${id}" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" data-step="${step}" ${extra}>`;
 
   root.innerHTML = `
   <div class="page">
@@ -207,10 +205,6 @@ PAGES.normal = function NormalPage(root){
   }
 
   /* ---- keep inputs in sync ---- */
-  function setSlider(r, v){
-    if (v < +r.min) r.min = v; if (v > +r.max) r.max = v;
-    r.value = v; r.style.setProperty("--p", ((v - r.min) / (r.max - r.min) * 100) + "%");
-  }
   function syncInputs(skip){
     if (skip !== muN) muN.value = fmtIn(S.mu);
     if (skip !== sdN) sdN.value = fmtIn(S.sd);
@@ -324,15 +318,7 @@ PAGES.normal = function NormalPage(root){
 
   /* ---- events ---- */
   const num = inp => parseNum(inp.value);
-  // Arrow keys nudge a number field (Shift = ×10), like a native number input.
-  $$(".num", root).forEach(inp => inp.addEventListener("keydown", e => {
-    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
-    const v = num(inp); if (v == null) return;
-    e.preventDefault();
-    const step = +inp.dataset.step * (e.shiftKey ? 10 : 1), d = Math.max(0, Num.decimalsFor(step));
-    inp.value = loc(trim(v + (e.key === "ArrowUp" ? step : -step), Math.max(d, 4)));
-    inp.dispatchEvent(new Event("input")); inp.dispatchEvent(new Event("change"));
-  }));
+  bindNudge(root);
   muR.addEventListener("input", () => { S.mu = +muR.value; update(); });
   sdR.addEventListener("input", () => { S.sd = +sdR.value; update(); });
   muN.addEventListener("input", () => { const v = num(muN); muN.setAttribute("aria-invalid", v == null); if (v != null){ S.mu = v; update(muN); } });

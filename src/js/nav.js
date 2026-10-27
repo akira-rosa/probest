@@ -15,7 +15,7 @@ const NAV = [
     { folder: "discrete",   items: ["binomial", "poisson", "geometric"] },
     { folder: "continuous", items: ["normal", "uniform", "exponential", "student-t"] },
   ] },
-  { folder: "inference", items: ["ci", "tests", "regression"] },
+  { folder: "inference", items: ["ci", "sample-size-finite", "tests", "regression"] },
 ];
 const PAGES = {};          // id -> (root) => cleanup fn
 const DEFAULT_PAGE = "normal";

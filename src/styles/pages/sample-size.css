@@ -1,0 +1,14 @@
+/* Sample size (finite population) page. */
+.seg.full{display:flex;width:100%}
+.seg.full button{flex:1}
+.presets{display:flex;gap:6px;margin:-4px 0 12px}
+.presets .btn{height:26px;padding:0 10px;font-size:12.5px}
+.presets .btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.zline{margin-bottom:8px;font-size:16px;color:var(--muted)}
+.zline math{display:inline}
+.unit{color:var(--faint);font-size:12.5px}
+.note{font-size:12.5px;line-height:1.4;color:var(--faint);margin:-6px 0 14px}
+.result .note{margin:12px 0 0;color:var(--muted)}
+.check-gap{margin-bottom:14px}
+#meanBox[hidden], #propBox[hidden]{display:none}
+.chip.census .sw{border-top:2px dotted var(--faint)}

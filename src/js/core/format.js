@@ -23,3 +23,9 @@ function fmtProb(p){
   if (p > 1 - 1e-4 && p < 1) return p.toFixed(6);
   return p.toFixed(4);
 }
+
+/* Whole numbers with the language's thousands separator: 12345 -> "12,345" / "12.345". */
+const fmtInt = v => isFinite(v) ? new Intl.NumberFormat(t("htmlLang"), { maximumFractionDigits: 0 }).format(v) : "—";
+
+/* Round up, ignoring floating-point noise (2401.0000000001 -> 2401). Used for sample sizes. */
+const ceilN = v => Math.ceil(v - 1e-9);

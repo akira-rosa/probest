@@ -24,3 +24,8 @@ input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:var(
 input[type=range]::-moz-range-progress{height:3px;border-radius:2px;background:var(--accent)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6.5px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
 input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
+
+/* checkbox with label */
+.check{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:1.35;color:var(--muted);cursor:pointer}
+.check input{margin:2px 0 0;accent-color:var(--accent);flex:none}
+.num:disabled, input[type=range]:disabled{opacity:.5;cursor:not-allowed}
