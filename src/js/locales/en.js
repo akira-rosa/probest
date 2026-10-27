@@ -20,6 +20,11 @@ I18N.en = {
   phBody: "This page isn’t built yet. Its formulas, graph and controls will go here.",
   phLink: "Open the normal distribution",
 
+  // ---- footer ----
+  license: "{l} License",
+  footSources: "Main sources: Barbetta, Reis & Bornia, <em>Estatística para cursos de engenharia e informática</em>, and Bussab & Morettin, <em>Estatística básica</em>. Each page lists the sections and examples it uses.",
+  footNote: "Free and open source. A single file that works offline in any modern browser.",
+
   // ---- sidebar folders ----
   "folder.eda": "Exploratory data analysis",
   "folder.probability": "Probability",

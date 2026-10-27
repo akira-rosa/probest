@@ -83,6 +83,7 @@ src/
     pages/sample-size.css sample size page
     pages/placeholder.css "not built yet" page
   js/
+    core/app-info.js      app name, version, repository and license (shown in the footer)
     core/util.js          small helpers ($, clamp, trim, store…)
     core/i18n.js          translation engine: t(), setLang(), detectLang()
     core/format.js        number display/parsing per language (show, parseNum, fmtProb)
@@ -97,7 +98,7 @@ src/
     pages/normal.js       normal distribution page
     pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet
-    app.js                shell: sidebar, search, routing, theme, language — loaded last
+    app.js                shell: sidebar, search, routing, theme, language, footer — loaded last
 ```
 
 The scripts are plain browser scripts (not ES modules) so that `src/index.html` also works when opened
@@ -140,6 +141,17 @@ the values, add its `<script>` tag to `src/index.html`, and add a button for it 
 - **Languages:** the choice is remembered; on first open it follows the browser's language.
   In Portuguese, numbers use a decimal comma and number fields accept either `1,5` or `1.5`.
 
+## Versioning
+
+The version lives in two places that must match: `package.json` and `src/js/core/app-info.js`
+(shown in the footer). The build stops with an error if they differ. Change the app name or the
+repository link in `app-info.js` too.
+
 ## Browser support
 
 Recent Chrome, Edge, Firefox and Safari (MathML Core support is required for formulas).
+
+## License
+
+[MIT](LICENSE) © 2026 Akira Rosa. The worked examples and formulas come from the books cited on each
+page; the books themselves are not included.

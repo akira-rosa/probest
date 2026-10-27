@@ -33,8 +33,18 @@ function read(file, from){
   return fs.readFileSync(full, "utf8").replace(/^\uFEFF/, "").trimEnd();
 }
 
+/* The version shown in the app (src/js/core/app-info.js) must match package.json. */
+function checkVersion(){
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")).version;
+  const info = fs.readFileSync(path.join(SRC, "js/core/app-info.js"), "utf8").match(/version:\s*"([^"]+)"/);
+  if (!info) throw new Error("no version found in src/js/core/app-info.js");
+  if (info[1] !== pkg) throw new Error(`version mismatch: package.json has ${pkg}, src/js/core/app-info.js has ${info[1]}`);
+  return pkg;
+}
+
 function build(){
   const started = Date.now();
+  const version = checkVersion();
   let html = fs.readFileSync(ENTRY, "utf8");
 
   // 1. Drop HTML comments (developer notes, grouping labels).
@@ -71,7 +81,7 @@ function build(){
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, html);
   const kb = (Buffer.byteLength(html) / 1024).toFixed(1);
-  console.log(`Built ${rel(OUT)}  (${css.length} stylesheets, ${js.length} scripts, ${kb} KB, ${Date.now() - started} ms)`);
+  console.log(`Built ${rel(OUT)} v${version}  (${css.length} stylesheets, ${js.length} scripts, ${kb} KB, ${Date.now() - started} ms)`);
 }
 
 function safeBuild(){

@@ -3,7 +3,7 @@
    App shell: sidebar, search, routing, language, theme.
    Loaded last; starts the app.
    ============================================================ */
-const app = $("#app"), navEl = $("#nav"), mainEl = $("#main"), qEl = $("#q");
+const app = $("#app"), navEl = $("#nav"), mainEl = $("#view"), qEl = $("#q");
 let cleanup = null;      // cleanup function returned by the current page
 let keepScroll = false;  // true when re-rendering the same page (e.g. language change)
 
@@ -91,11 +91,11 @@ function route(){
   if (PAGES[id]) cleanup = PAGES[id](mainEl) || null;
   else if (label) PlaceholderPage(mainEl, label);
   else { location.replace("#/" + DEFAULT_PAGE); return; }
-  document.title = `${label} · Stats Workbench`;
+  document.title = `${label} · ${APP.name}`;
   revealPage(id);
   renderNav();
   closeNav();
-  if (!keepScroll){ mainEl.scrollTop = 0; window.scrollTo(0, 0); }
+  if (!keepScroll) window.scrollTo(0, 0);
   keepScroll = false;
 }
 
@@ -107,6 +107,22 @@ function applyShellText(){
   $("#langSeg").setAttribute("aria-label", t("language"));
   $$("#langSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === LANG));
   paintThemeBtn();
+  renderFooter();
+}
+
+/* ---------- footer (every page) ---------- */
+const ICON_GITHUB = `<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>`;
+function renderFooter(){
+  $("#foot").innerHTML = `
+    <div class="foot-row">
+      <span class="foot-name"><b>${esc(APP.name)}</b> <span class="foot-ver">v${esc(APP.version)}</span></span>
+      <span class="foot-links">
+        <a href="${APP.repo}" target="_blank" rel="noopener">${ICON_GITHUB}GitHub</a>
+        <a href="${APP.repo}/blob/main/LICENSE" target="_blank" rel="noopener">${t("license", { l: APP.license })}</a>
+      </span>
+    </div>
+    <p class="foot-text">${t("footSources")}</p>
+    <p class="foot-text">${t("footNote")}</p>`;
 }
 
 /* ---------- theme ---------- */
@@ -156,6 +172,7 @@ sysDark.addEventListener("change", themeChanged);
 window.addEventListener("hashchange", route);
 
 /* ---------- start ---------- */
+$$(".app-name").forEach(e => { e.textContent = APP.name; });
 if (/Mac|iPhone|iPad/.test(navigator.platform)) $("#kbdHint").textContent = "⌘K";
 const savedTheme = store.get("sw-theme"); if (savedTheme) document.documentElement.dataset.theme = savedTheme;
 setLang(detectLang(), false);

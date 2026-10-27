@@ -77,9 +77,25 @@ nav > .folder + .folder{margin-top:2px}
 .scrim{display:none}
 
 /* ---------------- Main ---------------- */
-main{min-width:0;padding:34px 40px 48px}
+main{min-width:0;padding:34px 40px 28px;display:flex;flex-direction:column;min-height:100vh}
+#view{flex:1}
 .page{max-width:1240px;margin:0 auto}
 .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px}
+
+/* ---------------- Footer ---------------- */
+.foot{
+  max-width:1240px;width:100%;margin:44px auto 0;padding-top:16px;
+  border-top:1px solid var(--line);font-size:13px;color:var(--muted);
+}
+.foot-row{display:flex;align-items:center;justify-content:space-between;gap:8px 20px;flex-wrap:wrap;margin-bottom:6px}
+.foot-name b{color:var(--ink);font-weight:600}
+.foot-ver{color:var(--faint);margin-left:4px}
+.foot-links{display:flex;gap:18px;flex-wrap:wrap}
+.foot-links a{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
+.foot-links a:hover{color:var(--ink);text-decoration:underline}
+.foot-links svg{width:14px;height:14px}
+.foot-text{margin:4px 0 0;max-width:110ch;line-height:1.5;color:var(--faint)}
+.foot-text em{font-style:italic;color:var(--muted)}
 
 @media (max-width:860px){
   .app{grid-template-columns:1fr}
@@ -91,6 +107,7 @@ main{min-width:0;padding:34px 40px 48px}
     padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--line);font-weight:600;
   }
   .topbar button{border:1px solid var(--line);background:var(--surface);border-radius:6px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
-  main{padding:22px 16px 40px}
+  main{padding:22px 16px 24px;min-height:0}
+  .foot{margin-top:32px}
 }
 @media (prefers-reduced-motion:reduce){ .side, .chev, .folder-body{transition:none} }
