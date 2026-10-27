@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stats Workbench</title>
+<style>
+/* ============================================================
+   Stats Workbench — single-file, offline, no dependencies.
+   Theme tokens
+   ============================================================ */
+:root{
+  --bg:#F5F6F3;
+  --side:#ECEEEA;
+  --surface:#FFFFFF;
+  --ink:#1B2029;
+  --muted:#5F6672;
+  --faint:#9AA0A8;
+  --line:#DCDFD9;
+  --grid:#ECEEE9;
+  --hover:#E3E6E0;
+  --accent:#2448D8;
+  --accent-ink:#FFFFFF;
+  --accent-soft:rgba(36,72,216,.10);
+  --fill:rgba(36,72,216,.16);
+  --pin:#8E949C;
+  --danger:#B42318;
+  --ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --math: "STIX Two Math", "Cambria Math", "Latin Modern Math", "STIXGeneral", math, serif;
+  --radius:8px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#171A1F; --side:#121418; --surface:#1D2127; --ink:#E7E9EC; --muted:#A1A7B0; --faint:#6E757F;
+    --line:#2C3139; --grid:#242830; --hover:#262B33; --accent:#7D97FF; --accent-ink:#0E1220;
+    --accent-soft:rgba(125,151,255,.12); --fill:rgba(125,151,255,.20); --pin:#7A818B; --danger:#F97066;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#171A1F; --side:#121418; --surface:#1D2127; --ink:#E7E9EC; --muted:#A1A7B0; --faint:#6E757F;
+  --line:#2C3139; --grid:#242830; --hover:#262B33; --accent:#7D97FF; --accent-ink:#0E1220;
+  --accent-soft:rgba(125,151,255,.12); --fill:rgba(125,151,255,.20); --pin:#7A818B; --danger:#F97066;
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:15px/1.5 var(--ui); font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+math{font-family:var(--math)}
+
+/* ---------------- Layout ---------------- */
+.app{display:grid;grid-template-columns:256px minmax(0,1fr);min-height:100vh}
+
+/* ---------------- Sidebar ---------------- */
+.side{
+  position:sticky; top:0; height:100vh; overflow:auto;
+  background:var(--side); border-right:1px solid var(--line);
+  display:flex; flex-direction:column; padding:18px 12px 12px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 16px;font-weight:600;letter-spacing:-.01em}
+.mark{
+  width:28px;height:28px;border-radius:7px;display:grid;place-items:center;
+  background:var(--ink);color:var(--bg);font-family:var(--math);font-size:18px;line-height:1;
+}
+.search{position:relative;display:block;margin:0 4px 14px}
+.search input{
+  width:100%; height:34px; padding:0 52px 0 10px; border-radius:7px;
+  border:1px solid var(--line); background:var(--surface);
+}
+.search input::placeholder{color:var(--faint)}
+.search kbd{
+  position:absolute; right:7px; top:50%; transform:translateY(-50%);
+  font:11px var(--ui); color:var(--faint); border:1px solid var(--line); border-radius:4px; padding:1px 5px;
+}
+nav{flex:1}
+.nav-group{margin-bottom:12px}
+.nav-group h3{font-size:12px;font-weight:600;color:var(--muted);margin:0 0 4px;padding:0 10px}
+.nav-group a{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:5px 10px; border-radius:6px; color:var(--ink); text-decoration:none; font-size:14px;
+  position:relative;
+}
+.nav-group a:hover{background:var(--hover)}
+.nav-group a.soon{color:var(--faint)}
+.nav-group a[aria-current="page"]{background:var(--surface);color:var(--ink);font-weight:550;box-shadow:inset 0 0 0 1px var(--line)}
+.nav-group a[aria-current="page"]::before{
+  content:""; position:absolute; left:-6px; top:8px; bottom:8px; width:3px; border-radius:2px; background:var(--accent);
+}
+.nav-empty{padding:6px 10px;color:var(--faint);font-size:14px}
+.side-foot{border-top:1px solid var(--line);padding-top:10px;margin-top:6px}
+.ghost{
+  display:flex;align-items:center;gap:8px;width:100%;
+  border:0;background:none;padding:7px 10px;border-radius:6px;cursor:pointer;color:var(--muted);font-size:14px;text-align:left;
+}
+.ghost:hover{background:var(--hover);color:var(--ink)}
+.ghost svg{width:16px;height:16px}
+
+/* mobile top bar */
+.topbar{display:none}
+.scrim{display:none}
+
+/* ---------------- Main ---------------- */
+main{min-width:0;padding:34px 40px 48px}
+.page{max-width:1240px;margin:0 auto}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px}
+h1{font-size:28px;line-height:1.15;letter-spacing:-.02em;font-weight:650;margin:0 0 6px}
+.lede{margin:0;color:var(--muted);max-width:62ch}
+
+/* formulas: the centrepiece */
+.formulas{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:6px 22px; margin-bottom:18px;
+}
+.frow{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px;align-items:center;padding:14px 0}
+.frow + .frow{border-top:1px solid var(--grid)}
+.flabel{font-size:13px;color:var(--muted)}
+.fmath{overflow-x:auto;overflow-y:hidden;font-size:21px;padding:2px 0;scrollbar-width:thin}
+.fmath math{display:block;margin:0;text-align:left}
+.fmath math + math{margin-top:10px}
+.fmath math.res{color:var(--muted)}
+
+/* workspace */
+.work{display:grid;grid-template-columns:minmax(0,1fr) 312px;gap:18px;align-items:start}
+.plot-col{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 12px 10px; min-width:0;
+}
+.plot-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:0 2px 10px}
+.bar-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn{
+  height:30px;padding:0 11px;border-radius:6px;border:1px solid var(--line);background:var(--surface);
+  cursor:pointer;font-size:13px;white-space:nowrap;
+}
+.btn:hover{background:var(--hover)}
+.btn[hidden]{display:none}
+.seg{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:2px;gap:2px}
+.seg button{border:0;background:none;height:26px;padding:0 11px;border-radius:5px;cursor:pointer;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.plot-wrap{position:relative;height:clamp(300px,50vh,520px)}
+canvas#plot{width:100%;height:100%;display:block;touch-action:pan-y;cursor:crosshair}
+canvas#plot.dragging{cursor:ew-resize}
+canvas#plot.panning{cursor:grabbing}
+.readout{display:flex;gap:14px;font-size:13px;color:var(--muted)}
+.readout b{font-weight:500;color:var(--ink)}
+.readout[hidden]{display:none}
+.legend{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 4px 0;font-size:13px;color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:2px 4px 2px 8px;border-radius:5px;background:var(--bg)}
+.chip .sw{width:18px;height:0;border-top:2px solid var(--accent)}
+.chip.pinned .sw{border-top:2px dashed var(--pin)}
+.chip button{border:0;background:none;cursor:pointer;color:var(--faint);padding:0 4px;font-size:15px;line-height:1}
+.chip button:hover{color:var(--ink)}
+.chip:not(.pinned){padding-right:8px}
+.hint{color:var(--faint)}
+.hint[hidden]{display:none}
+
+/* controls column */
+.controls{display:flex;flex-direction:column;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.group{padding:16px 18px}
+.group + .group{border-top:1px solid var(--line)}
+.group h2{font-size:13px;font-weight:600;margin:0 0 12px;color:var(--ink)}
+.param{display:grid;grid-template-columns:1fr 96px;align-items:center;gap:6px 10px;margin-bottom:14px}
+.param:last-child{margin-bottom:0}
+.param label{font-size:14px;color:var(--muted)}
+.sym{font-family:var(--math);font-style:italic;color:var(--ink);font-size:17px;margin-right:4px}
+.lede .sym{margin:0 1px;font-size:16px}
+.param input[type=range]{grid-column:1 / -1}
+.num{
+  width:100%;height:32px;padding:0 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);
+  text-align:right;font-variant-numeric:tabular-nums;
+}
+.num:focus{background:var(--surface)}
+.num[aria-invalid="true"]{border-color:var(--danger);color:var(--danger)}
+input[type=number]::-webkit-inner-spin-button{opacity:.4}
+
+/* range slider */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:none;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(var(--accent),var(--accent)) 0/var(--p,50%) 100% no-repeat, var(--line)}
+input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:3px;border-radius:2px;background:var(--accent)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6.5px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
+
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.modes button{
+  display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px 5px;
+  border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer;color:var(--muted);font-size:11.5px;
+}
+.modes button:hover{background:var(--hover)}
+.modes button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.modes svg{width:34px;height:18px;display:block}
+.bounds{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bounds label{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px}
+.bounds label[hidden]{display:none}
+.bounds.single{grid-template-columns:1fr}
+.quick{display:flex;gap:6px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.quick span{font-size:12.5px;color:var(--muted);margin-right:2px}
+.quick .btn{height:26px;padding:0 8px;font-size:12.5px}
+
+.result{background:var(--accent-soft)}
+.p-big{font-size:34px;font-weight:600;letter-spacing:-.02em;line-height:1.1;color:var(--ink)}
+.p-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:14px 0 0;font-size:13.5px}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;text-align:right}
+.qrow{display:grid;grid-template-columns:auto 96px;gap:8px 10px;align-items:center;font-size:14px}
+.qrow .lbl{color:var(--muted)}
+.qrow .lbl math{font-size:16px}
+.qout{font-size:15px;text-align:right;padding-right:9px}
+.qrow .btn{grid-column:1 / -1;justify-self:start;margin-top:4px}
+
+/* placeholder page */
+.empty{
+  max-width:520px;margin:12vh auto 0;text-align:left;
+}
+.empty p{color:var(--muted)}
+.empty a{color:var(--accent)}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width:1080px){
+  .work{grid-template-columns:1fr}
+  .controls{display:grid;grid-template-columns:1fr 1fr}
+  .controls .group + .group{border-top:0}
+  .controls .group{border-top:1px solid var(--line)}
+  .controls .group:nth-child(-n+2){border-top:0}
+  .controls .group:nth-child(even){border-left:1px solid var(--line)}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;bottom:0;width:272px;z-index:20;transform:translateX(-100%);transition:transform .2s ease}
+  .app.nav-open .side{transform:none}
+  .app.nav-open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:15}
+  .topbar{
+    display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;
+    padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--line);font-weight:600;
+  }
+  .topbar button{border:1px solid var(--line);background:var(--surface);border-radius:6px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer}
+  main{padding:22px 16px 40px}
+  .frow{grid-template-columns:1fr;gap:6px}
+  .fmath{font-size:18px}
+  .formulas{padding:4px 16px}
+}
+@media (max-width:620px){
+  .controls{display:flex}
+  .controls .group:nth-child(even){border-left:0}
+  .controls .group + .group{border-top:1px solid var(--line)}
+  h1{font-size:24px}
+}
+@media (prefers-reduced-motion:reduce){ .side{transition:none} }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="topbar">
+    <button id="menuBtn" aria-label="Open menu" aria-controls="side" aria-expanded="false">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+    </button>
+    <span>Stats Workbench</span>
+  </div>
+  <div class="scrim" id="scrim"></div>
+
+  <aside class="side" id="side">
+    <div class="brand"><span class="mark">σ</span><span>Stats Workbench</span></div>
+    <label class="search">
+      <input id="q" type="search" placeholder="Find a formula" aria-label="Find a formula" autocomplete="off">
+      <kbd id="kbdHint">Ctrl K</kbd>
+    </label>
+    <nav id="nav" aria-label="Formulas"></nav>
+    <div class="side-foot">
+      <button class="ghost" id="themeBtn"></button>
+    </div>
+  </aside>
+
+  <main id="main"></main>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   Small helpers
+   ============================================================ */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const MINUS = "−";
+
+function trim(v, d = 4){
+  if (!isFinite(v)) return "—";
+  let s = (+v).toFixed(d);
+  if (s.includes(".")) s = s.replace(/0+$/, "").replace(/\.$/, "");
+  if (s === "-0") s = "0";
+  return s;
+}
+const show = s => String(s).replace(/^-/, MINUS);          // pretty minus for display
+function fmtProb(p){
+  if (!isFinite(p)) return "—";
+  if (p === 0) return "0";
+  if (p < 1e-4) return p.toExponential(3);
+  if (p > 1 - 1e-4 && p < 1) return p.toFixed(6);
+  return p.toFixed(4);
+}
+
+/* ============================================================
+   Numerics (shared by every page)
+   ============================================================ */
+const Num = {
+  SQRT2PI: Math.sqrt(2 * Math.PI),
+  normPdf(x, m = 0, s = 1){ const z = (x - m) / s; return Math.exp(-0.5 * z * z) / (s * Num.SQRT2PI); },
+  /* Standard normal CDF, Hart (1968) double-precision approximation via West (2005). */
+  Phi(x){
+    const ax = Math.abs(x); let c;
+    if (ax > 37) c = 0;
+    else {
+      const e = Math.exp(-ax * ax / 2);
+      if (ax < 7.07106781186547){
+        let b = 3.52624965998911e-02 * ax + 0.700383064443688;
+        b = b * ax + 6.37396220353165; b = b * ax + 33.912866078383; b = b * ax + 112.079291497871;
+        b = b * ax + 221.213596169931; b = b * ax + 220.206867912376;
+        c = e * b;
+        b = 8.83883476483184e-02 * ax + 1.75566716318264;
+        b = b * ax + 16.064177579207; b = b * ax + 86.7807322029461; b = b * ax + 296.564248779674;
+        b = b * ax + 637.333633378831; b = b * ax + 793.826512519948; b = b * ax + 440.413735824752;
+        c = c / b;
+      } else {
+        let b = ax + 0.65; b = ax + 4 / b; b = ax + 3 / b; b = ax + 2 / b; b = ax + 1 / b;
+        c = e / b / 2.506628274631;
+      }
+    }
+    return x > 0 ? 1 - c : c;
+  },
+  /* Inverse standard normal CDF: Acklam's algorithm + one Halley refinement step. */
+  PhiInv(p){
+    if (p <= 0) return -Infinity; if (p >= 1) return Infinity;
+    const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+    const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+    const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+    const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+    const lo = 0.02425, hi = 1 - lo; let x, q, r;
+    if (p < lo){ q = Math.sqrt(-2 * Math.log(p));
+      x = (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+    } else if (p <= hi){ q = p - 0.5; r = q * q;
+      x = (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+    } else { q = Math.sqrt(-2 * Math.log(1 - p));
+      x = -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+    }
+    const e = Num.Phi(x) - p, u = e * Num.SQRT2PI * Math.exp(x * x / 2);
+    return x - u / (1 + x * u / 2);
+  },
+  niceStep(range, target = 6){
+    const raw = range / target, mag = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / mag;
+    return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag;
+  },
+  ticks(a, b, target){
+    const s = Num.niceStep(b - a, target), out = [];
+    for (let v = Math.ceil(a / s) * s; v <= b + s * 1e-9; v += s) out.push(Math.abs(v) < s * 1e-9 ? 0 : v);
+    return { step: s, values: out };
+  },
+  decimalsFor(step){ return clamp(-Math.floor(Math.log10(step) + 1e-9), 0, 8); }
+};
+
+/* ============================================================
+   MathML builder (formulas render natively, no library)
+   ============================================================ */
+const M = {
+  n: v => { const s = String(v); return s.startsWith("-") ? `<mrow><mo form="prefix">${MINUS}</mo><mn>${s.slice(1)}</mn></mrow>` : `<mn>${s}</mn>`; },
+  i: s => `<mi>${s}</mi>`,
+  up: s => `<mi mathvariant="normal">${s}</mi>`,
+  o: s => `<mo>${s}</mo>`,
+  t: s => `<mspace width="0.35em"></mspace><mtext>${s}</mtext><mspace width="0.35em"></mspace>`,
+  row: (...a) => `<mrow>${a.join("")}</mrow>`,
+  frac: (a, b) => `<mfrac>${a}${b}</mfrac>`,
+  sqrt: a => `<msqrt>${a}</msqrt>`,
+  sup: (a, b) => `<msup>${a}${b}</msup>`,
+  sub: (a, b) => `<msub>${a}${b}</msub>`,
+  subsup: (a, b, c) => `<msubsup>${a}${b}${c}</msubsup>`,
+  paren: a => `<mrow><mo>(</mo>${a}<mo>)</mo></mrow>`,
+  brack: a => `<mrow><mo>[</mo>${a}<mo>]</mo></mrow>`,
+  minus: v => `<mo>${MINUS}</mo>` + (String(v).startsWith("-") ? M.paren(M.n(v)) : M.n(v)),
+  math: (a, cls = "") => `<math display="block"${cls ? ` class="${cls}"` : ""}>${a}</math>`,
+  prob(p){
+    const s = fmtProb(p);
+    if (s.includes("e")){
+      const [m, e] = s.split("e");
+      return M.row(M.n(m), M.o("×"), M.sup(M.n(10), M.n(String(+e))));
+    }
+    return M.n(s);
+  }
+};
+
+/* ============================================================
+   Plot engine (reusable by every page)
+   - pan: drag empty space · zoom: wheel · fit: double-click
+   - handles: draggable vertical markers supplied by the page
+   ============================================================ */
+class Plot {
+  constructor(canvas, opts){
+    Object.assign(this, { c: canvas, ctx: canvas.getContext("2d"), o: opts,
+      pad: { l: 50, r: 16, t: 34, b: 30 }, x0: -4, x1: 4, y0: 0, y1: 1, hover: null, drag: null, w: 0, h: 0 });
+    this.ro = new ResizeObserver(() => this.resize()); this.ro.observe(canvas);
+    canvas.addEventListener("pointerdown", e => this.down(e));
+    canvas.addEventListener("pointermove", e => this.move(e));
+    canvas.addEventListener("pointerup", () => this.up());
+    canvas.addEventListener("pointercancel", () => this.up());
+    canvas.addEventListener("pointerleave", () => { if (!this.drag){ this.hover = null; this.o.onHover?.(null); this.draw(); } });
+    canvas.addEventListener("wheel", e => this.wheel(e), { passive: false });
+    canvas.addEventListener("dblclick", () => this.o.onFit?.());
+  }
+  destroy(){ this.ro.disconnect(); }
+  resize(){
+    const r = this.c.getBoundingClientRect(); this.dpr = window.devicePixelRatio || 1;
+    this.w = r.width; this.h = r.height;
+    this.c.width = Math.round(r.width * this.dpr); this.c.height = Math.round(r.height * this.dpr);
+    this.draw();
+  }
+  get pw(){ return this.w - this.pad.l - this.pad.r; }
+  get ph(){ return this.h - this.pad.t - this.pad.b; }
+  X(x){ return this.pad.l + (x - this.x0) / (this.x1 - this.x0) * this.pw; }
+  Y(y){ return this.pad.t + this.ph - (y - this.y0) / (this.y1 - this.y0) * this.ph; }
+  ix(px){ return this.x0 + (px - this.pad.l) / this.pw * (this.x1 - this.x0); }
+  local(e){ const r = this.c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  hit(px){
+    let best = null, bd = 12;
+    for (const h of (this.o.handles?.() || [])){ const d = Math.abs(this.X(h.x) - px); if (d < bd){ bd = d; best = h; } }
+    return best;
+  }
+  down(e){
+    if (e.button !== 0) return;
+    const [px] = this.local(e), h = this.hit(px);
+    this.c.setPointerCapture(e.pointerId);
+    this.drag = h ? { type: "handle", key: h.key } : { type: "pan", px, x0: this.x0, x1: this.x1 };
+    this.c.classList.add(h ? "dragging" : "panning");
+  }
+  move(e){
+    const [px] = this.local(e);
+    if (this.drag?.type === "handle") this.o.onHandle?.(this.drag.key, this.ix(px));
+    else if (this.drag?.type === "pan"){
+      const dx = (px - this.drag.px) / this.pw * (this.drag.x1 - this.drag.x0);
+      this.x0 = this.drag.x0 - dx; this.x1 = this.drag.x1 - dx;
+    } else this.c.style.cursor = this.hit(px) ? "ew-resize" : "";
+    const inside = px >= this.pad.l && px <= this.w - this.pad.r;
+    this.hover = inside ? this.ix(px) : null; this.o.onHover?.(this.hover);
+    this.draw();
+  }
+  up(){ this.drag = null; this.c.classList.remove("dragging", "panning"); }
+  wheel(e){
+    e.preventDefault();
+    const [px] = this.local(e), xm = this.ix(px), k = Math.exp(clamp(e.deltaY, -200, 200) * 0.0015);
+    this.x0 = xm + (this.x0 - xm) * k; this.x1 = xm + (this.x1 - xm) * k;
+    this.draw();
+  }
+  draw(){
+    if (!this.w || !this.h) return;
+    const c = this.ctx; c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); c.clearRect(0, 0, this.w, this.h);
+    this.o.draw(this);
+  }
+  /* ---- drawing primitives ---- */
+  colors(){
+    return { ink: cssVar("--ink"), muted: cssVar("--muted"), faint: cssVar("--faint"), line: cssVar("--line"),
+             grid: cssVar("--grid"), accent: cssVar("--accent"), fill: cssVar("--fill"), pin: cssVar("--pin"),
+             surface: cssVar("--surface"), font: cssVar("--ui") };
+  }
+  clip(fn){ const c = this.ctx; c.save(); c.beginPath(); c.rect(this.pad.l, this.pad.t - 1, this.pw, this.ph + 1); c.clip(); fn(c); c.restore(); }
+  grid(C){
+    const c = this.ctx, xt = Num.ticks(this.x0, this.x1, Math.max(3, this.pw / 90)), yt = Num.ticks(this.y0, this.y1, Math.max(3, this.ph / 60));
+    const xd = Num.decimalsFor(xt.step), yd = Num.decimalsFor(yt.step);
+    c.lineWidth = 1; c.strokeStyle = C.grid; c.beginPath();
+    for (const v of xt.values){ const x = Math.round(this.X(v)) + .5; c.moveTo(x, this.pad.t); c.lineTo(x, this.pad.t + this.ph); }
+    for (const v of yt.values){ const y = Math.round(this.Y(v)) + .5; c.moveTo(this.pad.l, y); c.lineTo(this.pad.l + this.pw, y); }
+    c.stroke();
+    c.strokeStyle = C.line; c.beginPath();
+    const by = Math.round(this.Y(this.y0)) + .5; c.moveTo(this.pad.l, by); c.lineTo(this.pad.l + this.pw, by);
+    c.moveTo(this.pad.l + .5, this.pad.t); c.lineTo(this.pad.l + .5, this.pad.t + this.ph); c.stroke();
+    c.fillStyle = C.muted; c.font = `11.5px ${C.font}`;
+    c.textAlign = "center"; c.textBaseline = "top";
+    for (const v of xt.values) c.fillText(show(v.toFixed(xd)), this.X(v), this.pad.t + this.ph + 8);
+    c.textAlign = "right"; c.textBaseline = "middle";
+    for (const v of yt.values) c.fillText(show(v.toFixed(yd)), this.pad.l - 8, this.Y(v));
+  }
+  curve(f, { color, width = 2, dash = [] }){
+    this.clip(c => {
+      c.beginPath(); c.setLineDash(dash); c.lineWidth = width; c.strokeStyle = color; c.lineJoin = "round";
+      let first = true;
+      for (let px = this.pad.l; px <= this.pad.l + this.pw; px += 1){
+        const y = f(this.ix(px)); if (!isFinite(y)){ first = true; continue; }
+        const py = this.Y(y); first ? c.moveTo(px, py) : c.lineTo(px, py); first = false;
+      }
+      c.stroke(); c.setLineDash([]);
+    });
+  }
+  area(f, a, b, color){
+    const lo = Math.max(a, this.x0), hi = Math.min(b, this.x1); if (!(hi > lo)) return;
+    this.clip(c => {
+      const n = Math.max(2, Math.ceil(this.X(hi) - this.X(lo)));
+      c.beginPath(); c.moveTo(this.X(lo), this.Y(this.y0));
+      for (let i = 0; i <= n; i++){ const x = lo + (hi - lo) * i / n; c.lineTo(this.X(x), this.Y(f(x))); }
+      c.lineTo(this.X(hi), this.Y(this.y0)); c.closePath(); c.fillStyle = color; c.fill();
+    });
+  }
+  vline(x, color, dash = [], y1 = this.y1, width = 1){
+    if (x < this.x0 || x > this.x1) return;
+    const c = this.ctx, px = Math.round(this.X(x)) + .5;
+    c.save(); c.setLineDash(dash); c.strokeStyle = color; c.lineWidth = width;
+    c.beginPath(); c.moveTo(px, this.Y(this.y0)); c.lineTo(px, this.Y(Math.min(y1, this.y1))); c.stroke(); c.restore();
+  }
+  pill(x, y, text, C, strong){
+    const c = this.ctx; c.font = `${strong ? 600 : 500} 12px ${C.font}`;
+    const w = c.measureText(text).width + 14, h = 20, l = clamp(x - w / 2, this.pad.l, this.pad.l + this.pw - w);
+    c.fillStyle = strong ? C.accent : C.surface; c.strokeStyle = C.accent; c.lineWidth = 1;
+    c.beginPath(); c.roundRect(l, y, w, h, 5); c.fill(); c.stroke();
+    c.fillStyle = strong ? cssVar("--accent-ink") : C.accent; c.textAlign = "left"; c.textBaseline = "middle";
+    c.fillText(text, l + 7, y + h / 2 + .5);
+    return [l, l + w];
+  }
+}
+
+/* ============================================================
+   Navigation — edit this list as formulas get added.
+   Items with a matching entry in PAGES become live.
+   ============================================================ */
+const NAV = [
+  { group: "Descriptive statistics", items: [["mean", "Mean, median and mode"], ["spread", "Variance and standard deviation"], ["quartiles", "Quartiles and box plot"]] },
+  { group: "Probability", items: [["rules", "Probability rules"], ["bayes", "Conditional probability and Bayes"], ["counting", "Permutations and combinations"]] },
+  { group: "Discrete distributions", items: [["binomial", "Binomial"], ["poisson", "Poisson"], ["geometric", "Geometric"]] },
+  { group: "Continuous distributions", items: [["normal", "Normal"], ["uniform", "Uniform"], ["exponential", "Exponential"], ["student-t", "Student’s t"]] },
+  { group: "Inference", items: [["ci", "Confidence intervals"], ["tests", "Hypothesis tests"], ["regression", "Linear regression"]] },
+];
+const PAGES = {};          // id -> (root) => cleanup fn
+const DEFAULT_PAGE = "normal";
+
+/* ============================================================
+   Page: Normal distribution
+   ============================================================ */
+PAGES.normal = function NormalPage(root){
+  const S = { mu: 0, sd: 1, mode: "between", a: -1, b: 1, view: "pdf", pins: [] };
+  const { Phi, PhiInv, normPdf } = Num;
+
+  const glyph = mode => {
+    const pts = []; for (let i = 0; i <= 32; i++) pts.push([i + 1, 16 - 13 * Math.exp(-0.5 * ((i - 16) / 5.5) ** 2)]);
+    const line = "M" + pts.map(p => p.join(",")).join("L");
+    const area = line + "L33,16L1,16Z";
+    const rects = { left: [[0, 21]], right: [[13, 34]], between: [[11, 23]], outside: [[0, 11], [23, 34]] }[mode]
+      .map(([a, b]) => `<rect x="${a}" y="0" width="${b - a}" height="18"/>`).join("");
+    return `<svg viewBox="0 0 34 18" aria-hidden="true"><defs><clipPath id="g-${mode}">${rects}</clipPath></defs>
+      <path d="${area}" fill="currentColor" opacity=".3" clip-path="url(#g-${mode})"/>
+      <path d="${line}" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M1,16.5H33" stroke="currentColor" stroke-width="1" opacity=".5"/></svg>`;
+  };
+  const MODES = [["left", "Below x", "P(X ≤ x)"], ["right", "Above x", "P(X ≥ x)"], ["between", "Between", "P(a ≤ X ≤ b)"], ["outside", "Outside", "P(X ≤ a or X ≥ b)"]];
+
+  root.innerHTML = `
+  <div class="page">
+    <header class="page-head">
+      <div>
+        <h1>Normal distribution</h1>
+        <p class="lede">A symmetric, bell-shaped distribution described by its mean <span class="sym">μ</span> and standard deviation <span class="sym">σ</span>. Change the parameters, then drag the markers on the graph to measure probability.</p>
+      </div>
+    </header>
+
+    <section class="formulas" aria-label="Formulas">
+      <div class="frow"><span class="flabel" id="defLabel">Density</span><div class="fmath" id="fDef"></div></div>
+      <div class="frow"><span class="flabel">Probability</span><div class="fmath" id="fProb"></div></div>
+    </section>
+
+    <section class="work">
+      <div class="plot-col">
+        <div class="plot-bar">
+          <div class="seg" role="group" aria-label="Graph type">
+            <button data-view="pdf" aria-pressed="true">Density</button>
+            <button data-view="cdf" aria-pressed="false">Cumulative</button>
+          </div>
+          <div class="bar-actions">
+            <button class="btn" id="fitBtn" title="Double-click the graph also fits">Fit view</button>
+            <button class="btn" id="pinBtn" title="Keep a copy of this curve to compare against">Pin curve</button>
+            <button class="btn" id="unpinBtn" hidden>Clear pins</button>
+          </div>
+        </div>
+        <div class="plot-wrap">
+          <canvas id="plot" role="img" aria-label="Graph of the normal distribution"></canvas>
+        </div>
+        <div class="legend">
+          <div class="chips" id="chips"></div>
+          <span class="hint" id="hint">Drag markers to move them. Scroll to zoom, drag to pan, double-click to fit.</span>
+          <span class="readout" id="readout" hidden></span>
+        </div>
+      </div>
+
+      <aside class="controls" aria-label="Controls">
+        <div class="group">
+          <h2>Parameters</h2>
+          <div class="param">
+            <label for="muN"><span class="sym">μ</span>Mean</label>
+            <input class="num" id="muN" type="number" step="any" inputmode="decimal">
+            <input id="muR" type="range" min="-10" max="10" step="0.1" aria-label="Mean slider">
+          </div>
+          <div class="param">
+            <label for="sdN"><span class="sym">σ</span>Standard deviation</label>
+            <input class="num" id="sdN" type="number" step="any" min="0" inputmode="decimal">
+            <input id="sdR" type="range" min="0.1" max="5" step="0.01" aria-label="Standard deviation slider">
+          </div>
+        </div>
+
+        <div class="group">
+          <h2>Probability</h2>
+          <div class="modes" role="group" aria-label="Region">
+            ${MODES.map(([k, l, t]) => `<button data-mode="${k}" title="${t}" aria-pressed="false">${glyph(k)}<span>${l}</span></button>`).join("")}
+          </div>
+          <div class="bounds" id="bounds">
+            <label id="aLbl"><span class="sym" id="aSym">a</span><input class="num" id="aN" type="number" step="any" inputmode="decimal"></label>
+            <label id="bLbl"><span class="sym">b</span><input class="num" id="bN" type="number" step="any" inputmode="decimal"></label>
+          </div>
+          <div class="quick"><span>Range</span>
+            <button class="btn" data-k="1">μ ± 1σ</button><button class="btn" data-k="2">μ ± 2σ</button><button class="btn" data-k="3">μ ± 3σ</button>
+          </div>
+        </div>
+
+        <div class="group result" aria-live="polite">
+          <div class="p-big" id="pBig"></div>
+          <div class="p-sub" id="pSub"></div>
+          <dl class="facts" id="facts"></dl>
+        </div>
+
+        <div class="group">
+          <h2>Find x from a probability</h2>
+          <div class="qrow">
+            <label class="lbl" for="qp"><math><mi>P</mi><mo>(</mo><mi>X</mi><mo>≤</mo><mi>x</mi><mo>)</mo><mo>=</mo></math></label>
+            <input class="num" id="qp" type="number" step="any" min="0" max="1" value="0.95" inputmode="decimal">
+            <span class="lbl"><math><mi>x</mi><mo>=</mo></math></span>
+            <output class="qout" id="qx"></output>
+            <button class="btn" id="qUse">Mark x on the graph</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </div>`;
+
+  const el = id => $("#" + id, root);
+  const muN = el("muN"), muR = el("muR"), sdN = el("sdN"), sdR = el("sdR"), aN = el("aN"), bN = el("bN"), qp = el("qp");
+  const twoSided = () => S.mode === "between" || S.mode === "outside";
+  const bounds = () => twoSided() ? [Math.min(S.a, S.b), Math.max(S.a, S.b)] : [S.a, S.a];
+
+  /* ---- probability ---- */
+  function prob(){
+    const z = x => (x - S.mu) / S.sd, [lo, hi] = bounds();
+    switch (S.mode){
+      case "left":    return Phi(z(lo));
+      case "right":   return Phi(-z(lo));
+      case "between": return Math.max(0, Phi(z(hi)) - Phi(z(lo)));
+      case "outside": return Phi(z(lo)) + Phi(-z(hi));
+    }
+  }
+  function regions(){
+    const [lo, hi] = bounds();
+    return { left: [[-Infinity, lo]], right: [[lo, Infinity]], between: [[lo, hi]], outside: [[-Infinity, lo], [hi, Infinity]] }[S.mode];
+  }
+
+  /* ---- formulas ---- */
+  function renderFormulas(){
+    const mu = trim(S.mu, 4), sd = trim(S.sd, 4), [lo, hi] = bounds();
+    const x = M.i("x"), mu_ = M.i("μ"), sg = M.i("σ"), P = M.i("P"), X = M.i("X"), Ph = M.up("Φ");
+    const Phi_ = inner => M.row(Ph, M.paren(inner));
+    const gFrac = v => M.frac(M.row(M.i(v), M.o(MINUS), mu_), sg);
+    const nFrac = v => M.frac(M.row(M.n(trim(v, 4)), M.minus(mu)), M.n(sd));
+    const zv = v => M.n(((v - S.mu) / S.sd).toFixed(2));
+
+    if (S.view === "pdf"){
+      el("defLabel").textContent = "Density";
+      const gen = M.row(M.frac(M.n(1), M.row(sg, M.sqrt(M.row(M.n(2), M.up("π"))))),
+        M.sup(M.up("e"), M.row(M.o(MINUS), M.frac(M.sup(M.paren(M.row(x, M.o(MINUS), mu_)), M.n(2)), M.row(M.n(2), M.sup(sg, M.n(2)))))));
+      const sub = M.row(M.frac(M.n(1), M.row(M.n(sd), M.sqrt(M.row(M.n(2), M.up("π"))))),
+        M.sup(M.up("e"), M.row(M.o(MINUS), M.frac(M.sup(M.paren(M.row(x, M.minus(mu))), M.n(2)), M.row(M.n(2), M.o("·"), M.sup(M.n(sd), M.n(2)))))));
+      el("fDef").innerHTML = M.math(M.row(M.i("f"), M.paren(x), M.o("="), gen, M.o("="), sub));
+    } else {
+      el("defLabel").textContent = "Cumulative";
+      const l1 = M.row(M.i("F"), M.paren(x), M.o("="), P, M.paren(M.row(X, M.o("≤"), x)), M.o("="), Phi_(gFrac("x")), M.o("="),
+        Phi_(M.frac(M.row(x, M.minus(mu)), M.n(sd))));
+      const l2 = M.row(Ph, M.paren(M.i("z")), M.o("="), M.frac(M.n(1), M.sqrt(M.row(M.n(2), M.up("π")))),
+        M.subsup(M.o("∫"), M.row(M.o(MINUS), M.i("∞")), M.i("z")), M.sup(M.up("e"), M.row(M.o(MINUS), M.frac(M.sup(M.i("t"), M.n(2)), M.n(2)))),
+        M.row(M.up("d"), M.i("t")));
+      el("fDef").innerHTML = M.math(l1) + M.math(l2, "res");
+    }
+
+    const p = M.prob(prob()), L = M.n(trim(lo, 4)), H = M.n(trim(hi, 4));
+    let g, s;
+    switch (S.mode){
+      case "left":
+        g = M.row(P, M.paren(M.row(X, M.o("≤"), x)), M.o("="), Phi_(gFrac("x")));
+        s = M.row(P, M.paren(M.row(X, M.o("≤"), L)), M.o("="), Phi_(nFrac(lo)), M.o("="), Phi_(zv(lo)), M.o("="), p);
+        break;
+      case "right":
+        g = M.row(P, M.paren(M.row(X, M.o("≥"), x)), M.o("="), M.n(1), M.o(MINUS), Phi_(gFrac("x")));
+        s = M.row(P, M.paren(M.row(X, M.o("≥"), L)), M.o("="), M.n(1), M.o(MINUS), Phi_(nFrac(lo)), M.o("="), M.n(1), M.o(MINUS), Phi_(zv(lo)), M.o("="), p);
+        break;
+      case "between":
+        g = M.row(P, M.paren(M.row(M.i("a"), M.o("≤"), X, M.o("≤"), M.i("b"))), M.o("="), Phi_(gFrac("b")), M.o(MINUS), Phi_(gFrac("a")));
+        s = M.row(P, M.paren(M.row(L, M.o("≤"), X, M.o("≤"), H)), M.o("="), Phi_(nFrac(hi)), M.o(MINUS), Phi_(nFrac(lo)),
+          M.o("="), Phi_(zv(hi)), M.o(MINUS), Phi_(zv(lo)), M.o("="), p);
+        break;
+      case "outside":
+        g = M.row(P, M.paren(M.row(X, M.o("≤"), M.i("a"), M.t("or"), X, M.o("≥"), M.i("b"))), M.o("="), M.n(1), M.o(MINUS),
+          M.brack(M.row(Phi_(gFrac("b")), M.o(MINUS), Phi_(gFrac("a")))));
+        s = M.row(P, M.paren(M.row(X, M.o("≤"), L, M.t("or"), X, M.o("≥"), H)), M.o("="), M.n(1), M.o(MINUS),
+          M.brack(M.row(Phi_(zv(hi)), M.o(MINUS), Phi_(zv(lo)))), M.o("="), p);
+        break;
+    }
+    el("fProb").innerHTML = M.math(g) + M.math(s);
+  }
+
+  /* ---- result panel ---- */
+  function renderResult(){
+    const p = prob(), [lo, hi] = bounds(), z = v => show(((v - S.mu) / S.sd).toFixed(3));
+    el("pBig").textContent = fmtProb(p);
+    const pct = (p * 100).toFixed(p < 0.001 || p > 0.999 ? 4 : 2) + "%";
+    el("pSub").textContent = {
+      left: `${pct} of values are at or below ${show(trim(lo))}`,
+      right: `${pct} of values are at or above ${show(trim(lo))}`,
+      between: `${pct} of values fall between ${show(trim(lo))} and ${show(trim(hi))}`,
+      outside: `${pct} of values fall outside ${show(trim(lo))} to ${show(trim(hi))}`
+    }[S.mode];
+    const rows = twoSided() ? [["z-score of a", z(lo)], ["z-score of b", z(hi)]] : [["z-score of x", z(lo)]];
+    rows.push(["Variance σ²", show(trim(S.sd * S.sd, 4))], ["Median and mode", show(trim(S.mu, 4))]);
+    el("facts").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  }
+
+  function renderQuantile(){
+    const p = parseFloat(qp.value), ok = p > 0 && p < 1;
+    qp.setAttribute("aria-invalid", ok ? "false" : "true");
+    el("qx").textContent = ok ? show(trim(S.mu + S.sd * PhiInv(p), 4)) : "between 0 and 1";
+  }
+
+  function renderChips(){
+    const label = (m, s) => `μ = ${show(trim(m))}, σ = ${trim(s)}`;
+    el("chips").innerHTML = `<span class="chip"><span class="sw"></span>${label(S.mu, S.sd)}</span>` +
+      S.pins.map((p, i) => `<span class="chip pinned"><span class="sw"></span>${label(p.mu, p.sd)}<button data-unpin="${i}" aria-label="Remove pinned curve">×</button></span>`).join("");
+    el("unpinBtn").hidden = S.pins.length < 2;
+  }
+
+  /* ---- keep inputs in sync ---- */
+  function setSlider(r, v){
+    if (v < +r.min) r.min = v; if (v > +r.max) r.max = v;
+    r.value = v; r.style.setProperty("--p", ((v - r.min) / (r.max - r.min) * 100) + "%");
+  }
+  function syncInputs(skip){
+    if (skip !== muN) muN.value = trim(S.mu, 4);
+    if (skip !== sdN) sdN.value = trim(S.sd, 4);
+    if (skip !== aN) aN.value = trim(S.a, 4);
+    if (skip !== bN) bN.value = trim(S.b, 4);
+    setSlider(muR, S.mu); setSlider(sdR, S.sd);
+    $$(".modes button", root).forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === S.mode));
+    $$(".seg button", root).forEach(b => b.setAttribute("aria-pressed", b.dataset.view === S.view));
+    el("bLbl").hidden = !twoSided(); el("bounds").classList.toggle("single", !twoSided());
+    el("aSym").textContent = twoSided() ? "a" : "x";
+  }
+
+  function update(skip){
+    syncInputs(skip); renderFormulas(); renderResult(); renderQuantile(); renderChips(); plot.draw();
+  }
+
+  /* ---- view fitting ---- */
+  function fit(){ plot.x0 = S.mu - 4 * S.sd; plot.x1 = S.mu + 4 * S.sd; plot.draw(); }
+  function fitIfLost(){
+    const r = plot.x1 - plot.x0;
+    if (S.mu < plot.x0 || S.mu > plot.x1 || 8 * S.sd > 3 * r || 8 * S.sd < r / 10){
+      fit();
+      if (S.a < plot.x0 || S.a > plot.x1 || S.b < plot.x0 || S.b > plot.x1){ S.a = S.mu - S.sd; S.b = S.mu + S.sd; }
+      update();
+    }
+  }
+
+  /* ---- plot ---- */
+  function drawPlot(p){
+    const C = p.colors(), pdf = S.view === "pdf";
+    const f = pdf ? x => normPdf(x, S.mu, S.sd) : x => Phi((x - S.mu) / S.sd);
+    if (pdf){
+      let peak = 1 / (S.sd * Num.SQRT2PI); for (const q of S.pins) peak = Math.max(peak, 1 / (q.sd * Num.SQRT2PI));
+      p.y0 = 0; p.y1 = peak * 1.12;
+    } else { p.y0 = 0; p.y1 = 1.05; }
+    p.grid(C);
+
+    // σ ticks along the baseline
+    const c = p.ctx;
+    for (let k = -3; k <= 3; k++){
+      const x = S.mu + k * S.sd; if (x < p.x0 || x > p.x1) continue;
+      const px = Math.round(p.X(x)) + .5, by = p.Y(p.y0);
+      c.strokeStyle = k === 0 ? C.muted : C.faint; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(px, by); c.lineTo(px, by - (k === 0 ? 7 : 4)); c.stroke();
+    }
+    p.vline(S.mu, C.line, [3, 3], pdf ? normPdf(S.mu, S.mu, S.sd) : 1);
+
+    for (const q of S.pins){
+      p.curve(pdf ? x => normPdf(x, q.mu, q.sd) : x => Phi((x - q.mu) / q.sd), { color: C.pin, width: 1.5, dash: [5, 4] });
+    }
+    if (pdf) for (const [a, b] of regions()) p.area(f, a, b, C.fill);
+    p.curve(f, { color: C.accent, width: 2.2 });
+
+    // cumulative view: show probability as a bar on the y-axis
+    if (!pdf){
+      const [lo, hi] = bounds(), Fa = f(lo), Fb = f(hi);
+      const spans = { left: [[0, Fa]], right: [[Fa, 1]], between: [[Fa, Fb]], outside: [[0, Fa], [Fb, 1]] }[S.mode];
+      c.save(); c.setLineDash([3, 3]); c.strokeStyle = C.accent; c.lineWidth = 1;
+      for (const x of twoSided() ? [lo, hi] : [lo]){
+        if (x < p.x0 || x > p.x1) continue;
+        c.beginPath(); c.moveTo(p.pad.l, p.Y(f(x))); c.lineTo(p.X(x), p.Y(f(x))); c.stroke();
+      }
+      c.restore();
+      c.fillStyle = C.accent;
+      for (const [u, v] of spans) c.fillRect(p.pad.l + 1, p.Y(v), 5, Math.max(1, p.Y(u) - p.Y(v)));
+    }
+
+    // handles
+    const hs = handles(); let lastR = -Infinity;
+    for (const h of hs){
+      if (h.x < p.x0 || h.x > p.x1) continue;
+      const px = p.X(h.x), py = p.Y(f(h.x));
+      p.vline(h.x, C.accent, [], pdf ? f(h.x) : p.y1, 1.5);
+      c.fillStyle = C.surface; c.strokeStyle = C.accent; c.lineWidth = 2;
+      c.beginPath(); c.arc(px, py, 5, 0, Math.PI * 2); c.fill(); c.stroke();
+      const txt = `${h.label} = ${show(trim(h.x, 3))}`;
+      c.font = `600 12px ${C.font}`; const w = c.measureText(txt).width + 14;
+      const y = (px - w / 2 < lastR + 4) ? 30 : 6;
+      const [, r] = p.pill(px, y, txt, C, true); lastR = y === 6 ? r : lastR;
+    }
+
+    // hover crosshair
+    if (p.hover != null && !p.drag){
+      const y = f(p.hover);
+      p.vline(p.hover, C.faint, [2, 3]);
+      c.fillStyle = C.ink; c.beginPath(); c.arc(p.X(p.hover), p.Y(y), 3, 0, Math.PI * 2); c.fill();
+    }
+  }
+  function handles(){
+    return twoSided() ? [{ key: "a", x: S.a, label: "a" }, { key: "b", x: S.b, label: "b" }] : [{ key: "a", x: S.a, label: "x" }];
+  }
+  const plot = new Plot(el("plot"), {
+    draw: drawPlot,
+    handles,
+    onFit: fit,
+    onHandle(key, x){
+      const dec = Num.decimalsFor(Num.niceStep(plot.x1 - plot.x0, 200));
+      x = +x.toFixed(dec);
+      if (key === "a") S.a = twoSided() ? Math.min(x, S.b) : x; else S.b = Math.max(x, S.a);
+      syncInputs(); renderFormulas(); renderResult();
+    },
+    onHover(x){
+      const r = el("readout");
+      el("hint").hidden = x != null;
+      if (x == null){ r.hidden = true; return; }
+      const d = Num.decimalsFor(Num.niceStep(plot.x1 - plot.x0, 200));
+      r.hidden = false;
+      r.innerHTML = `<span>x <b>${show(x.toFixed(d))}</b></span><span>f(x) <b>${normPdf(x, S.mu, S.sd).toFixed(4)}</b></span><span>F(x) <b>${Phi((x - S.mu) / S.sd).toFixed(4)}</b></span>`;
+    }
+  });
+
+  /* ---- events ---- */
+  const num = inp => { const v = parseFloat(inp.value); return isFinite(v) ? v : null; };
+  muR.addEventListener("input", () => { S.mu = +muR.value; update(); });
+  sdR.addEventListener("input", () => { S.sd = +sdR.value; update(); });
+  muN.addEventListener("input", () => { const v = num(muN); muN.setAttribute("aria-invalid", v == null); if (v != null){ S.mu = v; update(muN); } });
+  sdN.addEventListener("input", () => { const v = num(sdN); const ok = v != null && v > 0; sdN.setAttribute("aria-invalid", !ok); if (ok){ S.sd = v; update(sdN); } });
+  muN.addEventListener("change", () => { muN.removeAttribute("aria-invalid"); update(); fitIfLost(); });
+  sdN.addEventListener("change", () => { sdN.removeAttribute("aria-invalid"); update(); fitIfLost(); });
+  aN.addEventListener("input", () => { const v = num(aN); if (v != null){ S.a = v; update(aN); } });
+  bN.addEventListener("input", () => { const v = num(bN); if (v != null){ S.b = v; update(bN); } });
+  aN.addEventListener("change", () => update());
+  bN.addEventListener("change", () => update());
+  qp.addEventListener("input", renderQuantile);
+
+  $$(".modes button", root).forEach(b => b.addEventListener("click", () => {
+    const was = twoSided(); S.mode = b.dataset.mode;
+    if (twoSided() && !was && S.b <= S.a) S.b = S.a + S.sd;
+    update();
+  }));
+  $$(".seg button", root).forEach(b => b.addEventListener("click", () => { S.view = b.dataset.view; update(); }));
+  $$(".quick .btn", root).forEach(b => b.addEventListener("click", () => {
+    const k = +b.dataset.k; S.mode = "between"; S.a = +(S.mu - k * S.sd).toFixed(6); S.b = +(S.mu + k * S.sd).toFixed(6);
+    update(); fitIfLost();
+  }));
+  el("fitBtn").addEventListener("click", fit);
+  el("pinBtn").addEventListener("click", () => {
+    if (!S.pins.some(p => p.mu === S.mu && p.sd === S.sd)) S.pins.push({ mu: S.mu, sd: S.sd });
+    update();
+  });
+  el("unpinBtn").addEventListener("click", () => { S.pins = []; update(); });
+  el("chips").addEventListener("click", e => { const i = e.target.dataset?.unpin; if (i != null){ S.pins.splice(+i, 1); update(); } });
+  el("qUse").addEventListener("click", () => {
+    const p = parseFloat(qp.value); if (!(p > 0 && p < 1)) return;
+    S.mode = "left"; S.a = +(S.mu + S.sd * PhiInv(p)).toFixed(6); update(); fitIfLost();
+  });
+
+  const onTheme = () => plot.draw();
+  document.addEventListener("themechange", onTheme);
+
+  fit(); update();
+  return () => { plot.destroy(); document.removeEventListener("themechange", onTheme); };
+};
+
+/* ============================================================
+   Placeholder for pages not built yet
+   ============================================================ */
+function PlaceholderPage(root, label){
+  root.innerHTML = `<div class="page"><div class="empty">
+    <h1>${label}</h1>
+    <p>This page isn’t built yet. Its formulas, graph and controls will go here.</p>
+    <p><a href="#/${DEFAULT_PAGE}">Open the normal distribution</a></p>
+  </div></div>`;
+}
+
+/* ============================================================
+   Shell: sidebar, search, routing, theme
+   ============================================================ */
+const app = $("#app"), navEl = $("#nav"), mainEl = $("#main"), qEl = $("#q");
+let cleanup = null;
+
+function renderNav(filter = ""){
+  const f = filter.trim().toLowerCase(), cur = currentId();
+  const html = NAV.map(g => {
+    const items = g.items.filter(([, l]) => !f || l.toLowerCase().includes(f) || g.group.toLowerCase().includes(f));
+    if (!items.length) return "";
+    return `<div class="nav-group"><h3>${g.group}</h3>${items.map(([id, l]) =>
+      `<a href="#/${id}" class="${PAGES[id] ? "" : "soon"}" ${PAGES[id] ? "" : 'title="Not built yet"'} ${id === cur ? 'aria-current="page"' : ""}>${l}</a>`).join("")}</div>`;
+  }).join("");
+  navEl.innerHTML = html || `<p class="nav-empty">No formulas match “${filter.replace(/[<>&]/g, "")}”.</p>`;
+}
+function currentId(){ return (location.hash.replace(/^#\/?/, "").split("?")[0]) || DEFAULT_PAGE; }
+function labelFor(id){ for (const g of NAV) for (const [i, l] of g.items) if (i === id) return l; return null; }
+
+function route(){
+  const id = currentId(), label = labelFor(id);
+  if (cleanup){ cleanup(); cleanup = null; }
+  if (PAGES[id]) cleanup = PAGES[id](mainEl) || null;
+  else if (label) PlaceholderPage(mainEl, label);
+  else { location.replace("#/" + DEFAULT_PAGE); return; }
+  document.title = (label || "Stats Workbench") + " · Stats Workbench";
+  renderNav(qEl.value);
+  closeNav();
+  mainEl.scrollTop = 0; window.scrollTo(0, 0);
+}
+
+qEl.addEventListener("input", () => renderNav(qEl.value));
+qEl.addEventListener("keydown", e => {
+  if (e.key === "Escape"){ qEl.value = ""; renderNav(); qEl.blur(); }
+  if (e.key === "Enter"){ const a = navEl.querySelector("a:not(.soon)") || navEl.querySelector("a"); if (a){ location.hash = a.getAttribute("href"); qEl.blur(); } }
+});
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){ e.preventDefault(); openNav(); qEl.focus(); qEl.select(); }
+});
+if (/Mac|iPhone|iPad/.test(navigator.platform)) $("#kbdHint").textContent = "⌘K";
+
+function openNav(){ app.classList.add("nav-open"); $("#menuBtn").setAttribute("aria-expanded", "true"); }
+function closeNav(){ app.classList.remove("nav-open"); $("#menuBtn").setAttribute("aria-expanded", "false"); }
+$("#menuBtn").addEventListener("click", openNav);
+$("#scrim").addEventListener("click", closeNav);
+
+/* theme */
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch {} }
+};
+const sysDark = matchMedia("(prefers-color-scheme: dark)");
+const isDark = () => (document.documentElement.dataset.theme || (sysDark.matches ? "dark" : "light")) === "dark";
+function paintThemeBtn(){
+  const d = isDark();
+  $("#themeBtn").innerHTML = d
+    ? `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>Light theme`
+    : `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 9.5A5.5 5.5 0 1 1 6.5 2.5a4.5 4.5 0 0 0 7 7z"/></svg>Dark theme`;
+}
+const saved = store.get("sw-theme"); if (saved) document.documentElement.dataset.theme = saved;
+$("#themeBtn").addEventListener("click", () => {
+  const next = isDark() ? "light" : "dark";
+  document.documentElement.dataset.theme = next; store.set("sw-theme", next);
+  paintThemeBtn(); document.dispatchEvent(new Event("themechange"));
+});
+sysDark.addEventListener("change", () => { paintThemeBtn(); document.dispatchEvent(new Event("themechange")); });
+paintThemeBtn();
+
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
