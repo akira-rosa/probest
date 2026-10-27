@@ -29,3 +29,10 @@
 .qtrio b{font-size:26px;font-weight:600;overflow-wrap:anywhere}
 .qtrio math{font-size:15px;color:var(--muted);font-weight:400}
 .p-sub:empty{display:none}
+
+/* paired data: dot swatches in the legend */
+.dotsw{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dotsw.pos{background:var(--accent)}
+.dotsw.neg{background:var(--danger)}
+.pair-page .data-in{min-height:140px}
+.pair-page .p-big{font-size:26px;letter-spacing:-.01em}

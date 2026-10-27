@@ -16,10 +16,8 @@ Open `dist/index.html` in a browser, or copy that one file anywhere (USB stick, 
 The app opens on a home page that lists every formula by topic. The sidebar has 21 formulas in
 seven folders: descriptive statistics, probability, discrete random variables, continuous random
 variables, estimation, hypothesis tests, and correlation and regression. Every page is a formula
-and is named after it; pages not built yet show a placeholder. Ideas for later pages are in
-[TODO.md](TODO.md) and stay out of the menu until they are built.
-
-Built so far:
+and is named after it, and all 21 are built. Ideas for later pages are in [TODO.md](TODO.md) and
+stay out of the menu until they are built.
 
 - **Arithmetic mean, standard deviation and quartiles** (Descriptive statistics): type or paste
   the data, then drag any point of the dot plot to change it. The mean is drawn as the balance
@@ -37,6 +35,11 @@ Built so far:
 - **Chi-square test of independence** (Hypothesis tests): an editable contingency table up to 6 × 6
   showing each cell's expected count and its share of q², the chi-square curve with the critical
   value, and Yates' correction for 2 × 2 tables.
+- **Pearson's correlation coefficient and simple linear regression** (Correlation and regression):
+  paired data typed one pair per line, a scatter plot whose points drag in both directions. The
+  correlation page shows the quadrants around (x̄, ȳ) and the test of ρ = 0 with the smallest
+  significant |r|; the regression page shows the least-squares line, the residuals or their squares,
+  and a draggable prediction ŷ(x₀) with a warning when it extrapolates.
 - **Sample size** (Estimation): the reference page for the format below. Mean or proportion,
   σ known or a pilot sample (t with n − 1 degrees of freedom), the p(1 − p) ≤ 1/4 bound, and the
   finite population correction n = N·n₀ / (N + n₀ − 1). Examples from Barbetta (Ex. 7.5),
@@ -64,7 +67,7 @@ gives its parameters, formulas, functions and examples. The data pages share `co
 (data box, dot plot with draggable points) in the same way, with their configs in `pages/desc/`.
 The addition rule and conditional probability share `core/vennpage.js`; diagrams that are not x–y
 graphs use the `Board` canvas in `core/board.js`. The two interval pages share `core/cipage.js` and
-the two one-sample tests share `core/testpage.js`.
+the two one-sample tests share `core/testpage.js`, and the paired-data pages share `core/pairpage.js`.
 
 ## Page format
 
@@ -139,6 +142,7 @@ src/
     core/vennpage.js      template for the two-event Venn pages
     core/cipage.js        template for the confidence interval pages
     core/testpage.js      template for the one-sample test pages
+    core/pairpage.js      template for the paired-data pages (pairs box, scatter plot)
     core/ui.js            shared controls (numInput, setSlider, bindNudge) and page sections
                           (varsTableHtml, examplesHtml, codeHtml, sectionsHtml, bindCopy)
     locales/en.js         English strings
@@ -149,6 +153,7 @@ src/
     pages/expected-value.js expected value and variance of a discrete variable
     pages/est/*.js        confidence intervals for the mean and for a proportion
     pages/tests/*.js      tests for a mean and a proportion, chi-square test of independence
+    pages/reg/*.js        correlation, linear regression and their shared data sets
     pages/dist/*.js       binomial, hypergeometric, Poisson, uniform, exponential, normal
     pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet
