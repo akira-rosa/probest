@@ -21,8 +21,6 @@ I18N.en = {
   phLink: "Back to the home page",
 
   // ---- home page ----
-  "home.lede": "Probability and statistics formulas to explore in class. Each page puts a formula on a graph you can drag, shows the formula with your numbers in it and explains every symbol, following Barbetta, Reis & Bornia and Bussab & Morettin.",
-  "home.hint": "Pick a formula below or in the menu, or press {key} to search. {ready} of {total} formulas are ready; the others are on the way.",
 
   // ---- footer ----
   license: "{l} License",

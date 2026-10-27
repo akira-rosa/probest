@@ -157,7 +157,7 @@ src/
     pages/dist/*.js       binomial, hypergeometric, Poisson, uniform, exponential, normal
     pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet
-    pages/home.js         home page: what the app is and every formula by topic
+    pages/home.js         home page: the app name and every formula by topic
     app.js                shell: sidebar, search, routing, theme, language, footer — loaded last
 ```
 

@@ -21,8 +21,6 @@ I18N.pt = {
   phLink: "Voltar para a página inicial",
 
   // ---- home page ----
-  "home.lede": "Fórmulas de probabilidade e estatística para explorar em aula. Cada página coloca uma fórmula em um gráfico que você pode arrastar, mostra a fórmula com os seus números e explica cada símbolo, seguindo Barbetta, Reis & Bornia e Bussab & Morettin.",
-  "home.hint": "Escolha uma fórmula abaixo ou no menu, ou pressione {key} para buscar. {ready} de {total} fórmulas estão prontas; as outras estão a caminho.",
 
   // ---- footer ----
   license: "Licença {l}",

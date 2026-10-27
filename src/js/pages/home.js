@@ -1,10 +1,9 @@
 "use strict";
 /* ============================================================
-   Home (landing) page: what the app is, and every formula by topic.
+   Home (landing) page: the app name and every formula by topic.
    Not part of NAV; reached with an empty address (#/) or the app name.
    ============================================================ */
 function HomePage(root){
-  const all = navPages(), ready = all.filter(id => PAGES[id]).length;
   const topics = NAV.map(f => `
     <section class="topic">
       <h2>${t("folder." + f.folder)}</h2>
@@ -16,8 +15,6 @@ function HomePage(root){
   <div class="page home">
     <header class="home-head">
       <h1>${esc(APP.name)}</h1>
-      <p class="home-lede">${t("home.lede")}</p>
-      <p class="home-hint">${t("home.hint", { key: `<kbd>${esc($("#kbdHint").textContent)}</kbd>`, ready, total: all.length })}</p>
     </header>
     <div class="topics">${topics}</div>
   </div>`;
