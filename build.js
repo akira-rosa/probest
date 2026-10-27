@@ -2,18 +2,23 @@
 /*
   Build: join src/ into one self-contained HTML file.
 
-    node build.js              -> dist/probest.html
+    node build.js              -> dist/probest.html (minified)
+    node build.js --pretty     -> the same file, not minified (readable, for debugging)
     node build.js --watch      -> rebuild whenever a file in src/ changes
     node build.js --out x.html -> choose the output file
 
   How it works: src/index.html lists every stylesheet (<link rel="stylesheet">)
   and script (<script src>) in load order. Each local file is read and inlined
   in that same order: all CSS into one <style>, all JS into one <script>.
-  HTML comments in src/index.html are dropped. No dependencies, Node 16+.
+  HTML comments in src/index.html are dropped. Then the CSS and JS are
+  minified (minify.js): comments and whitespace are removed and variables,
+  parameters and functions get short names in the built file. The source
+  files are never changed. No dependencies, Node 16+.
 */
 "use strict";
 const fs = require("fs");
 const path = require("path");
+const { minifyJS, minifyCSS, shortenNames } = require("./minify.js");
 
 const ROOT = __dirname;
 const SRC = path.join(ROOT, "src");
@@ -21,6 +26,7 @@ const ENTRY = path.join(SRC, "index.html");
 
 const args = process.argv.slice(2);
 const watch = args.includes("--watch") || args.includes("-w");
+const pretty = args.includes("--pretty");
 const outArg = args.indexOf("--out");
 const OUT = path.resolve(ROOT, outArg >= 0 && args[outArg + 1] ? args[outArg + 1] : "dist/probest.html");
 
@@ -49,6 +55,7 @@ function build(){
 
   // 1. Drop HTML comments (developer notes, grouping labels).
   html = html.replace(/<!--[\s\S]*?-->/g, "");
+  if (!pretty) html = html.replace(/\n[ \t]+/g, "\n");          // indentation of the page skeleton
 
   // 2. Stylesheets -> one <style> where the first <link> was.
   const css = [];
@@ -67,9 +74,18 @@ function build(){
     return js.length === 1 ? "@@SCRIPTS@@\n" : "";
   });
 
-  // Inline text must not close its own tag early.
-  const style = `<style>\n${css.join("\n\n").replace(/<\/style/gi, "<\\/style")}\n</style>`;
-  const script = `<script>\n${js.join("\n\n").replace(/<\/script/gi, "<\\/script")}\n</script>`;
+  // Minify (or not), then inline. Inline text must not close its own tag early.
+  let cssText = css.join("\n\n"), jsText = js.join("\n\n");
+  if (!pretty){
+    cssText = minifyCSS(cssText);
+    // each file is minified on its own; ";" keeps them apart whatever they end with
+    jsText = js.map(f => minifyJS(f)).join(";\n");
+    const short = shortenNames(jsText);
+    if (short.code) jsText = short.code;
+    else console.warn(`Note: names were not shortened (${short.error}); the file still works, it is just larger.`);
+  }
+  const style = `<style>\n${cssText.replace(/<\/style/gi, "<\\/style")}\n</style>`;
+  const script = `<script>\n${jsText.replace(/<\/script/gi, "<\\/script")}\n</script>`;
   html = html.replace("@@STYLES@@", () => style).replace("@@SCRIPTS@@", () => script);
 
   // 4. Tidy blank lines and add a banner.
@@ -81,7 +97,7 @@ function build(){
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, html);
   const kb = (Buffer.byteLength(html) / 1024).toFixed(1);
-  console.log(`Built ${rel(OUT)} v${version}  (${css.length} stylesheets, ${js.length} scripts, ${kb} KB, ${Date.now() - started} ms)`);
+  console.log(`Built ${rel(OUT)} v${version}${pretty ? " (pretty)" : ""}  (${css.length} stylesheets, ${js.length} scripts, ${kb} KB, ${Date.now() - started} ms)`);
 }
 
 function safeBuild(){

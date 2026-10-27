@@ -103,9 +103,18 @@ When you're done, build the single file:
 ```sh
 npm run build        # or: node build.js        -> dist/probest.html
 npm run watch        # or: node build.js --watch (rebuilds on every save)
+node build.js --pretty                         # same file, not minified (for debugging)
 ```
 
 The build needs only [Node.js](https://nodejs.org) 16 or newer — there are no packages to install.
+
+The built file is minified to keep it light (about 340 KB instead of 460 KB). `minify.js` removes comments
+and whitespace and gives variables, parameters and functions short names, using the JavaScript parser that
+comes with Node. Property names, strings and the logic are not touched, so the app works exactly the same;
+the files in `src/` are never changed. If the short names can't be made (for example on an unusual Node
+build), the build says so and writes the file with the long names, which also works. To read or debug
+the built code, use `--pretty`.
+
 `dist/probest.html` is committed on purpose, so the latest app can be downloaded straight from GitHub.
 Rebuild before committing.
 
@@ -113,6 +122,7 @@ Rebuild before committing.
 
 ```
 build.js                  joins src/ into dist/probest.html
+minify.js                 minifies the built CSS and JS (used by build.js)
 package.json              npm run build / npm run watch
 dist/probest.html         the built app (generated — don't edit)
 src/
