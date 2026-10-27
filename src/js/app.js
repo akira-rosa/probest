@@ -88,10 +88,11 @@ function labelFor(id){ return navPages().includes(id) ? t("nav." + id) : null; }
 function route(){
   const id = currentId(), label = labelFor(id);
   if (cleanup){ cleanup(); cleanup = null; }
-  if (PAGES[id]) cleanup = PAGES[id](mainEl) || null;
+  if (id === HOME) cleanup = HomePage(mainEl) || null;
+  else if (PAGES[id]) cleanup = PAGES[id](mainEl) || null;
   else if (label) PlaceholderPage(mainEl, label);
-  else { location.replace("#/" + DEFAULT_PAGE); return; }
-  document.title = `${label} · ${APP.name}`;
+  else { location.replace("#/"); return; }
+  document.title = id === HOME ? APP.name : `${label} · ${APP.name}`;
   revealPage(id);
   renderNav();
   closeNav();

@@ -13,9 +13,11 @@ Open `dist/index.html` in a browser, or copy that one file anywhere (USB stick, 
 
 ## Pages
 
-The sidebar has ten folders: exploratory data analysis, probability, random variables, discrete
-distributions, continuous distributions, estimation, hypothesis tests, correlation and regression,
-design of experiments, and reference. Pages without content yet show a placeholder.
+The app opens on a home page that lists every formula by topic. The sidebar has 21 formulas in
+seven folders: descriptive statistics, probability, discrete random variables, continuous random
+variables, estimation, hypothesis tests, and correlation and regression. Every page is a formula
+and is named after it; pages not built yet show a placeholder. Ideas for later pages are in
+[TODO.md](TODO.md) and stay out of the menu until they are built.
 
 Built so far:
 
@@ -23,8 +25,9 @@ Built so far:
   σ known or a pilot sample (t with n − 1 degrees of freedom), the p(1 − p) ≤ 1/4 bound, and the
   finite population correction n = N·n₀ / (N + n₀ − 1). Examples from Barbetta (Ex. 7.5),
   Bussab & Morettin (Ex. 10.13, 10.14) and the course slides.
-- **Normal** (Continuous distributions): density and cumulative graphs, probability below / above /
-  between / outside, z-scores, inverse lookup, pinned curves. To be updated to the new format.
+- **Normal distribution** (Continuous random variables): density and cumulative graphs, probability
+  below / above / between / outside, z-scores, inverse lookup, pinned curves. To be updated to the
+  new format.
 
 ## Page format
 
@@ -82,6 +85,7 @@ src/
     pages/normal.css      normal distribution page
     pages/sample-size.css sample size page
     pages/placeholder.css "not built yet" page
+    pages/home.css        home page
   js/
     core/app-info.js      app name, version, repository and license (shown in the footer)
     core/util.js          small helpers ($, clamp, trim, store…)
@@ -98,6 +102,7 @@ src/
     pages/normal.js       normal distribution page
     pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet
+    pages/home.js         home page: what the app is and every formula by topic
     app.js                shell: sidebar, search, routing, theme, language, footer — loaded last
 ```
 

@@ -8,7 +8,8 @@
   background:var(--side); border-right:1px solid var(--line);
   display:flex; flex-direction:column; padding:18px 12px 12px;
 }
-.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 16px;font-weight:600;letter-spacing:-.01em}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 16px;font-weight:600;letter-spacing:-.01em;color:var(--ink);text-decoration:none}
+.topbar-name{color:var(--ink);text-decoration:none}
 .mark{
   width:28px;height:28px;border-radius:7px;display:grid;place-items:center;
   background:var(--ink);color:var(--bg);font-family:var(--math);font-size:18px;line-height:1;

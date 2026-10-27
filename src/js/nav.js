@@ -9,19 +9,18 @@
    Pages with an entry in PAGES are live; the rest show a placeholder.
    ============================================================ */
 const NAV = [
-  { folder: "eda",              items: ["frequency-table", "descriptive-measures", "quartiles-boxplot", "two-variables"] },
-  { folder: "probability",      items: ["events", "counting", "conditional", "bayes"] },
-  { folder: "random-variables", items: ["discrete-rv", "continuous-rv"] },
-  { folder: "discrete",         items: ["bernoulli-uniform", "binomial", "hypergeometric", "poisson", "geometric-negbin", "multinomial", "which-model"] },
-  { folder: "continuous",       items: ["uniform", "exponential", "normal", "normal-approx", "student-t"] },
-  { folder: "estimation",       items: ["sampling-mean", "sampling-proportion", "ci-mean", "ci-proportion", "sample-size"] },
-  { folder: "tests",            items: ["test-proportion", "test-mean", "two-groups", "chi-square"] },
-  { folder: "regression",       items: ["correlation", "linear-regression", "multiple-regression"] },
-  { folder: "doe",              items: ["factorial-2k"] },
-  { folder: "reference",        items: ["tables"] },
+  { folder: "descriptive", items: ["mean", "standard-deviation", "quartiles"] },
+  { folder: "probability", items: ["addition-rule", "conditional-probability", "bayes"] },
+  { folder: "discrete",    items: ["expected-value", "binomial", "hypergeometric", "poisson"] },
+  { folder: "continuous",  items: ["uniform", "exponential", "normal"] },
+  { folder: "estimation",  items: ["ci-mean", "ci-proportion", "sample-size"] },
+  { folder: "tests",       items: ["test-mean", "test-proportion", "chi-square"] },
+  { folder: "regression",  items: ["correlation", "linear-regression"] },
 ];
+/* Pages planned for later are listed in TODO.md, not here, so they stay out of the menu. */
 const PAGES = {};          // id -> (root) => cleanup fn
-const DEFAULT_PAGE = "normal";
+const HOME = "home";       // landing page: shown for an empty address and when clicking the app name
+const DEFAULT_PAGE = HOME;
 
 /* ---------- tree helpers ---------- */
 /* Folders are identified by their path, e.g. "distributions/continuous". */
