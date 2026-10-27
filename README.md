@@ -28,17 +28,20 @@ Built so far:
 
 ## Page format
 
-Every calculator page follows the same structure, so students always know where to look:
+Every calculator page follows the same structure, so students always know where to look.
+The interactive part comes first:
 
-1. **Header**: title and one paragraph on what the page is for.
-2. **Formulas**: the general formula next to the same formula with the current values, updated live.
-3. **Graph, controls and result**: the graph can be dragged and zoomed; the result box shows the
+1. **Title.**
+2. **Graph, controls and result**: the graph can be dragged and zoomed; the result box shows the
    answer and the intermediate values.
+3. **Formulas**: the general formula next to the same formula with the current values, updated live,
+   followed by a table defining every variable in the formula with its current value
+   (`varsTableHtml()` in `core/ui.js`).
 4. **Sections** (`sectionsHtml()` in `core/ui.js`):
+   - **About**: a short explanation of what the page calculates, then **Good to know**: rules and
+     remarks from the books (rounding, assumptions, shortcuts).
    - **Examples**: worked examples from Barbetta, Bussab & Morettin or the course slides,
      loaded with one click, each showing its answer and source.
-   - **Symbols**: what each letter in the formula means.
-   - **Good to know**: rules and remarks from the books (rounding, assumptions, shortcuts).
    - **In R**: the same calculation as R code with the current values, with a copy button.
    - **Sources**: book, section, equations and examples used.
 
@@ -87,7 +90,7 @@ src/
     core/mathml.js        builder for formulas (M.frac, M.sqrt, …)
     core/plot.js          canvas graph: pan, zoom, draggable markers, custom axis ticks
     core/ui.js            shared controls (numInput, setSlider, bindNudge) and page sections
-                          (examplesHtml, symbolsHtml, codeHtml, sectionsHtml, bindCopy)
+                          (varsTableHtml, examplesHtml, codeHtml, sectionsHtml, bindCopy)
     locales/en.js         English strings
     locales/pt.js         Portuguese strings
     nav.js                sidebar folder tree (NAV), page registry (PAGES), tree helpers

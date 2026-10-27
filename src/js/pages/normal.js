@@ -31,10 +31,6 @@ PAGES.normal = function NormalPage(root){
       </div>
     </header>
 
-    <section class="formulas" aria-label="${t("formulas")}">
-      <div class="frow"><span class="flabel" id="defLabel"></span><div class="fmath" id="fDef"></div></div>
-      <div class="frow"><span class="flabel">${t("probability")}</span><div class="fmath" id="fProb"></div></div>
-    </section>
 
     <section class="work">
       <div class="plot-col">
@@ -105,6 +101,12 @@ PAGES.normal = function NormalPage(root){
           </div>
         </div>
       </aside>
+    </section>
+
+    <section class="formulas" aria-label="${t("formulas")}">
+      <h2>${t("formulas")}</h2>
+      <div class="frow"><span class="flabel" id="defLabel"></span><div class="fmath" id="fDef"></div></div>
+      <div class="frow"><span class="flabel">${t("probability")}</span><div class="fmath" id="fProb"></div></div>
     </section>
   </div>`;
 

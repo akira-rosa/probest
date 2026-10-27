@@ -74,9 +74,12 @@ I18N.en = {
   "nav.tables": "Statistical tables",
 
   // ---- page sections (every calculator) ----
+  about: "About",
+  varSymbol: "Symbol",
+  varMeaning: "Meaning",
+  varValue: "Value",
   examples: "Examples",
   examplesHint: "Load a worked example from the books or the course slides.",
-  symbols: "Symbols",
   inR: "In R",
   inRHint: "The same calculation in R, with the current values.",
   goodToKnow: "Good to know",
@@ -182,6 +185,8 @@ I18N.en = {
   "ss.sym.eps": "maximum sampling error tolerated (margin of error), in the units of the variable. Barbetta writes E<sub>0</sub>.",
   "ss.sym.sigma": "population standard deviation, from a previous study or from experience",
   "ss.sym.s": "standard deviation of the pilot sample, used in place of σ",
+  "ss.sym.df": "degrees of freedom of t: the pilot sample size minus 1",
+  "ss.sym.pq": "variance of a proportion. With no estimate of p, its largest value 1/4 (at p = 0.5) is used.",
   "ss.sym.p": "expected proportion. With no estimate, the bound p(1 − p) ≤ 1/4 is used.",
   "ss.note.round": "The sample size is the smallest whole number that gives the required precision, so it is always rounded up, never to the nearest whole number.",
   "ss.note.sigma": "σ is usually unknown. Take it from previous studies or experience, or from a pilot sample. With a pilot sample, Barbetta recommends t<sub>γ</sub> with n − 1 degrees of freedom in place of z<sub>γ</sub>.",

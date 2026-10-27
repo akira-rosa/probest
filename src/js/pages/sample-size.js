@@ -11,8 +11,8 @@
    Sources: Barbetta 7.4 (Quadro 7.1) · Bussab & Morettin 10.11
 
    Page format (copy it for new pages):
-     header → formula panel → graph + controls + result → sections
-     (examples, symbols, R code, good to know, sources)
+     title → graph + controls + result → formulas with a table of the variables
+     → about (short explanation, good to know) → examples → R code → sources
    ============================================================ */
 PAGES["sample-size"] = function SampleSizePage(root){
   const S = SampleSizePage.state || (SampleSizePage.state = {
@@ -64,17 +64,7 @@ PAGES["sample-size"] = function SampleSizePage(root){
   const sym = s => `<span class="sym">${s}</span>`;
   root.innerHTML = `
   <div class="page">
-    <header class="page-head">
-      <div>
-        <h1>${t("ss.title")}</h1>
-        <p class="lede">${t("ss.lede", { eps: sym("ε"), gamma: sym("γ"), N: sym("N") })}</p>
-      </div>
-    </header>
-
-    <section class="formulas" aria-label="${t("formulas")}">
-      <div class="frow"><span class="flabel">${t("ss.initial")}</span><div class="fmath" id="fN0"></div></div>
-      <div class="frow"><span class="flabel" id="fNLabel"></span><div class="fmath" id="fN"></div></div>
-    </section>
+    <header class="page-head"><h1>${t("ss.title")}</h1></header>
 
     <section class="work">
       <div class="plot-col">
@@ -167,7 +157,15 @@ PAGES["sample-size"] = function SampleSizePage(root){
       </aside>
     </section>
 
+    <section class="formulas" aria-label="${t("formulas")}">
+      <h2>${t("formulas")}</h2>
+      <div class="frow"><span class="flabel">${t("ss.initial")}</span><div class="fmath" id="fN0"></div></div>
+      <div class="frow"><span class="flabel" id="fNLabel"></span><div class="fmath" id="fN"></div></div>
+      <div id="vars"></div>
+    </section>
+
     ${sectionsHtml({
+      about: t("ss.lede", { eps: sym("ε"), gamma: sym("γ"), N: sym("N") }),
       notes: [t("ss.note.round"), t("ss.note.sigma"), t("ss.note.p"), t("ss.note.two"), t("ss.note.N")],
       sources: [t("ss.src.barbetta"), t("ss.src.bussab"), t("ss.src.slides")],
     })}
@@ -229,19 +227,22 @@ PAGES["sample-size"] = function SampleSizePage(root){
     el("facts").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   }
 
-  /* ---------- sections: symbols and R ---------- */
-  function renderSymbols(R){
+  /* ---------- table of variables (under the formulas) ---------- */
+  function renderVars(R){
+    const num = v => show(v), dec = R.usesT || S.zTable ? 3 : 5;
     const rows = [
-      [M.sub(M.i("n"), M.n(0)), t("ss.sym.n0")],
-      [M.i("n"), t("ss.sym.n")],
+      [M.sub(M.i("n"), M.n(0)), t("ss.sym.n0"), num(nf(R.n0))],
+      [M.i("n"), t("ss.sym.n"), fmtInt(R.size)],
     ];
-    if (S.finite) rows.push([M.i("N"), t("ss.sym.N")]);
-    rows.push([M.i("γ"), t("ss.sym.gamma")]);
-    rows.push(R.usesT ? [critSym(R), t("ss.sym.t")] : [critSym(R), t("ss.sym.z")]);
-    rows.push([M.i("ε"), t("ss.sym.eps")]);
-    if (R.mean) rows.push(R.usesT ? [M.i("s"), t("ss.sym.s")] : [M.i("σ"), t("ss.sym.sigma")]);
-    else rows.push([M.i("p"), t("ss.sym.p")]);
-    el("symbols").innerHTML = symbolsHtml(rows);
+    if (S.finite) rows.push([M.i("N"), t("ss.sym.N"), fmtInt(S.N)]);
+    rows.push([M.i("γ"), t("ss.sym.gamma"), num(trim(S.conf, 2)) + "%"]);
+    rows.push([critSym(R), R.usesT ? t("ss.sym.t") : t("ss.sym.z"), num(trim(R.crit, dec))]);
+    if (R.usesT) rows.push([M.text(t("dfAbbr")), t("ss.sym.df"), String(R.df)]);
+    rows.push([M.i("ε"), t("ss.sym.eps"), num(trim(R.eps, 6)) + (R.mean ? "" : ` (${num(trim(R.eps * 100, 3))}%)`)]);
+    if (R.mean) rows.push(R.usesT ? [M.i("s"), t("ss.sym.s"), num(trim(S.sigma, 4))] : [M.i("σ"), t("ss.sym.sigma"), num(trim(S.sigma, 4))]);
+    else if (S.worst) rows.push([M.row(M.i("p"), M.paren(M.row(M.n(1), M.o(MINUS), M.i("p")))), t("ss.sym.pq"), "≤ " + num("0.25")]);
+    else rows.push([M.i("p"), t("ss.sym.p"), num(trim(S.p, 4))]);
+    el("vars").innerHTML = varsTableHtml(rows);
   }
   function renderR(R){
     const L = [], conf = trim(S.conf / 100, 4), q = `1 - (1 - conf) / 2`;
@@ -305,7 +306,7 @@ PAGES["sample-size"] = function SampleSizePage(root){
   function update(skip){
     const R = compute(S);
     syncInputs(skip, R); renderFormulas(R); renderResult(R); renderChips();
-    renderSymbols(R); renderR(R); markExample(el("examples"), S.example);
+    renderVars(R); renderR(R); markExample(el("examples"), S.example);
     plot.draw();
   }
 

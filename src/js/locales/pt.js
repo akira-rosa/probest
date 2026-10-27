@@ -74,9 +74,12 @@ I18N.pt = {
   "nav.tables": "Tabelas estatísticas",
 
   // ---- page sections (every calculator) ----
+  about: "Sobre",
+  varSymbol: "Símbolo",
+  varMeaning: "Significado",
+  varValue: "Valor",
   examples: "Exemplos",
   examplesHint: "Carregue um exemplo resolvido dos livros ou dos slides da disciplina.",
-  symbols: "Símbolos",
   inR: "No R",
   inRHint: "O mesmo cálculo no R, com os valores atuais.",
   goodToKnow: "Observações",
@@ -182,6 +185,8 @@ I18N.pt = {
   "ss.sym.eps": "erro amostral máximo tolerado, na unidade da variável. Barbetta usa E<sub>0</sub>.",
   "ss.sym.sigma": "desvio padrão populacional, de um estudo anterior ou da experiência",
   "ss.sym.s": "desvio padrão da amostra piloto, usado no lugar de σ",
+  "ss.sym.df": "graus de liberdade da t: o tamanho da amostra piloto menos 1",
+  "ss.sym.pq": "variância de uma proporção. Sem estimativa de p, usa-se seu maior valor, 1/4 (em p = 0,5).",
   "ss.sym.p": "proporção esperada. Sem estimativa, usa-se o limite p(1 − p) ≤ 1/4.",
   "ss.note.round": "O tamanho da amostra é o menor inteiro que garante a precisão desejada, por isso é sempre arredondado para cima, nunca para o inteiro mais próximo.",
   "ss.note.sigma": "Em geral σ é desconhecido. Use o valor de estudos anteriores, da experiência ou de uma amostra piloto. Com amostra piloto, Barbetta recomenda t<sub>γ</sub> com n − 1 graus de liberdade no lugar de z<sub>γ</sub>.",

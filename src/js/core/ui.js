@@ -73,20 +73,28 @@ function bindCopy(el){
   });
 }
 
-/* Symbol list: rows of [MathML for the symbol, description HTML]. */
-const symbolsHtml = rows => `<dl class="symbols">${rows.map(([m, d]) => `<dt><math>${m}</math></dt><dd>${d}</dd>`).join("")}</dl>`;
+/* Table defining every variable in the formula: rows of [MathML symbol, meaning HTML, current value]. */
+const varsTableHtml = rows => `<table class="vars-table">
+  <thead><tr><th>${t("varSymbol")}</th><th>${t("varMeaning")}</th><th>${t("varValue")}</th></tr></thead>
+  <tbody>${rows.map(([m, d, v]) => `<tr><td class="v-sym"><math>${m}</math></td><td class="v-desc">${d}</td><td class="v-val">${v ?? ""}</td></tr>`).join("")}</tbody>
+</table>`;
 const listHtml = (items, cls) => `<ul class="${cls}">${items.map(i => `<li>${i}</li>`).join("")}</ul>`;
 
-/* The standard block of sections. Each page fills #examples, #symbols and #rcode on update. */
-function sectionsHtml({ notes, sources }){
+/* The standard block below the formulas: About (short explanation + good to know), Examples, In R, Sources.
+   Each page fills #examples and #rcode on update. */
+function sectionsHtml({ about, notes, sources }){
   return `<section class="sections">
+    <div class="sect sect-wide">
+      <h2>${t("about")}</h2>
+      <p class="about">${about}</p>
+      <h3>${t("goodToKnow")}</h3>
+      ${listHtml(notes, "notes")}
+    </div>
     <div class="sect sect-wide">
       <h2>${t("examples")}</h2>
       <p class="sect-lede">${t("examplesHint")}</p>
       <div id="examples"></div>
     </div>
-    <div class="sect"><h2>${t("symbols")}</h2><div id="symbols"></div></div>
-    <div class="sect"><h2>${t("goodToKnow")}</h2>${listHtml(notes, "notes")}</div>
     <div class="sect sect-wide">
       <div class="sect-head"><h2>${t("inR")}</h2><button class="btn copy" type="button" data-copy>${t("copy")}</button></div>
       <p class="sect-lede">${t("inRHint")}</p>
