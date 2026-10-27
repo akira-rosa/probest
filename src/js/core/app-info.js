@@ -4,7 +4,8 @@
    Keep `version` equal to the one in package.json (the build checks it).
    ============================================================ */
 const APP = {
-  name: "Stats Workbench",
+  name: "Probest Workbench",
+  author: "L. Akira Rosa",
   version: "0.1.0",
   repo: "https://github.com/akira-rosa/probest",
   license: "MIT",

@@ -21,9 +21,9 @@ I18N.pt = {
   phLink: "Abrir a distribuição normal",
 
   // ---- footer ----
+  byAuthor: "por {a}",
   license: "Licença {l}",
   footSources: "Fontes principais: Barbetta, Reis & Bornia, <em>Estatística para cursos de engenharia e informática</em>, e Bussab & Morettin, <em>Estatística básica</em>. Cada página indica as seções e os exemplos que usa.",
-  footNote: "Livre e de código aberto. Um único arquivo que funciona offline em qualquer navegador moderno.",
 
   // ---- sidebar folders ----
   "folder.eda": "Análise exploratória de dados",

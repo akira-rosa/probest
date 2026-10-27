@@ -21,9 +21,9 @@ I18N.en = {
   phLink: "Open the normal distribution",
 
   // ---- footer ----
+  byAuthor: "by {a}",
   license: "{l} License",
   footSources: "Main sources: Barbetta, Reis & Bornia, <em>Estatística para cursos de engenharia e informática</em>, and Bussab & Morettin, <em>Estatística básica</em>. Each page lists the sections and examples it uses.",
-  footNote: "Free and open source. A single file that works offline in any modern browser.",
 
   // ---- sidebar folders ----
   "folder.eda": "Exploratory data analysis",

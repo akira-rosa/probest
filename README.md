@@ -1,4 +1,4 @@
-# Stats Workbench
+# Probest Workbench
 
 A portable statistics and probability calculator. The finished app is **one HTML file**
 ([`dist/index.html`](dist/index.html)) that runs in any modern browser — no install, no internet connection.
@@ -153,5 +153,5 @@ Recent Chrome, Edge, Firefox and Safari (MathML Core support is required for for
 
 ## License
 
-[MIT](LICENSE) © 2026 Akira Rosa. The worked examples and formulas come from the books cited on each
+[MIT](LICENSE) © 2026 L. Akira Rosa. The worked examples and formulas come from the books cited on each
 page; the books themselves are not included.

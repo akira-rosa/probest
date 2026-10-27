@@ -115,14 +115,13 @@ const ICON_GITHUB = `<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="cur
 function renderFooter(){
   $("#foot").innerHTML = `
     <div class="foot-row">
-      <span class="foot-name"><b>${esc(APP.name)}</b> <span class="foot-ver">v${esc(APP.version)}</span></span>
+      <span class="foot-name"><b>${esc(APP.name)}</b> <span class="foot-ver">v${esc(APP.version)}</span> <span class="foot-author">${t("byAuthor", { a: esc(APP.author) })}</span></span>
       <span class="foot-links">
         <a href="${APP.repo}" target="_blank" rel="noopener">${ICON_GITHUB}GitHub</a>
         <a href="${APP.repo}/blob/main/LICENSE" target="_blank" rel="noopener">${t("license", { l: APP.license })}</a>
       </span>
     </div>
-    <p class="foot-text">${t("footSources")}</p>
-    <p class="foot-text">${t("footNote")}</p>`;
+    <p class="foot-text">${t("footSources")}</p>`;
 }
 
 /* ---------- theme ---------- */
