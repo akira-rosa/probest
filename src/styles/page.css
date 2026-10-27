@@ -74,3 +74,38 @@ canvas#plot.panning{cursor:grabbing}
   .controls .group:nth-child(even){border-left:0}
   .controls .group + .group{border-top:1px solid var(--line)}
 }
+
+/* ---- sections below the graph: examples, symbols, R code, notes, sources ---- */
+.sections{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:18px}
+.sect{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px 18px;min-width:0}
+.sect-wide{grid-column:1 / -1}
+.sect h2{font-size:15px;font-weight:600;margin:0 0 10px}
+.sect-lede{margin:-4px 0 12px;font-size:13.5px;color:var(--muted)}
+.examples{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.example{
+  display:grid;gap:3px;align-content:start;text-align:left;cursor:pointer;
+  padding:10px 12px;border:1px solid var(--line);border-radius:7px;background:var(--bg);
+}
+.example:hover{border-color:var(--faint)}
+.example[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.ex-title{font-size:14px;font-weight:550;line-height:1.3}
+.ex-answer{font-size:13px;color:var(--accent)}
+.ex-source{font-size:12px;color:var(--faint)}
+.symbols{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px 14px;margin:0;font-size:14px;align-items:baseline}
+.symbols dt{font-size:17px;text-align:right;white-space:nowrap}
+.symbols dd{margin:0;color:var(--muted);line-height:1.45}
+.code{
+  margin:0;padding:12px 14px;overflow-x:auto;border:1px solid var(--grid);border-radius:7px;background:var(--bg);
+  font:13px/1.6 ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;font-variant-numeric:normal;
+}
+.code .cmt{color:var(--faint)}
+.sect-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.sect-head h2{margin:0}
+.copy{height:26px;padding:0 10px;font-size:12.5px}
+.notes, .sources{margin:0;padding-left:18px;font-size:14px;line-height:1.5;color:var(--muted)}
+.notes li + li, .sources li + li{margin-top:7px}
+.sources em{color:var(--ink);font-style:italic}
+@media (max-width:860px){
+  .sections{grid-template-columns:minmax(0,1fr)}
+  .sect{padding:14px 16px 16px}
+}

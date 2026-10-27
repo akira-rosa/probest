@@ -13,13 +13,38 @@ Open `dist/index.html` in a browser, or copy that one file anywhere (USB stick, 
 
 ## Pages
 
-- **Normal distribution** (Distributions → Continuous): density and cumulative graphs, probability
-  below / above / between / outside, live formulas, z-scores, inverse lookup, pinned curves.
-- **Sample size for a finite population** (Inference): mean or proportion, confidence level, margin
-  of error, σ or p (or the bound p(1 − p) ≤ 1/4), population size N.
-  n₀ = z²σ²/ε² or z²p(1 − p)/ε², then n = N·n₀ / (N + n₀ − 1), rounded up.
-  Graphs of n against N and against ε. The defaults reproduce the class example
-  (N = 3000, ε = 2%, 95% confidence → n₀ = 2401, n = 1334).
+The sidebar has ten folders: exploratory data analysis, probability, random variables, discrete
+distributions, continuous distributions, estimation, hypothesis tests, correlation and regression,
+design of experiments, and reference. Pages without content yet show a placeholder.
+
+Built so far:
+
+- **Sample size** (Estimation): the reference page for the format below. Mean or proportion,
+  σ known or a pilot sample (t with n − 1 degrees of freedom), the p(1 − p) ≤ 1/4 bound, and the
+  finite population correction n = N·n₀ / (N + n₀ − 1). Examples from Barbetta (Ex. 7.5),
+  Bussab & Morettin (Ex. 10.13, 10.14) and the course slides.
+- **Normal** (Continuous distributions): density and cumulative graphs, probability below / above /
+  between / outside, z-scores, inverse lookup, pinned curves. To be updated to the new format.
+
+## Page format
+
+Every calculator page follows the same structure, so students always know where to look:
+
+1. **Header**: title and one paragraph on what the page is for.
+2. **Formulas**: the general formula next to the same formula with the current values, updated live.
+3. **Graph, controls and result**: the graph can be dragged and zoomed; the result box shows the
+   answer and the intermediate values.
+4. **Sections** (`sectionsHtml()` in `core/ui.js`):
+   - **Examples**: worked examples from Barbetta, Bussab & Morettin or the course slides,
+     loaded with one click, each showing its answer and source.
+   - **Symbols**: what each letter in the formula means.
+   - **Good to know**: rules and remarks from the books (rounding, assumptions, shortcuts).
+   - **In R**: the same calculation as R code with the current values, with a copy button.
+   - **Sources**: book, section, equations and examples used.
+
+`src/js/pages/sample-size.js` is the reference implementation: copy its structure for new pages.
+The main sources are always Barbetta, Reis & Bornia (*Estatística para cursos de engenharia e
+informática*) and Bussab & Morettin (*Estatística básica*), and notation follows them (γ, z<sub>γ</sub>, ε).
 
 ## Developing
 
@@ -58,15 +83,16 @@ src/
     core/util.js          small helpers ($, clamp, trim, store…)
     core/i18n.js          translation engine: t(), setLang(), detectLang()
     core/format.js        number display/parsing per language (show, parseNum, fmtProb)
-    core/numerics.js      maths: normal pdf/cdf/inverse, axis ticks
+    core/numerics.js      maths: normal and Student's t (pdf, cdf, inverse), axis ticks
     core/mathml.js        builder for formulas (M.frac, M.sqrt, …)
     core/plot.js          canvas graph: pan, zoom, draggable markers, custom axis ticks
-    core/ui.js            shared form controls: numInput, setSlider, bindNudge
+    core/ui.js            shared controls (numInput, setSlider, bindNudge) and page sections
+                          (examplesHtml, symbolsHtml, codeHtml, sectionsHtml, bindCopy)
     locales/en.js         English strings
     locales/pt.js         Portuguese strings
     nav.js                sidebar folder tree (NAV), page registry (PAGES), tree helpers
     pages/normal.js       normal distribution page
-    pages/sample-size-finite.js  sample size for a finite population
+    pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet
     app.js                shell: sidebar, search, routing, theme, language — loaded last
 ```
@@ -84,7 +110,7 @@ that order. Avoid reusing a top-level name in two files.
 3. **Page code:** create `src/js/pages/<id>.js` that registers `PAGES["<id>"] = function (root) { … }`.
    It renders into `root` and may return a cleanup function. Read strings with `t("key")` and show
    numbers through `show()` so they get the right decimal separator. Reuse the layout classes from
-   `styles/page.css` and the helpers in `core/ui.js`; `pages/sample-size-finite.js` is a compact example.
+   `styles/page.css` and the helpers in `core/ui.js`, and follow the page format above.
 4. **Styles (optional):** add `src/styles/pages/<id>.css`.
 5. **Register the files** with a `<script>` / `<link>` tag in `src/index.html` (pages go before `app.js`).
 

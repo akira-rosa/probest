@@ -56,3 +56,55 @@ const Num = {
   },
   decimalsFor(step){ return clamp(-Math.floor(Math.log10(step) + 1e-9), 0, 8); }
 };
+
+/* ---------- Student's t ---------- */
+Object.assign(Num, {
+  /* log Γ(x), Lanczos approximation (g = 7, n = 9). */
+  lgamma(x){
+    const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
+      -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+    if (x < 0.5) return Math.log(Math.PI / Math.abs(Math.sin(Math.PI * x))) - Num.lgamma(1 - x);
+    x -= 1; let a = c[0]; const t = x + 7.5;
+    for (let i = 1; i < 9; i++) a += c[i] / (x + i);
+    return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+  },
+  /* Regularized incomplete beta I_x(a, b), continued fraction (Numerical Recipes betacf). */
+  ibeta(x, a, b){
+    if (x <= 0) return 0; if (x >= 1) return 1;
+    const front = Math.exp(Num.lgamma(a + b) - Num.lgamma(a) - Num.lgamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+    if (x > (a + 1) / (a + b + 2)) return 1 - Num.ibeta(1 - x, b, a);
+    const TINY = 1e-300; let f = 1, C = 1, D = 1 - (a + b) * x / (a + 1);
+    D = 1 / (Math.abs(D) < TINY ? TINY : D); f = D;
+    for (let m = 1; m <= 300; m++){
+      for (const num of [m * (b - m) * x / ((a + 2 * m - 1) * (a + 2 * m)), -(a + m) * (a + b + m) * x / ((a + 2 * m) * (a + 2 * m + 1))]){
+        D = 1 + num * D; D = 1 / (Math.abs(D) < TINY ? TINY : D);
+        C = 1 + num / C; if (Math.abs(C) < TINY) C = TINY;
+        f *= C * D;
+      }
+      if (Math.abs(C * D - 1) < 1e-15) break;
+    }
+    return front * f / a;
+  },
+  /* P(T ≤ t) for Student's t with df degrees of freedom. */
+  tCdf(t, df){
+    const tail = 0.5 * Num.ibeta(df / (df + t * t), df / 2, 0.5);
+    return t >= 0 ? 1 - tail : tail;
+  },
+  tPdf(t, df){
+    return Math.exp(Num.lgamma((df + 1) / 2) - Num.lgamma(df / 2) - 0.5 * Math.log(df * Math.PI) - (df + 1) / 2 * Math.log(1 + t * t / df));
+  },
+  /* Inverse of tCdf: Newton steps from the normal quantile, bisection as a safety net. */
+  tInv(p, df){
+    if (p <= 0) return -Infinity; if (p >= 1) return Infinity;
+    let x = Num.PhiInv(p), lo = -1e4, hi = 1e4;
+    for (let i = 0; i < 100; i++){
+      const f = Num.tCdf(x, df) - p;
+      if (Math.abs(f) < 1e-14) break;
+      f > 0 ? (hi = x) : (lo = x);
+      let nx = x - f / Num.tPdf(x, df);
+      if (!(nx > lo && nx < hi)) nx = (lo + hi) / 2;
+      x = nx;
+    }
+    return x;
+  },
+});

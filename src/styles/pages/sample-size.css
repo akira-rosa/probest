@@ -12,3 +12,5 @@
 .check-gap{margin-bottom:14px}
 #meanBox[hidden], #propBox[hidden]{display:none}
 .chip.census .sw{border-top:2px dotted var(--faint)}
+.seg-gap{margin-bottom:12px}
+#pilotRow[hidden], #NRow[hidden]{display:none}

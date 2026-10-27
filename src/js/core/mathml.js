@@ -7,6 +7,7 @@ const M = {
   i: s => `<mi>${s}</mi>`,
   up: s => `<mi mathvariant="normal">${s}</mi>`,
   o: s => `<mo>${s}</mo>`,
+  text: s => `<mtext>${s}</mtext>`,
   t: s => `<mspace width="0.35em"></mspace><mtext>${s}</mtext><mspace width="0.35em"></mspace>`,
   row: (...a) => `<mrow>${a.join("")}</mrow>`,
   frac: (a, b) => `<mfrac>${a}${b}</mfrac>`,
