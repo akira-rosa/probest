@@ -6,7 +6,7 @@ Simply download ([`dist/probest.html`](dist/probest.html)) and open it on a brow
 # Probest Workbench
 
 A portable statistics and probability calculator. The finished app is **one HTML file**
-([`dist/probest.html`](dist/probest.html)) that runs in any modern browser — no install, no internet connection.
+([`dist/probest.html`](dist/probest.html)) that runs in any modern browser - no install, no internet connection.
 
 Each page pairs the formula (general form and with your values substituted), an
 interactive graph, and controls for the variables, so you can see how every input
