@@ -123,12 +123,20 @@ the built code, use `--pretty`.
 `dist/probest.html` is committed on purpose, so the latest app can be downloaded straight from GitHub.
 Rebuild before committing.
 
+### Changes go through pull requests
+
+`main` is protected: nobody pushes to it directly. Every change, whoever makes it, goes on its own
+branch and into a pull request, and reaches `main` only when Akira approves it by merging the pull
+request on GitHub. Rebuild `dist/probest.html` on the branch, so the pull request shows the built app
+too. After a merge, update your copy with `git checkout main` and `git pull`.
+
 ## Project layout
 
 ```
 build.js                  joins src/ into dist/probest.html
 minify.js                 minifies the built CSS and JS (used by build.js)
 package.json              npm run build / npm run watch
+CLAUDE.md                 working rules for Claude (pull requests only)
 dist/probest.html         the built app (generated — don't edit)
 src/
   index.html              page skeleton + the list of styles and scripts, in load order
