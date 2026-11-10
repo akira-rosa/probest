@@ -17,6 +17,14 @@ function openInR(code){
   else location.hash = "#/r";
 }
 
+/* R and webR versions, from the packed R block (build.js writes them there). The block is at
+   the end of the page, so while the page is still loading the versions of vendor/webr are shown;
+   paintStatus() puts in the packed ones once R starts. */
+function rVersions(){
+  const el = document.getElementById("r-pack");
+  return { r: el ? el.dataset.r : "4.6.0", webr: el ? el.dataset.webr : "0.6.0" };
+}
+
 PAGES.r = function RPage(root){
   const ui = RPage.ui || (RPage.ui = { tab: "env", help: null, view: null, helpBack: [] });
 
@@ -101,7 +109,7 @@ PAGES.r = function RPage(root){
     <section class="sections">
       <div class="sect sect-wide">
         <h2>${t("about")}</h2>
-        <p class="about">${t("r.about")}</p>
+        <p class="about" id="rAbout">${t("r.about", rVersions())}</p>
         <h3>${t("goodToKnow")}</h3>
         ${listHtml(["r.note.offline", "r.note.session", "r.note.packages", "r.note.files", "r.note.stop"].map(k => t(k)), "notes")}
       </div>
@@ -128,7 +136,10 @@ PAGES.r = function RPage(root){
       : st === "failed" ? t("r.failed") : st === "closed" ? t("r.closed") : st === "none" ? t("r.none") : t("r.off");
     statusEl.textContent = label;
     statusEl.dataset.state = st === "ready" && busy ? "busy" : st;
-    if (st === "ready" && RSession.versions.r) statusEl.title = `R ${RSession.versions.r} · webR ${RSession.versions.webr}`;
+    if (st === "ready" && RSession.versions.r){
+      statusEl.title = `R ${RSession.versions.r} · webR ${RSession.versions.webr}`;
+      $("#rAbout", root).textContent = t("r.about", RSession.versions);
+    }
     $("#rRestart", root).hidden = st === "none";
     const missing = $("#rMissing", root);
     missing.hidden = st !== "none" && st !== "failed";

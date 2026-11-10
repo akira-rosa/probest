@@ -121,7 +121,8 @@ function build(){
    Every file in vendor/webr/ except the notes (README.md, LICENSE.md, versions.json)
    goes into one block: [4-byte length][JSON index of [path, offset, size]][the files],
    gzip'd and base64'd. webr.js is an ES module; it is wrapped so that it defines only
-   the global WebRLib and runs as a plain script. Cached between builds in watch mode. */
+   the global WebRLib and runs as a plain script (with one fix for Firefox, see classicWebR).
+   Cached between builds in watch mode. */
 const WEBR = path.join(ROOT, "vendor", "webr");
 const WEBR_NOTES = new Set(["README.md", "LICENSE.md", "versions.json"]);
 let rPackCache = null;
@@ -140,7 +141,10 @@ function classicWebR(src){
   if (!m) throw new Error("vendor/webr/webr.js: the export list was not found (has the webR version changed?)");
   if (/^\s*import\s/m.test(src.slice(0, 2000))) throw new Error("vendor/webr/webr.js imports other modules; use the browser build of webr.js");
   const names = m[1].split(",").map(p => { const [local, as] = p.trim().split(/\s+as\s+/); return `${as || local}:${local}`; });
-  return `var WebRLib=(function(){"use strict";${src.slice(0, m.index)};return{${names.join(",")}};})();\n`;
+  // Firefox gives a page opened from a file the origin "null", and webR uses location.origin as a
+  // base address (new URL(x, location.origin)), which then fails; fall back to the page's address.
+  const urlFix = `const URL=class extends globalThis.URL{constructor(u,b){super(u,b==="null"?globalThis.location.href:b)}};`;
+  return `var WebRLib=(function(){"use strict";${urlFix}${src.slice(0, m.index)};return{${names.join(",")}};})();\n`;
 }
 
 function rPack(){

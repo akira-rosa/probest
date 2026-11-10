@@ -66,10 +66,21 @@ const RSession = (() => {
   /* ---------- unpacking ---------- */
   async function unpack(){
     if (packBuf) return packBuf;
-    const b64 = packEl().textContent.trim();
-    const res = await fetch("data:application/octet-stream;base64," + b64);
-    packBuf = await new Response(res.body.pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+    const gz = new Blob([base64Bytes(packEl().textContent.trim())]);
+    packBuf = await new Response(gz.stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
     return packBuf;
+  }
+  /* Base64 → bytes, in slices (a 32 MB data: address is too long for some browsers). */
+  function base64Bytes(b64){
+    if (typeof Uint8Array.fromBase64 === "function") return Uint8Array.fromBase64(b64);
+    const pad = b64.endsWith("==") ? 2 : b64.endsWith("=") ? 1 : 0;
+    const out = new Uint8Array(b64.length / 4 * 3 - pad);
+    let o = 0;
+    for (let i = 0; i < b64.length; i += 1 << 20){
+      const part = atob(b64.slice(i, i + (1 << 20)));
+      for (let j = 0; j < part.length; j++) out[o++] = part.charCodeAt(j);
+    }
+    return out;
   }
   function readPack(buf){
     const headLen = new DataView(buf).getUint32(0, true);
