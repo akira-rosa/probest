@@ -135,8 +135,9 @@ function minifyCSS(css){
   const keep = [];
   const hold = s => `\u0000${keep.push(s) - 1}\u0000`;
   css = css
-    .replace(/url\((?:[^()'"]|'[^']*'|"[^"]*")*\)|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, hold)   // strings and url(…)
-    .replace(/\/\*[\s\S]*?\*\//g, "")
+    // one pass, left to right, so a quote inside a comment or a comment marker inside a string is not misread
+    .replace(/\/\*[\s\S]*?\*\/|url\((?:[^()'"]|'[^']*'|"[^"]*")*\)|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,
+      m => m.startsWith("/*") ? "" : hold(m))                                  // drop comments; keep strings and url(…)
     .replace(/\s+/g, " ")
     .replace(/\s*([{};,>])\s*/g, "$1")
     .replace(/:\s+/g, ":")

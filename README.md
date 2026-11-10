@@ -14,7 +14,8 @@ changes the result. Available in English and Português (Brasil).
 
 It also has an **R console**: real R (4.6, through [webR](https://github.com/r-wasm/webr)) running
 inside the page, offline, with a script editor, plots, help pages, a data viewer and files, laid out
-like RStudio. Every formula page can send its R code there with **Run in R**.
+like RStudio. Every formula page can send its R code there with **Run in R**, and the **R
+documentation** page is a searchable guide to the R used in the course, with runnable examples.
 
 ## Using the app
 
@@ -25,8 +26,8 @@ It is about 32 MB, almost all of it R; everything else is about 0.4 MB.
 
 The app opens on a home page that lists every page by topic. The sidebar has 21 formulas in
 seven folders: descriptive statistics, probability, discrete random variables, continuous random
-variables, estimation, hypothesis tests, and correlation and regression, plus the R console under
-Tools. Every formula page is named after its formula, and all of them are built. Ideas for later pages are in [TODO.md](TODO.md) and
+variables, estimation, hypothesis tests, and correlation and regression, plus the R console and
+the R documentation under Tools. Every formula page is named after its formula, and all of them are built. Ideas for later pages are in [TODO.md](TODO.md) and
 stay out of the menu until they are built.
 
 - **Arithmetic mean, standard deviation and quartiles** (Descriptive statistics): type or paste
@@ -73,6 +74,10 @@ stay out of the menu until they are built.
   in Barbetta's Table 3, so the answers match the book.
 
 - **R console** (Tools): see [The R console](#the-r-console) below.
+- **R documentation** (Tools): 59 short examples in ten topics (basics, data, descriptive statistics,
+  probability, distributions, estimation, tests, correlation and regression, plots, programming), each
+  with Run in R and Copy, and a search over titles, explanations and code. The examples are in
+  `pages/r-guide.js`; their titles and explanations are in the locale files (`rg.*`).
 
 The six distribution pages share one template, `core/distpage.js`: each page in `pages/dist/` only
 gives its parameters, formulas, functions and examples. The data pages share `core/datapage.js`
@@ -223,6 +228,7 @@ src/
     pages/placeholder.js  page shown for entries not built yet
     pages/home.js         home page: the app name and every formula by topic
     pages/r.js            R console page (and openInR, used by the "Run in R" buttons)
+    pages/r-guide.js      R documentation: the examples, by topic
     app.js                shell: sidebar, search, routing, theme, language, footer — loaded last
 ```
 
