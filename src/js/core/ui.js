@@ -55,9 +55,11 @@ function codeHtml(code){
 /* Pad code so trailing comments line up: rLine("n0 <- 1", "initial size"). */
 const rLine = (code, comment, width = 30) => comment ? (code.length >= width ? code + "  " : code.padEnd(width)) + "# " + comment : code;
 
-/* Copy buttons inside el (bind once per page render). */
+/* Copy and "Run in R" buttons inside el (bind once per page render). */
 function bindCopy(el){
   el.addEventListener("click", async e => {
+    const run = e.target.closest("[data-run-r]");
+    if (run){ openInR(run.closest(".sect").querySelector("pre").innerText); return; }
     const b = e.target.closest("[data-copy]"); if (!b) return;
     const text = b.closest(".sect").querySelector("pre").innerText;
     let ok = false;
@@ -98,7 +100,7 @@ function sectionsHtml({ about, notes, sources }){
       <div id="examples"></div>
     </div>
     <div class="sect sect-wide">
-      <div class="sect-head"><h2>${t("inR")}</h2><button class="btn copy" type="button" data-copy>${t("copy")}</button></div>
+      <div class="sect-head"><h2>${t("inR")}</h2><span class="sect-actions"><button class="btn copy" type="button" data-run-r title="${t("runInRTitle")}">${t("runInR")}</button><button class="btn copy" type="button" data-copy>${t("copy")}</button></span></div>
       <p class="sect-lede">${t("inRHint")}</p>
       <div id="rcode"></div>
     </div>
