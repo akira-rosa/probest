@@ -61,7 +61,7 @@ I18N.pt = {
   "nav.chi-square": "Teste qui-quadrado de independência",
   "nav.correlation": "Coeficiente de correlação de Pearson",
   "nav.linear-regression": "Regressão linear simples",
-  "nav.r": "Console do R",
+  "nav.r": "Console R",
 
   // ---- page sections (every calculator) ----
   about: "Sobre",
