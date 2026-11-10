@@ -16,6 +16,7 @@ const NAV = [
   { folder: "estimation",  items: ["ci-mean", "ci-proportion", "sample-size"] },
   { folder: "tests",       items: ["test-mean", "test-proportion", "chi-square"] },
   { folder: "regression",  items: ["correlation", "linear-regression"] },
+  { folder: "tools",       items: ["r"] },
 ];
 /* Pages planned for later are listed in TODO.md, not here, so they stay out of the menu. */
 const PAGES = {};          // id -> (root) => cleanup fn

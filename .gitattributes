@@ -1,1 +1,6 @@
 * text=auto eol=lf
+
+# webR binaries (R compiled to WebAssembly): never diff or merge them as text
+vendor/webr/** binary
+vendor/webr/*.md text
+vendor/webr/*.json text

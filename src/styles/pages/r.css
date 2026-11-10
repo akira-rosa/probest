@@ -1,0 +1,165 @@
+/* R console page (pages/r.js): an RStudio-like workbench. Shared bits used elsewhere:
+   .sect-actions (the "Run in R" + "Copy" buttons) and the code colours (.t-*). */
+:root{
+  --code-kw:#8B3FB8; --code-str:#1A7F37; --code-num:#B05A00; --code-fn:#2448D8; --code-op:#5F6672;
+  --mono: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+  --plot-bg:#FFFFFF;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --code-kw:#D2A8FF; --code-str:#7EE787; --code-num:#FFB46B; --code-fn:#8FA6FF; --code-op:#A1A7B0; }
+}
+:root[data-theme="dark"]{ --code-kw:#D2A8FF; --code-str:#7EE787; --code-num:#FFB46B; --code-fn:#8FA6FF; --code-op:#A1A7B0; }
+
+.t-kw{color:var(--code-kw)}
+.t-str{color:var(--code-str)}
+.t-num{color:var(--code-num)}
+.t-fn{color:var(--code-fn)}
+.t-op{color:var(--code-op)}
+.t-cmt{color:var(--faint);font-style:italic}
+
+.sect-actions{display:flex;gap:6px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:default}
+.link-btn{border:0;background:none;padding:0 2px;color:var(--accent);cursor:pointer;font-size:12.5px}
+.link-btn:hover{text-decoration:underline}
+.link-btn.danger{color:var(--danger)}
+
+/* ---------- page frame ---------- */
+.page-r{max-width:none}
+.r-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.r-head h1{margin-right:2px}
+.r-head-actions{margin-left:auto;display:flex;gap:6px}
+.r-head-actions [hidden]{display:none}
+.r-status{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+.r-status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.r-status[data-state="ready"]::before{background:#2EA043}
+.r-status[data-state="busy"]::before,.r-status[data-state="starting"]::before{background:#D29922;animation:r-pulse 1s ease-in-out infinite alternate}
+.r-status[data-state="failed"]::before,.r-status[data-state="closed"]::before{background:var(--danger)}
+@keyframes r-pulse{to{opacity:.3}}
+@media (prefers-reduced-motion: reduce){ .r-status::before{animation:none!important} }
+.r-missing{margin:0 0 14px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);font-size:14px;color:var(--muted);line-height:1.5}
+.r-missing code, .r-missing kbd{font-family:var(--mono);font-size:12.5px;color:var(--ink)}
+.r-missing[hidden]{display:none}
+
+/* ---------- the workbench ---------- */
+.rw{
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);
+  gap:10px;height:calc(100vh - 150px);min-height:600px;
+}
+.rw-script{grid-column:1;grid-row:1}
+.rw-console{grid-column:1;grid-row:2}
+.rw-side{grid-column:2;grid-row:1 / span 2}
+.rw-pane{display:flex;flex-direction:column;min-height:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.rw-bar{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;border-bottom:1px solid var(--line);min-height:42px;flex-wrap:wrap}
+.rw-bar .btn, .rw-subbar .btn{height:27px;padding:0 9px;font-size:12.5px}
+.rw-title{font-size:13px;font-weight:600}
+.rw-actions{display:flex;align-items:center;gap:5px;margin-left:auto;flex-wrap:wrap}
+.rw-sep{width:1px;height:18px;background:var(--line);margin:0 3px}
+.rw-cwd{font-family:var(--mono);font-size:12px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.rw-empty{margin:0;padding:18px 16px;font-size:13.5px;color:var(--muted);line-height:1.5}
+.rw-subbar{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--grid);margin:0}
+.rw-subbar .icon-btn{width:27px;height:27px;font-size:17px;line-height:1}
+.rw-subbar .icon-btn:disabled{opacity:.35;cursor:default}
+.r-field{flex:1;min-width:0;height:28px;padding:0 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-size:13px}
+
+/* tabs */
+.rw-tabs{gap:2px;padding:0 6px;align-items:stretch;min-height:40px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.rw-tabs button{border:0;background:none;padding:0 10px;font-size:13px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.rw-tabs button:hover{color:var(--ink)}
+.rw-tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:550}
+.rw-tab{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto}
+.rw-tab[hidden]{display:none}
+
+/* ---------- code editor ---------- */
+.rw-ed{flex:1;min-height:0;position:relative}
+.ed{position:absolute;inset:0;display:flex;font:13px/1.55 var(--mono);font-variant-ligatures:none;tab-size:2}
+.ed-gutter{flex:none;width:42px;overflow:hidden;background:var(--bg);border-right:1px solid var(--grid);color:var(--faint);text-align:right;user-select:none}
+.ed-nums{white-space:pre;padding:10px 8px 10px 0;will-change:transform}
+.ed-body{position:relative;flex:1;min-width:0;overflow:hidden}
+.ed-hl, .ed-input{margin:0;padding:10px 12px;font:inherit;letter-spacing:0;white-space:pre;tab-size:inherit;border:0}
+.ed-hl{position:absolute;top:0;left:0;min-width:100%;pointer-events:none;color:var(--ink);will-change:transform}
+.ed-input{
+  position:absolute;inset:0;width:100%;height:100%;resize:none;outline:none;overflow:auto;
+  background:transparent;color:transparent;caret-color:var(--ink);
+}
+.ed-input::selection{background:var(--accent-soft);color:transparent}
+
+/* ---------- console ---------- */
+.con{flex:1;min-height:0;display:flex;flex-direction:column;font:13px/1.5 var(--mono);font-variant-ligatures:none;cursor:text}
+.con-out{flex:0 1 auto;overflow:auto;padding:8px 12px 0;white-space:pre-wrap;word-break:break-word}
+.con-out > div{min-height:1.5em}
+.c-stderr{color:var(--danger)}
+.c-info{color:var(--muted);font-style:italic}
+.c-ps{color:var(--accent);user-select:none}
+.c-echo{color:var(--ink)}
+.c-stdout{color:var(--ink)}
+.con-in{display:flex;align-items:flex-start;padding:0 12px 10px;flex:1 0 auto}
+.con-prompt{color:var(--accent);white-space:pre;min-width:1.4ch;margin-right:.6ch;user-select:none}
+.con-in textarea{flex:1;min-width:0;border:0;outline:none;resize:none;background:none;font:inherit;padding:0;color:var(--ink);overflow:hidden;min-height:1.5em}
+
+/* completion list */
+.r-complete{
+  position:fixed;z-index:60;margin:0;padding:4px;list-style:none;min-width:160px;max-width:320px;max-height:220px;overflow:auto;
+  background:var(--surface);border:1px solid var(--line);border-radius:7px;box-shadow:0 8px 24px rgba(0,0,0,.16);
+  font:12.5px/1.4 var(--mono);
+}
+.r-complete li{padding:3px 8px;border-radius:4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-complete li[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* ---------- tables in the side tabs ---------- */
+.r-table{width:100%;border-collapse:collapse;font-size:13px}
+.r-table th{text-align:left;font-weight:500;font-size:12px;color:var(--muted);padding:6px 10px;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0}
+.r-table td{padding:6px 10px;border-bottom:1px solid var(--grid);vertical-align:baseline}
+.env-name{font-family:var(--mono);font-weight:550;white-space:nowrap;width:1%}
+.env-desc{color:var(--muted);font-size:12.5px}
+.env-preview{font-family:var(--mono);font-size:12px;color:var(--ink);word-break:break-all}
+.files-table .f-name{font-family:var(--mono);font-size:12.5px;word-break:break-all}
+.files-table .f-size{color:var(--muted);font-size:12px;white-space:nowrap;text-align:right;width:1%}
+.files-table .f-act{white-space:nowrap;text-align:right;width:1%}
+
+/* plots: always on white, like paper */
+.pl-count{font-size:12.5px;color:var(--muted);min-width:46px;text-align:center}
+.pl-area{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;background:var(--bg)}
+.pl-area canvas{max-width:100%;max-height:100%;width:auto;height:auto;background:var(--plot-bg);border-radius:4px;box-shadow:0 0 0 1px var(--line)}
+.pl-area canvas[hidden], .pl-area p[hidden]{display:none}
+.r-zoom{position:fixed;inset:0;z-index:70;background:rgba(10,12,16,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;cursor:zoom-out}
+.r-zoom img{max-width:100%;max-height:calc(100% - 50px);background:#fff;border-radius:6px}
+
+/* help pages (HTML made by R) */
+.help-body{flex:1;min-height:0;overflow:auto}
+.help-html{padding:6px 18px 24px;font-size:14px;line-height:1.55}
+.help-html h2{font-size:19px;margin:12px 0 8px}
+.help-html h3{font-size:14.5px;margin:18px 0 6px}
+.help-html table{border-collapse:collapse;font-size:13.5px}
+.help-html td{padding:3px 10px 3px 0;vertical-align:top}
+.help-html td:first-child:not(:only-child){white-space:nowrap;font-family:var(--mono);font-size:12.5px;padding-right:14px}
+.help-html td p{margin:0 0 6px}
+.help-html pre, .help-html code{font-family:var(--mono);font-size:12.5px}
+.help-html pre{background:var(--bg);border:1px solid var(--grid);border-radius:6px;padding:8px 10px;overflow-x:auto}
+.help-html a{color:var(--accent)}
+.help-html hr{border:0;border-top:1px solid var(--line)}
+.help-html img{max-width:100%}
+.help-html > table:first-child{width:100%;color:var(--faint);font-size:12px}
+.help-text{margin:0;padding:12px 16px;font:12.5px/1.5 var(--mono);white-space:pre-wrap}
+
+/* data viewer */
+.data-head{padding:8px 12px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--grid)}
+.data-head:empty{display:none}
+.data-body{flex:1;min-height:0;overflow:auto}
+.data-table{font-family:var(--mono);font-size:12.5px;width:auto;min-width:100%}
+.data-table td, .data-table th{padding:3px 10px}
+.data-table td{text-align:right;white-space:nowrap}
+.data-table tbody th{position:static;color:var(--faint);font-weight:400;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap}
+.data-table thead th{text-align:right;white-space:nowrap}
+.data-table .na{color:var(--faint);font-style:italic}
+
+.r-keys .r-kbd{white-space:nowrap;width:1%}
+.r-keys kbd{font:12px var(--mono);padding:2px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;background:var(--bg)}
+
+@media (max-width:1100px){
+  .rw{grid-template-columns:minmax(0,1fr);grid-template-rows:none;height:auto;min-height:0}
+  .rw-script{grid-row:auto;height:46vh;min-height:300px}
+  .rw-console{grid-row:auto;height:46vh;min-height:300px}
+  .rw-side{grid-column:1;grid-row:auto;height:70vh;min-height:420px}
+}

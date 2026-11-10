@@ -12,16 +12,21 @@ Each page pairs the formula (general form and with your values substituted), an
 interactive graph, and controls for the variables, so you can see how every input
 changes the result. Available in English and Português (Brasil).
 
+It also has an **R console**: real R (4.6, through [webR](https://github.com/r-wasm/webr)) running
+inside the page, offline, with a script editor, plots, help pages, a data viewer and files, laid out
+like RStudio. Every formula page can send its R code there with **Run in R**.
+
 ## Using the app
 
 Open `dist/probest.html` in a browser, or copy that one file anywhere (USB stick, email, shared drive).
+It is about 32 MB, almost all of it R; everything else is about 0.4 MB.
 
 ## Pages
 
-The app opens on a home page that lists every formula by topic. The sidebar has 21 formulas in
+The app opens on a home page that lists every page by topic. The sidebar has 21 formulas in
 seven folders: descriptive statistics, probability, discrete random variables, continuous random
-variables, estimation, hypothesis tests, and correlation and regression. Every page is a formula
-and is named after it, and all 21 are built. Ideas for later pages are in [TODO.md](TODO.md) and
+variables, estimation, hypothesis tests, and correlation and regression, plus the R console under
+Tools. Every formula page is named after its formula, and all of them are built. Ideas for later pages are in [TODO.md](TODO.md) and
 stay out of the menu until they are built.
 
 - **Arithmetic mean, standard deviation and quartiles** (Descriptive statistics): type or paste
@@ -67,12 +72,39 @@ stay out of the menu until they are built.
   lookup and pinned curves. The normal page can round z to 2 decimals and the tail area to 4, as
   in Barbetta's Table 3, so the answers match the book.
 
+- **R console** (Tools): see [The R console](#the-r-console) below.
+
 The six distribution pages share one template, `core/distpage.js`: each page in `pages/dist/` only
 gives its parameters, formulas, functions and examples. The data pages share `core/datapage.js`
 (data box, dot plot with draggable points) in the same way, with their configs in `pages/desc/`.
 The addition rule and conditional probability share `core/vennpage.js`; diagrams that are not x–y
 graphs use the `Board` canvas in `core/board.js`. The two interval pages share `core/cipage.js` and
 the two one-sample tests share `core/testpage.js`, and the paired-data pages share `core/pairpage.js`.
+
+## The R console
+
+`pages/r.js` is an RStudio-like workbench around real R:
+
+- **Script** (top left): an R editor with syntax colours and line numbers. Ctrl+Enter runs the
+  current line (a whole statement if it spans several lines) or the selection, Ctrl+Shift+Enter
+  runs everything, Tab completes names, Ctrl+Shift+C comments lines, Alt+− types `<-`. Open and save
+  `.R` files; the script is kept in the browser between visits.
+- **Console** (bottom left): R's own console loop, so `+` continuation, errors and warnings behave
+  as in R. ↑ and ↓ go through the history, Tab completes, Ctrl+L clears.
+- **Environment, Plots, Help, Data, Files** (right): the objects in the workspace; every plot (step
+  through them, zoom, save as PNG); help pages (`?mean`, with working links); `View(data)`; and the
+  working directory, where you can upload a CSV to read with `read.csv()` and download what R writes.
+
+The session lives as long as the app is open: leaving the page keeps everything. **Restart R** starts
+a new session, and is also the way to stop code that runs too long (webR can't interrupt R when the
+page is opened from a file). `readline()` and `menu()` can't wait for input; packages from CRAN can't
+be installed (that needs the internet), but every base package is there.
+
+How it works: `build.js` packs the webR files from `vendor/webr/` (see its
+[README](vendor/webr/README.md)) into one gzip'd, base64 block at the end of the page.
+`js/r/session.js` unpacks it when the R page first opens (about 1 s), starts R in a Web Worker and
+answers R's file requests from memory, so nothing is downloaded. `js/r/editor.js` has the editor,
+the R syntax colours and Tab completion.
 
 ## Page format
 
@@ -109,11 +141,14 @@ When you're done, build the single file:
 npm run build        # or: node build.js        -> dist/probest.html
 npm run watch        # or: node build.js --watch (rebuilds on every save)
 node build.js --pretty                         # same file, not minified (for debugging)
+node build.js --no-r                           # leave R out: a 0.4 MB file, quicker to rebuild
 ```
+
+R only runs in the built file: in `src/index.html` the R console page says R isn't included.
 
 The build needs only [Node.js](https://nodejs.org) 16 or newer — there are no packages to install.
 
-The built file is minified to keep it light (about 340 KB instead of 460 KB). `minify.js` removes comments
+The app's code is minified to keep it light (about 400 KB instead of 540 KB, without R). `minify.js` removes comments
 and whitespace and gives variables, parameters and functions short names, using the JavaScript parser that
 comes with Node. Property names, strings and the logic are not touched, so the app works exactly the same;
 the files in `src/` are never changed. If the short names can't be made (for example on an unusual Node
@@ -133,9 +168,10 @@ too. After a merge, update your copy with `git checkout main` and `git pull`.
 ## Project layout
 
 ```
-build.js                  joins src/ into dist/probest.html
+build.js                  joins src/ into dist/probest.html (and packs R into it)
 minify.js                 minifies the built CSS and JS (used by build.js)
 package.json              npm run build / npm run watch
+vendor/webr/              R compiled to WebAssembly (webR 0.6.0, R 4.6.0): see its README
 CLAUDE.md                 working rules for Claude (pull requests only)
 dist/probest.html         the built app (generated — don't edit)
 src/
@@ -153,6 +189,7 @@ src/
     pages/sample-size.css sample size page
     pages/placeholder.css "not built yet" page
     pages/home.css        home page
+    pages/r.css           R console (workbench, editor, console, tabs) and the R code colours
   js/
     core/app-info.js      app name, version, repository and license (shown in the footer)
     core/util.js          small helpers ($, clamp, trim, store…)
@@ -170,6 +207,8 @@ src/
     core/pairpage.js      template for the paired-data pages (pairs box, scatter plot)
     core/ui.js            shared controls (numInput, setSlider, bindNudge) and page sections
                           (varsTableHtml, examplesHtml, codeHtml, sectionsHtml, bindCopy)
+    r/session.js          the R session: unpacks webR, starts R, console loop, plots, help, files
+    r/editor.js           R syntax colours, the script editor, Tab completion
     locales/en.js         English strings
     locales/pt.js         Portuguese strings
     nav.js                sidebar folder tree (NAV), page registry (PAGES), tree helpers
@@ -183,6 +222,7 @@ src/
     pages/sample-size.js  sample size (reference page for the format)
     pages/placeholder.js  page shown for entries not built yet
     pages/home.js         home page: the app name and every formula by topic
+    pages/r.js            R console page (and openInR, used by the "Run in R" buttons)
     app.js                shell: sidebar, search, routing, theme, language, footer — loaded last
 ```
 
@@ -244,10 +284,15 @@ into the `src:` line.
 
 ## Browser support
 
-Recent Chrome, Edge, Firefox and Safari (MathML Core support is required for formulas).
+Recent Chrome, Edge, Firefox and Safari (MathML Core support is required for formulas; the R
+console needs `DecompressionStream`, in Chrome and Edge 80+, Firefox 113+ and Safari 16.4+).
 
 ## License
 
-[MIT](LICENSE) © 2026 L. Akira Rosa. Inria Serif is © 2017 The Inria Serif Project Authors, used under
+The source code in this repository is [MIT](LICENSE) © 2026 L. Akira Rosa. The built
+`dist/probest.html` also contains webR, whose binaries (R and other GPL software) are licensed under
+the GNU GPL version 3, so the built file as a whole is distributed under the GPL v3; the MIT-licensed
+code may be used under either. See [vendor/webr/LICENSE.md](vendor/webr/LICENSE.md); the source of R
+and webR is at https://www.r-project.org and https://github.com/r-wasm/webr. Inria Serif is © 2017 The Inria Serif Project Authors, used under
 the [SIL Open Font License 1.1](src/fonts/OFL-InriaSerif.txt). The worked examples and formulas come from the books cited on each
 page; the books themselves are not included.
