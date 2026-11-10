@@ -163,3 +163,20 @@
   .rw-console{grid-row:auto;height:46vh;min-height:300px}
   .rw-side{grid-column:1;grid-row:auto;height:70vh;min-height:420px}
 }
+
+/* ---------- R documentation (pages/r-guide.js) ---------- */
+.rg-tools{display:grid;gap:10px;margin-bottom:16px}
+.rg-search{height:34px;font-size:14px;max-width:520px}
+.rg-toc{display:flex;flex-wrap:wrap;gap:6px}
+.rg-toc .btn{height:28px;font-size:12.5px}
+.rg-sections{margin-top:0}
+.rg-sect{scroll-margin-top:16px}
+.rg-sect[hidden], .rg-item[hidden], .rg-none[hidden]{display:none}
+.rg-items{display:grid;align-items:start;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:12px 16px;margin-top:12px}
+.rg-item{display:flex;flex-direction:column;gap:6px;min-width:0;padding:12px 14px;border:1px solid var(--grid);border-radius:7px;background:var(--bg)}
+.rg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.rg-head h3{margin:3px 0 0;font-size:14px;font-weight:600;line-height:1.35}
+.rg-text{margin:0;font-size:13.5px;line-height:1.45;color:var(--muted)}
+.rg-code{margin-top:2px;background:var(--surface)}
+/* the UI font turns "<-" into an arrow; R pages show R's operators as typed */
+.page-r, .rg-page{font-feature-settings:"calt" 0;font-variant-ligatures:none}
